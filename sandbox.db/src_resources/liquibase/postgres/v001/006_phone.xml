@@ -3,22 +3,21 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
-    <changeSet author="nkabylbai" id="create-enum-Gender">
+
+    <changeSet author="nkabylbai" id="create-enum-PhoneType">
         <sql endDelimiter=";;"><![CDATA[
-      create type Gender as enum ('MALE', 'FEMALE')
+      create type PhoneType as enum ('HOME', 'WORK', 'MOBILE')
     ]]></sql>
     </changeSet>
 
-    <changeSet author="nkabylbai" id="create-table-Accounts">
+
+    <changeSet author="nkabylbai" id="create-table-Phones">
         <sql endDelimiter=";;"><![CDATA[
-      create table Clients (
+      create table Phones (
         id serial primary key,
-        surname varchar(255) not null,
-        name varchar(255) not null,
-        patronymic varchar(255),
-        gender Gender not null,
-        birthDate Date not null,
-        charmId integer references Charms(id) not null,
+        clientId integer references Clients(id),
+        number varchar(30),
+        type PhoneType,
         isActive boolean default true
       )
     ]]></sql>

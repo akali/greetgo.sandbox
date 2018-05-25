@@ -5,6 +5,7 @@ public class Phone {
   public int clientId;
   public String number;
   public PhoneType type;
+  public boolean isActive = true;
 
   public Phone(int id, int clientId, String number, PhoneType type) {
     this.id = id;

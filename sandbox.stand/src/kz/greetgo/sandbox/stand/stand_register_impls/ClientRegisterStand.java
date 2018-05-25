@@ -110,7 +110,7 @@ public class ClientRegisterStand implements ClientRegister {
 
   private AddressDot getAddressDot(int clientId, AddressType addressType) {
     for (AddressDot addressDot : db.get().addressStorage.values()) {
-      if (addressDot.clientId == clientId && addressDot.addressType == addressType) {
+      if (addressDot.clientId == clientId && addressDot.type == addressType) {
         return addressDot;
       }
     }

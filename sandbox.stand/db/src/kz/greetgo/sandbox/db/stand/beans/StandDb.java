@@ -99,7 +99,7 @@ public class StandDb implements HasAfterInject {
     AddressDot a = new AddressDot();
     a.id = Integer.parseInt(splitLine[1].trim());
     a.clientId = Integer.parseInt(splitLine[2].trim());
-    a.addressType = AddressType.valueOf(splitLine[3].trim());
+    a.type = AddressType.valueOf(splitLine[3].trim());
 
     String[] fullAdd = splitLine[4].trim().split(",");
     a.street = fullAdd[0].trim();

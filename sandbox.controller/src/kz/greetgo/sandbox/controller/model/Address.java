@@ -7,6 +7,7 @@ public class Address {
   public String street;
   public String house;
   public String flat;
+  public boolean isActive = true;
 
   public Address() { }
 
