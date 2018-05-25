@@ -17,6 +17,7 @@
         name varchar(255) not null,
         patronymic varchar(255),
         gender Gender not null,
+        birthDate Date not null,
         charmId integer references Charms(id) not null,
         isActive boolean default true
       )
@@ -24,4 +25,3 @@
     </changeSet>
 
 </databaseChangeLog>
-        <!--birthDate Date not null,-->

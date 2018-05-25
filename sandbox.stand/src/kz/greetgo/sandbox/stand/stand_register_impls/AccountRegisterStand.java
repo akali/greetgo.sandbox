@@ -95,7 +95,7 @@ public class AccountRegisterStand implements AccountRegister {
     clientAccountInfo.id = clientDot.id;
     clientAccountInfo.fullName = String.format("%s %s %s", clientDot.name, clientDot.surname, clientDot.patronymic);
     clientAccountInfo.charm = charmRegister.get().getCharm(clientDot.charmId).name;
-    clientAccountInfo.age = calculateYearDiff(new Date(clientDot.birthDate));
+    clientAccountInfo.age = calculateYearDiff(clientDot.birthDate);
 
     List<Account> accounts = getClientAccounts(clientAccountInfo.id);
     if (accounts.size() == 0) return null;

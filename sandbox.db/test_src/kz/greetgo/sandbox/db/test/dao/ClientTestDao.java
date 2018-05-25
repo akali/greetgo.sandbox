@@ -5,8 +5,8 @@ import org.apache.ibatis.annotations.Insert;
 
 public interface ClientTestDao {
 
-  @Insert("insert into Clients ( surname, name, patronymic, gender, charmId ) " +
-    "values ( #{surname}, #{name}, #{patronymic}, #{gender}::Gender, #{charmId} )")
+  @Insert("insert into Clients ( surname, name, patronymic, gender, birthDate, charmId ) " +
+    "values ( #{surname}, #{name}, #{patronymic}, #{gender}::Gender, #{birthDate}, #{charmId} )")
   void insertClientDot(ClientDot clientDot);
 
 }

@@ -1,5 +1,6 @@
 package kz.greetgo.sandbox.controller.model;
 
+import java.util.Date;
 import java.util.List;
 
 public class ClientToSave {
@@ -8,7 +9,7 @@ public class ClientToSave {
   public String surname;
   public String patronymic;
   public Gender gender;
-  public Long birthDate;
+  public Date birthDate;
   public int charmId;
   public Address factAddress;
   public Address regAddress;
