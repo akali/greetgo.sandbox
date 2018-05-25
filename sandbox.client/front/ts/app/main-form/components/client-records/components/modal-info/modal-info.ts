@@ -87,7 +87,7 @@ export class ModalInfoComponent implements OnInit {
       this.form = this.fb.group({
         name: new FormControl(this.name, [Validators.required]),
         surname: new FormControl(this.surname, [Validators.required]),
-        patronymic: new FormControl(this.patronymic, [Validators.required]),
+        patronymic: new FormControl(this.patronymic),
         gender: new FormControl(this.gender, [Validators.required]),
         birthDate: new FormControl(this.birthDate, [Validators.required]),
         charm: new FormControl('', [Validators.required]),
@@ -107,7 +107,7 @@ export class ModalInfoComponent implements OnInit {
       this.form = this.fb.group({
         name: new FormControl(this.name, [Validators.required]),
         surname: new FormControl(this.surname, [Validators.required]),
-        patronymic: new FormControl(this.patronymic, [Validators.required]),
+        patronymic: new FormControl(this.patronymic),
         gender: new FormControl(this.gender, [Validators.required]),
         birthDate: new FormControl(this.birthDate, [Validators.required]),
         charm: new FormControl(this.charmId, [Validators.required]),

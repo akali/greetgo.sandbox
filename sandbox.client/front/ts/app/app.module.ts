@@ -10,6 +10,7 @@ import {ModalInfoComponent} from "./main-form/components/client-records/componen
 import {MainFormComponent} from "./main-form/main-form";
 import {AccountTableComponent} from "./main-form/components/client-records/components/account-table/account-table";
 import {ClientRecordsComponent} from "./main-form/components/client-records/client-records";
+import {OnlyNumber} from "../utils/OnlyNumber";
 
 import {HttpService} from "./HttpService";
 import {AccountService} from "./services/AccountService";
@@ -105,7 +106,8 @@ import 'hammerjs'
     ReactiveFormsModule,
   ],
   declarations: [
-    RootComponent, LoginComponent, MainFormComponent, ModalInfoComponent, AccountTableComponent, ClientRecordsComponent
+    RootComponent, LoginComponent, MainFormComponent,
+    ModalInfoComponent, AccountTableComponent, ClientRecordsComponent, OnlyNumber
   ],
   bootstrap: [RootComponent],
   providers: [HttpService, AccountService],
