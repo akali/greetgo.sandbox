@@ -31,4 +31,10 @@ public class AccountDot {
     this.number = number;
     this.registeredAt = registeredAt;
   }
+
+  public void showInfo() {
+    System.out.println(
+      String.format("----------: Init Account { id:%2d, clientId:%2d, money:%2f, number:%s}",
+        this.id, this.clientId, this.money, this.number));
+  }
 }

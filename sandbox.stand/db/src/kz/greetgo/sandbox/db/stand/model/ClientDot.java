@@ -24,4 +24,10 @@ public class ClientDot {
     this.birthDate = birthDate;
     this.charmId = charmId;
   }
+
+  public void showInfo() {
+    System.out.println(
+      String.format("----------: Init Client { id:%2d, name:%s %s %s}",
+        this.id, this.surname, this.name, this.patronymic));
+  }
 }
