@@ -46,7 +46,7 @@ export class ModalInfoComponent implements OnInit {
 
   charmsDictionary: Charm[];
 
-  DUMB_ID = 1;
+  DUMB_ID = -1;
 
   errorMessage: string | null = null;
 
