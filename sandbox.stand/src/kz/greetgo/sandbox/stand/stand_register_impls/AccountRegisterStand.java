@@ -23,7 +23,7 @@ public class AccountRegisterStand implements AccountRegister {
 
   @Override
   public ClientAccountInfoPage getClientAccountInfo(TableRequestDetails requestDetails) {
-    ArrayList<ClientAccountInfo> clientAccountInfoList = new ArrayList<>();
+    List<ClientAccountInfo> clientAccountInfoList = new ArrayList<>();
 
     for (ClientDot clientDot : db.get().clientStorage.values()) {
       if (clientDot.isActive) {
@@ -43,14 +43,16 @@ public class AccountRegisterStand implements AccountRegister {
     return new ClientAccountInfoPage(clientAccountInfoList, totalAccountInfoCount);
   }
 
-  private ArrayList<ClientAccountInfo> filter(ArrayList<ClientAccountInfo> list, String filterValue) {
+  @Override
+  public List<ClientAccountInfo> filter(List<ClientAccountInfo> list, String filterValue) {
     return list.stream()
       .filter(a -> a.fullName.replaceAll("\\s+", "").toLowerCase()
         .contains(filterValue.replaceAll("\\s+", "").toLowerCase())
       ).collect(Collectors.toCollection(ArrayList::new));
   }
 
-  private ArrayList<ClientAccountInfo> sort(ArrayList<ClientAccountInfo> list, SortColumn column, SortDirection direction) {
+  @Override
+  public List<ClientAccountInfo> sort(List<ClientAccountInfo> list, SortColumn column, SortDirection direction) {
 
     switch (column) {
       case FIO:
@@ -75,7 +77,8 @@ public class AccountRegisterStand implements AccountRegister {
     return list;
   }
 
-  private ArrayList<ClientAccountInfo> paginate(ArrayList<ClientAccountInfo> list, int pageIndex, int pageSize) {
+  @Override
+  public List<ClientAccountInfo> paginate(List<ClientAccountInfo> list, int pageIndex, int pageSize) {
     int fromIndex = pageIndex * pageSize;
     int toIndex = fromIndex + pageSize;
     if (fromIndex > list.size()) fromIndex = 0;
@@ -94,17 +97,20 @@ public class AccountRegisterStand implements AccountRegister {
     clientAccountInfo.charm = charmRegister.get().getCharm(clientDot.charmId).name;
     clientAccountInfo.age = calculateYearDiff(new Date(clientDot.birthDate));
 
-    ArrayList<Account> accounts = selectAccountsByClientId(clientAccountInfo.id);
+    List<Account> accounts = getClientAccounts(clientAccountInfo.id);
     if (accounts.size() == 0) return null;
 
-    clientAccountInfo.totalAccBalance = getTotalAccBalance(accounts);
-    clientAccountInfo.minAccBalance = getMinAccBalance(accounts);
-    clientAccountInfo.maxAccBalance = getMaxAccBalance(accounts);
+    clientAccountInfo.totalAccBalance = getTotalAccBalance(clientId);
+    clientAccountInfo.minAccBalance = getMinAccBalance(clientId);
+    clientAccountInfo.maxAccBalance = getMaxAccBalance(clientId);
 
     return clientAccountInfo;
   }
 
-  private float getMinAccBalance(ArrayList<Account> accounts) {
+  @Override
+  public float getMinAccBalance(int clientId) {
+    List<Account> accounts = getClientAccounts(clientId);
+
     float result = accounts.get(0).money;
     for (int i = 1; i < accounts.size(); i++) {
       Account curAcc = accounts.get(i);
@@ -113,7 +119,10 @@ public class AccountRegisterStand implements AccountRegister {
     return result;
   }
 
-  private float getMaxAccBalance(ArrayList<Account> accounts) {
+  @Override
+  public float getMaxAccBalance(int clientId) {
+    List<Account> accounts = getClientAccounts(clientId);
+
     float result = accounts.get(0).money;
     for (int i = 1; i < accounts.size(); i++) {
       Account curAcc = accounts.get(i);
@@ -122,8 +131,10 @@ public class AccountRegisterStand implements AccountRegister {
     return result;
   }
 
+  @Override
+  public float getTotalAccBalance(int clientId) {
+    List<Account> accounts = getClientAccounts(clientId);
 
-  private float getTotalAccBalance(ArrayList<Account> accounts) {
     float result = 0f;
     for (Account acc : accounts) {
       result += acc.money;
@@ -131,7 +142,8 @@ public class AccountRegisterStand implements AccountRegister {
     return result;
   }
 
-  private ArrayList<Account> selectAccountsByClientId(int clientId) {
+  @Override
+  public List<Account> getClientAccounts(int clientId) {
     ArrayList<Account> accounts = new ArrayList<>();
 
     for (AccountDot accountDot : db.get().accountStorage.values()) {
