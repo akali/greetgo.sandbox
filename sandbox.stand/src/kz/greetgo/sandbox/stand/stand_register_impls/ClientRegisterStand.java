@@ -100,7 +100,7 @@ public class ClientRegisterStand implements ClientRegister {
     removeAllAddresses(clientId);
     removeAllPhones(clientId);
 
-    return accountRegister.get().getAllAccountInfo(requestDetails);
+    return accountRegister.get().getClientAccountInfo(requestDetails);
   }
 
   private void disableClientDot(int clientId) {

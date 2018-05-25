@@ -18,9 +18,9 @@ public class AccountController implements Controller {
   public BeanGetter<AccountRegister> accInfoRegister;
 
   @ToJson
-  @Mapping("/")
-  public ClientAccountInfoPage getAllAccountInfo(@Json @Par("requestDetails") TableRequestDetails requestDetails) {
-    return accInfoRegister.get().getAllAccountInfo(requestDetails);
+  @Mapping("/getClientAccountInfoPage")
+  public ClientAccountInfoPage getClientAccountInfoPage(@Json @Par("requestDetails") TableRequestDetails requestDetails) {
+    return accInfoRegister.get().getClientAccountInfo(requestDetails);
   }
 
 }

@@ -115,7 +115,8 @@ export class AccountTableComponent implements OnDestroy {
     console.log(requestDetails.toString());
     this.dataSource.startLoading();
 
-    this.httpService.get("/accounts/", {requestDetails: JSON.stringify(requestDetails)}).toPromise().then(response => {
+    this.httpService.get("/accounts/getClientAccountInfoPage",
+      {requestDetails: JSON.stringify(requestDetails)}).toPromise().then(response => {
       this.onAccountInfoListRequestSuccess(response);
     }, error => {
       console.log(error);
@@ -147,7 +148,7 @@ export class AccountTableComponent implements OnDestroy {
   private requestClientDelete(clientId: number) {
     const requestDetails = this.getRequestDetails();
 
-    this.httpService.post("/client/delete",
+    this.httpService.post("/client/deleteClient",
       {clientId: clientId, requestDetails: JSON.stringify(requestDetails)}).toPromise().then(response => {
       this.onClientDeleteSuccess(response);
     }, error => {

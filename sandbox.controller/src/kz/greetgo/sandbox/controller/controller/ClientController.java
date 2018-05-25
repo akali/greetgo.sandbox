@@ -14,25 +14,25 @@ public class ClientController implements Controller {
   public BeanGetter<ClientRegister> clientRegister;
 
   @ToJson
-  @Mapping("/info")
-  public ClientDetails getClientInfo(@Par("clientId") int clientId) {
+  @Mapping("/getClientDetails")
+  public ClientDetails getClientDetails(@Par("clientId") int clientId) {
     return clientRegister.get().getClientDetails(clientId);
   }
 
   @ToJson()
-  @Mapping("/create")
-  public ClientAccountInfo createNewClient(@Json @Par("clientToSave") ClientToSave clientToSave) {
+  @Mapping("/createClient")
+  public ClientAccountInfo createClient(@Json @Par("clientToSave") ClientToSave clientToSave) {
     return clientRegister.get().createNewClient(clientToSave);
   }
 
   @ToJson()
-  @Mapping("/edit")
+  @Mapping("/editClient")
   public ClientAccountInfo editClient(@Json @Par("clientToSave") ClientToSave clientToSave) {
     return clientRegister.get().editClient(clientToSave);
   }
 
   @ToJson()
-  @Mapping("/delete")
+  @Mapping("/deleteClient")
   public ClientAccountInfoPage deleteClient(@Par("clientId") int clientId,
                                             @Json @Par("requestDetails") TableRequestDetails requestDetails) {
     return clientRegister.get().deleteClient(clientId, requestDetails);

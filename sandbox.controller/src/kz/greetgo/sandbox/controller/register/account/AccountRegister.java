@@ -5,6 +5,6 @@ import kz.greetgo.sandbox.controller.model.ClientAccountInfoPage;
 import kz.greetgo.sandbox.controller.model.TableRequestDetails;
 
 public interface AccountRegister {
-  ClientAccountInfoPage getAllAccountInfo(TableRequestDetails requestDetails);
+  ClientAccountInfoPage getClientAccountInfo(TableRequestDetails requestDetails);
   ClientAccountInfo getAccountInfo(int clientId);
 }

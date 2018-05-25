@@ -22,7 +22,7 @@ public class AccountRegisterStand implements AccountRegister {
   public BeanGetter<CharmRegister> charmRegister;
 
   @Override
-  public ClientAccountInfoPage getAllAccountInfo(TableRequestDetails requestDetails) {
+  public ClientAccountInfoPage getClientAccountInfo(TableRequestDetails requestDetails) {
     ArrayList<ClientAccountInfo> clientAccountInfoList = new ArrayList<>();
 
     for (ClientDot clientDot : db.get().clientStorage.values()) {
