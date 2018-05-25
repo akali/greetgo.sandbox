@@ -6,10 +6,11 @@
     <changeSet author="nkabylbai" id="create-table-Charms">
         <sql endDelimiter=";;"><![CDATA[
       create table Charms (
-        charmId serial primary key,
+        id serial primary key,
         name varchar(50) not null,
         description text,
-        energy float(4)
+        energy float(4),
+        isActive boolean default true
       )
     ]]></sql>
     </changeSet>
