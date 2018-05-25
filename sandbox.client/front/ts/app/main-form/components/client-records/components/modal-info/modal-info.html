@@ -4,11 +4,11 @@
     <mat-dialog-content [formGroup]="form" class="modal-form">
 
         <mat-form-field>
-            <input matInput placeholder="Name" formControlName="name" required />
+            <input matInput placeholder="Surname" formControlName="surname" required />
         </mat-form-field>
 
         <mat-form-field>
-            <input matInput placeholder="Surname" formControlName="surname" required />
+            <input matInput placeholder="Name" formControlName="name" required />
         </mat-form-field>
 
         <mat-form-field>
@@ -27,7 +27,7 @@
         </mat-form-field>
 
         <mat-form-field required>
-            <mat-label>Please, choose a charm</mat-label>
+            <mat-label>Please, choose a charm *</mat-label>
             <mat-select formControlName="charm">
                 <mat-option
                     *ngFor="let charm of charmsDictionary" [value]="charm.id">{{ charm.name }}</mat-option>
