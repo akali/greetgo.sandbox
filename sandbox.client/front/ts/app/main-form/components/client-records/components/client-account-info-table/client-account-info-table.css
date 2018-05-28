@@ -29,11 +29,11 @@
 
 .account-button-row {
     display: flex;
-    align-items: center;
-    justify-content: space-around;
+    align-items: right;
 }
 
 .account-button {
     border: 1px solid #3f51b5;
     font-weight: bold;
+    margin: 5px;
 }
