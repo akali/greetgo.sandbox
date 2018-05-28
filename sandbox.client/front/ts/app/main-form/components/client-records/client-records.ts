@@ -1,7 +1,7 @@
 import {Component, OnDestroy} from "@angular/core";
 import {HttpService} from "../../../HttpService";
 import {MatDialog, MatDialogConfig} from "@angular/material";
-import {ModalInfoComponent} from "./components/modal-info/modal-info";
+import {ModalClientDetailsComponent} from "./components/modal-client-details/modal-client-details";
 import {ActionType} from "../../../../utils/ActionType";
 
 @Component({
@@ -27,7 +27,7 @@ export class ClientRecordsComponent {
     dialogConfig.autoFocus = true;
     dialogConfig.data = {clientId: clientId, actionType: actionType};
 
-    const dialogRef = this.dialog.open(ModalInfoComponent, dialogConfig);
+    const dialogRef = this.dialog.open(ModalClientDetailsComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe(data => {
       console.log(data);

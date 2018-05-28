@@ -16,11 +16,11 @@ import {Constants} from "../../../../../../utils/Constants";
 import {ClientDetails} from "../../../../../../model/ClientDetails";
 
 @Component({
-  selector: 'modal-info-component',
-  template: require('./modal-info.html'),
-  styles: [require('./modal-info.css')],
+  selector: 'modal-client-details-component',
+  template: require('./modal-client-details.html'),
+  styles: [require('./modal-client-details.css')],
 })
-export class ModalInfoComponent implements OnInit {
+export class ModalClientDetailsComponent implements OnInit {
 
   actionType: ActionType;
 

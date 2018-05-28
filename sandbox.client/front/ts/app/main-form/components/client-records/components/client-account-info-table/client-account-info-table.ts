@@ -15,11 +15,11 @@ import {Subject} from "rxjs/Subject";
 import 'rxjs/add/operator/takeUntil';
 
 @Component({
-  selector: 'table-basic-example',
-  styles: [require('./account-table.css')],
-  template: require('./account-table.html'),
+  selector: 'client-account-info-table',
+  styles: [require('./client-account-info-table')],
+  template: require('./client-account-info-table.html'),
 })
-export class AccountTableComponent implements OnDestroy {
+export class ClientAccountInfoTableComponent implements OnDestroy {
 
   private unsubscribe = new Subject<void>();
 

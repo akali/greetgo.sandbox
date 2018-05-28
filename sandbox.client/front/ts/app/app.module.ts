@@ -6,9 +6,8 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 import {RootComponent} from "./root.component";
 import {LoginComponent} from "./input/login.component";
-import {ModalInfoComponent} from "./main-form/components/client-records/components/modal-info/modal-info";
+import {ModalClientDetailsComponent} from "./main-form/components/client-records/components/modal-client-details/modal-client-details";
 import {MainFormComponent} from "./main-form/main-form";
-import {AccountTableComponent} from "./main-form/components/client-records/components/account-table/account-table";
 import {ClientRecordsComponent} from "./main-form/components/client-records/client-records";
 import {OnlyNumber} from "../utils/OnlyNumber";
 
@@ -107,11 +106,11 @@ import 'hammerjs'
   ],
   declarations: [
     RootComponent, LoginComponent, MainFormComponent,
-    ModalInfoComponent, AccountTableComponent, ClientRecordsComponent, OnlyNumber
+    ModalClientDetailsComponent, ClientAccountInfoTableComponent, ClientRecordsComponent, OnlyNumber
   ],
   bootstrap: [RootComponent],
   providers: [HttpService, AccountService],
-  entryComponents: [ModalInfoComponent],
+  entryComponents: [ModalClientDetailsComponent],
 })
 export class AppModule {
 }
