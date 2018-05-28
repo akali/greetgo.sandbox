@@ -1,6 +1,6 @@
 package kz.greetgo.sandbox.controller.model;
 
-public class ClientAccountInfo {
+public class ClientAccountRecord {
   public int clientId;
   public String clientFullName;
   public String clientCharmName;
@@ -9,5 +9,5 @@ public class ClientAccountInfo {
   public float maxAccBalance;
   public float minAccBalance;
 
-  public ClientAccountInfo() { }
+  public ClientAccountRecord() { }
 }

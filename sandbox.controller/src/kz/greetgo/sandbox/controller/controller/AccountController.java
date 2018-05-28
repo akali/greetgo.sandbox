@@ -6,7 +6,7 @@ import kz.greetgo.mvc.annotations.Json;
 import kz.greetgo.mvc.annotations.Mapping;
 import kz.greetgo.mvc.annotations.Par;
 import kz.greetgo.mvc.annotations.ToJson;
-import kz.greetgo.sandbox.controller.model.ClientAccountInfoPage;
+import kz.greetgo.sandbox.controller.model.ClientAccountRecordPage;
 import kz.greetgo.sandbox.controller.model.TableRequestDetails;
 import kz.greetgo.sandbox.controller.register.account.AccountRegister;
 import kz.greetgo.sandbox.controller.util.Controller;
@@ -19,8 +19,8 @@ public class AccountController implements Controller {
 
   @ToJson
   @Mapping("/getClientAccountInfoPage")
-  public ClientAccountInfoPage getClientAccountInfoPage(@Json @Par("requestDetails") TableRequestDetails requestDetails) {
-    return accInfoRegister.get().getClientAccountInfo(requestDetails);
+  public ClientAccountRecordPage getClientAccountInfoPage(@Json @Par("requestDetails") TableRequestDetails requestDetails) {
+    return accInfoRegister.get().getClientAccountRecordPage(requestDetails);
   }
 
 }

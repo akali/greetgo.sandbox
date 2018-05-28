@@ -22,12 +22,12 @@ public class AccountRegisterStand implements AccountRegister {
   public BeanGetter<CharmRegister> charmRegister;
 
   @Override
-  public ClientAccountInfoPage getClientAccountInfo(TableRequestDetails requestDetails) {
-    List<ClientAccountInfo> clientAccountInfoList = new ArrayList<>();
+  public ClientAccountRecordPage getClientAccountRecordPage(TableRequestDetails requestDetails) {
+    List<ClientAccountRecord> clientAccountInfoList = new ArrayList<>();
 
     for (ClientDot clientDot : db.get().clientStorage.values()) {
       if (clientDot.isActive) {
-        ClientAccountInfo clientAccountInfo = getAccountInfo(clientDot.id);
+        ClientAccountRecord clientAccountInfo = getClientAccountRecord(clientDot.id);
         clientAccountInfoList.add(clientAccountInfo);
       }
     }
@@ -40,11 +40,11 @@ public class AccountRegisterStand implements AccountRegister {
     clientAccountInfoList = paginate(clientAccountInfoList, requestDetails.pageIndex, requestDetails.pageSize);
 
 
-    return new ClientAccountInfoPage(clientAccountInfoList, totalAccountInfoCount);
+    return new ClientAccountRecordPage(clientAccountInfoList, totalAccountInfoCount);
   }
 
   @Override
-  public List<ClientAccountInfo> filter(List<ClientAccountInfo> list, String filterValue) {
+  public List<ClientAccountRecord> filter(List<ClientAccountRecord> list, String filterValue) {
     return list.stream()
       .filter(a -> a.clientFullName.replaceAll("\\s+", "").toLowerCase()
         .contains(filterValue.replaceAll("\\s+", "").toLowerCase())
@@ -52,7 +52,7 @@ public class AccountRegisterStand implements AccountRegister {
   }
 
   @Override
-  public List<ClientAccountInfo> sort(List<ClientAccountInfo> list, SortColumn column, SortDirection direction) {
+  public List<ClientAccountRecord> sort(List<ClientAccountRecord> list, SortColumn column, SortDirection direction) {
 
     switch (column) {
       case FIO:
@@ -62,13 +62,13 @@ public class AccountRegisterStand implements AccountRegister {
         list.sort(Comparator.comparingInt(a -> a.clientAge));
         break;
       case TOTAL:
-        list.sort((ClientAccountInfo a1, ClientAccountInfo a2) -> (int) (a1.totalAccBalance - a2.totalAccBalance));
+        list.sort((ClientAccountRecord a1, ClientAccountRecord a2) -> (int) (a1.totalAccBalance - a2.totalAccBalance));
         break;
       case MAX:
-        list.sort((ClientAccountInfo a1, ClientAccountInfo a2) -> (int) (a1.maxAccBalance - a2.maxAccBalance));
+        list.sort((ClientAccountRecord a1, ClientAccountRecord a2) -> (int) (a1.maxAccBalance - a2.maxAccBalance));
         break;
       case MIN:
-        list.sort((ClientAccountInfo a1, ClientAccountInfo a2) -> (int) (a1.minAccBalance - a2.minAccBalance));
+        list.sort((ClientAccountRecord a1, ClientAccountRecord a2) -> (int) (a1.minAccBalance - a2.minAccBalance));
         break;
     }
 
@@ -78,7 +78,7 @@ public class AccountRegisterStand implements AccountRegister {
   }
 
   @Override
-  public List<ClientAccountInfo> paginate(List<ClientAccountInfo> list, int pageIndex, int pageSize) {
+  public List<ClientAccountRecord> paginate(List<ClientAccountRecord> list, int pageIndex, int pageSize) {
     int fromIndex = pageIndex * pageSize;
     int toIndex = fromIndex + pageSize;
     if (fromIndex > list.size()) fromIndex = 0;
@@ -88,10 +88,10 @@ public class AccountRegisterStand implements AccountRegister {
   }
 
   @Override
-  public ClientAccountInfo getAccountInfo(int clientId) {
+  public ClientAccountRecord getClientAccountRecord(int clientId) {
     ClientDot clientDot = db.get().clientStorage.get(clientId);
 
-    ClientAccountInfo clientAccountInfo = new ClientAccountInfo();
+    ClientAccountRecord clientAccountInfo = new ClientAccountRecord();
     clientAccountInfo.clientId = clientDot.id;
     clientAccountInfo.clientFullName = String.format("%s %s %s", clientDot.name, clientDot.surname, clientDot.patronymic);
     clientAccountInfo.clientCharmName = charmRegister.get().getCharm(clientDot.charmId).name;

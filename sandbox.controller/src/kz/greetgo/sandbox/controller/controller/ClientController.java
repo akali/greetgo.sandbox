@@ -21,20 +21,20 @@ public class ClientController implements Controller {
 
   @ToJson()
   @Mapping("/createClient")
-  public ClientAccountInfo createClient(@Json @Par("clientToSave") ClientToSave clientToSave) {
+  public ClientAccountRecord createClient(@Json @Par("clientToSave") ClientToSave clientToSave) {
     return clientRegister.get().createNewClient(clientToSave);
   }
 
   @ToJson()
   @Mapping("/editClient")
-  public ClientAccountInfo editClient(@Json @Par("clientToSave") ClientToSave clientToSave) {
+  public ClientAccountRecord editClient(@Json @Par("clientToSave") ClientToSave clientToSave) {
     return clientRegister.get().editClient(clientToSave);
   }
 
   @ToJson()
   @Mapping("/deleteClient")
-  public ClientAccountInfoPage deleteClient(@Par("clientId") int clientId,
-                                            @Json @Par("requestDetails") TableRequestDetails requestDetails) {
+  public ClientAccountRecordPage deleteClient(@Par("clientId") int clientId,
+                                              @Json @Par("requestDetails") TableRequestDetails requestDetails) {
     return clientRegister.get().deleteClient(clientId, requestDetails);
   }
 }

@@ -1,7 +1,7 @@
 import {Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild} from '@angular/core';
 import {MatPaginator, MatSort} from "@angular/material";
 import {SelectionModel} from "@angular/cdk/collections";
-import {ClientAccountInfo} from "../../../../../../model/ClientAccountInfo";
+import {ClientAccountInfo} from "../../../../../../model/ClientAccountRecord";
 import {HttpService} from "../../../../../HttpService";
 import {GenericDataSource} from "./GenericDataSource";
 import {debounceTime, distinctUntilChanged, tap} from "rxjs/operators";
@@ -10,7 +10,7 @@ import {AccountService} from "../../../../../services/AccountService";
 import {SortDirection} from "../../../../../../model/SortDirection";
 import {TableRequestDetails} from "../../../../../../model/TableRequestDetails";
 import {SortColumn} from "../../../../../../model/SortColumn";
-import {ClientAccountInfoPage} from "../../../../../../model/ClientAccountInfoPage";
+import {ClientAccountInfoPage} from "../../../../../../model/ClientAccounRecordPage";
 import {Subject} from "rxjs/Subject";
 import 'rxjs/add/operator/takeUntil';
 

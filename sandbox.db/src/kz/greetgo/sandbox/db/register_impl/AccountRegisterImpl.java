@@ -8,27 +8,27 @@ import java.util.List;
 public class AccountRegisterImpl implements AccountRegister {
 
   @Override
-  public ClientAccountInfoPage getClientAccountInfo(TableRequestDetails requestDetails) {
+  public ClientAccountRecordPage getClientAccountRecordPage(TableRequestDetails requestDetails) {
     return null;
   }
 
   @Override
-  public ClientAccountInfo getAccountInfo(int clientId) {
+  public ClientAccountRecord getAccountInfo(int clientId) {
     return null;
   }
 
   @Override
-  public List<ClientAccountInfo> filter(List<ClientAccountInfo> list, String filterValue) {
+  public List<ClientAccountRecord> filter(List<ClientAccountRecord> list, String filterValue) {
     return null;
   }
 
   @Override
-  public List<ClientAccountInfo> sort(List<ClientAccountInfo> list, SortColumn column, SortDirection direction) {
+  public List<ClientAccountRecord> sort(List<ClientAccountRecord> list, SortColumn column, SortDirection direction) {
     return null;
   }
 
   @Override
-  public List<ClientAccountInfo> paginate(List<ClientAccountInfo> list, int pageIndex, int pageSize) {
+  public List<ClientAccountRecord> paginate(List<ClientAccountRecord> list, int pageIndex, int pageSize) {
     return null;
   }
 

@@ -41,17 +41,17 @@ public class ClientRegisterImpl implements ClientRegister {
   }
 
   @Override
-  public ClientAccountInfo createNewClient(ClientToSave clientToSave) {
+  public ClientAccountRecord createNewClient(ClientToSave clientToSave) {
     return null;
   }
 
   @Override
-  public ClientAccountInfo editClient(ClientToSave clientToSave) {
+  public ClientAccountRecord editClient(ClientToSave clientToSave) {
     return null;
   }
 
   @Override
-  public ClientAccountInfoPage deleteClient(int clientId, TableRequestDetails requestDetails) {
+  public ClientAccountRecordPage deleteClient(int clientId, TableRequestDetails requestDetails) {
     return null;
   }
 }

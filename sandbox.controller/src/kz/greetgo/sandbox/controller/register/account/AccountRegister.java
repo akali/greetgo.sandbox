@@ -5,15 +5,15 @@ import kz.greetgo.sandbox.controller.model.*;
 import java.util.List;
 
 public interface AccountRegister {
-  ClientAccountInfoPage getClientAccountInfo(TableRequestDetails requestDetails);
+  ClientAccountRecordPage getClientAccountRecordPage(TableRequestDetails requestDetails);
 
-  ClientAccountInfo getAccountInfo(int clientId);
+  ClientAccountRecord getClientAccountRecord(int clientId);
 
-  List<ClientAccountInfo> filter(List<ClientAccountInfo> list, String filterValue);
+  List<ClientAccountRecord> filter(List<ClientAccountRecord> list, String filterValue);
 
-  List<ClientAccountInfo> sort(List<ClientAccountInfo> list, SortColumn column, SortDirection direction);
+  List<ClientAccountRecord> sort(List<ClientAccountRecord> list, SortColumn column, SortDirection direction);
 
-  List<ClientAccountInfo> paginate(List<ClientAccountInfo> list, int pageIndex, int pageSize);
+  List<ClientAccountRecord> paginate(List<ClientAccountRecord> list, int pageIndex, int pageSize);
 
   float getMinAccBalance(int clientId);
 
