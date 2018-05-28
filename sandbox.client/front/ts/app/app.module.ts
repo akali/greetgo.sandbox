@@ -8,11 +8,16 @@ import {RootComponent} from "./root.component";
 import {LoginComponent} from "./input/login.component";
 import {ModalClientDetailsComponent} from "./main-form/components/client-records/components/modal-client-details/modal-client-details";
 import {MainFormComponent} from "./main-form/main-form";
+import {ClientAccountInfoTableComponent} from "./main-form/components/client-records/components/client-account-info-table/client-account-info-table";
 import {ClientRecordsComponent} from "./main-form/components/client-records/client-records";
 import {OnlyNumber} from "../utils/OnlyNumber";
 
 import {HttpService} from "./HttpService";
 import {AccountService} from "./services/AccountService";
+
+import 'core-js/es6/reflect';
+import 'hammerjs'
+
 
 import {
   MatAutocompleteModule,
@@ -88,11 +93,8 @@ import {
     MatFormFieldModule
   ]
 })
-export class DemoMaterialModule {
+export class MaterialModule {
 }
-
-import 'core-js/es6/reflect';
-import 'hammerjs'
 
 @NgModule({
   imports: [
@@ -101,12 +103,17 @@ import 'hammerjs'
     JsonpModule,
     FormsModule,
     BrowserAnimationsModule,
-    DemoMaterialModule,
+    MaterialModule,
     ReactiveFormsModule,
   ],
   declarations: [
-    RootComponent, LoginComponent, MainFormComponent,
-    ModalClientDetailsComponent, ClientAccountInfoTableComponent, ClientRecordsComponent, OnlyNumber
+    RootComponent,
+    LoginComponent,
+    MainFormComponent,
+    OnlyNumber,
+    ClientRecordsComponent,
+    ModalClientDetailsComponent,
+    ClientAccountInfoTableComponent,
   ],
   bootstrap: [RootComponent],
   providers: [HttpService, AccountService],

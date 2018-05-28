@@ -16,7 +16,7 @@ import 'rxjs/add/operator/takeUntil';
 
 @Component({
   selector: 'client-account-info-table',
-  styles: [require('./client-account-info-table')],
+  styles: [require('./client-account-info-table.css')],
   template: require('./client-account-info-table.html'),
 })
 export class ClientAccountInfoTableComponent implements OnDestroy {
