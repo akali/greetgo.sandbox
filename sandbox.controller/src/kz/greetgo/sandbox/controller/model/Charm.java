@@ -1,5 +1,7 @@
 package kz.greetgo.sandbox.controller.model;
 
+import java.util.Objects;
+
 public class Charm {
   public int id;
   public String name;
@@ -15,4 +17,16 @@ public class Charm {
   }
 
   public Charm() { }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Charm charm = (Charm) o;
+    return id == charm.id &&
+      isActive == charm.isActive &&
+      Objects.equals(name, charm.name) &&
+      Objects.equals(description, charm.description) &&
+      Objects.equals(energy, charm.energy);
+  }
 }

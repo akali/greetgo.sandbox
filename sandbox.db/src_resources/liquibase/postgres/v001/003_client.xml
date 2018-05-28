@@ -18,7 +18,7 @@
         patronymic varchar(255),
         gender Gender not null,
         birthDate Date not null,
-        charmId integer references Charms(id) not null,
+        charmId integer references Charms(id) on delete cascade not null ,
         isActive boolean default true
       )
     ]]></sql>

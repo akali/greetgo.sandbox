@@ -7,7 +7,7 @@
         <sql endDelimiter=";;"><![CDATA[
       create table Accounts (
         id serial primary key,
-        clientId integer references Clients(id),
+        clientId integer references Clients(id) on delete cascade,
         money float(4),
         number varchar(30),
         registeredAt timestamp,

@@ -15,7 +15,7 @@
         <sql endDelimiter=";;"><![CDATA[
       create table Phones (
         id serial primary key,
-        clientId integer references Clients(id),
+        clientId integer references Clients(id) on delete cascade,
         number varchar(30),
         type PhoneType,
         isActive boolean default true

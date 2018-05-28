@@ -10,8 +10,8 @@ import org.apache.ibatis.annotations.Select;
 
 public interface CharmTestDao {
 
-  @Insert("insert into Charms ( name, description, energy, isActive) " +
-"                                                   values ( #{name}, #{description}, #{energy}, #{isActive} )")
+  @Insert("insert into Charms ( id, name, description, energy, isActive) " +
+"                                                   values ( #{id}, #{name}, #{description}, #{energy}, #{isActive} )")
   void insertCharm(Charm charm);
 
   @Insert("insert into Charms ( name, description, energy ) values ( #{name}, #{description}, #{energy} )")
@@ -20,7 +20,18 @@ public interface CharmTestDao {
   @Select("select COUNT(*) from Charms")
   int getRecordsCount();
 
-  @Delete("delete from Charms")
+  @Delete("drop table if exists Charms cascade;" +
+    "create table Accounts (\n" +
+    "        id serial primary key,\n" +
+    "        clientId integer references Clients(id) on delete cascade,\n" +
+    "        money float(4),\n" +
+    "        number varchar(30),\n" +
+    "        registeredAt timestamp,\n" +
+    "        isActive boolean default true\n" +
+    "      )")
+  void recreateTable();
+
+  @Delete("Delete from Charms")
   void clearTable();
 
 }

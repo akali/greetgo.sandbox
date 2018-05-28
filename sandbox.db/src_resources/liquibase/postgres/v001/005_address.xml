@@ -13,7 +13,7 @@
         <sql endDelimiter=";;"><![CDATA[
       create table Addresses (
         id serial primary key,
-        clientId integer references Clients(id),
+        clientId integer references Clients(id) on delete cascade,
         type AddressType not null,
         street varchar(100) not null,
         house varchar(100) not null,
