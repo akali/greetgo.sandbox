@@ -10,6 +10,8 @@ public class Account {
   public Timestamp registeredAt;
   public boolean isActive = true;
 
+  public Account() { }
+
   public Account(int id, int clientId, Float money, String number, Timestamp registeredAt) {
     this.id = id;
     this.clientId = clientId;

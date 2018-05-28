@@ -1,11 +1,13 @@
 package kz.greetgo.sandbox.db.test.dao;
 
 import kz.greetgo.depinject.core.Bean;
+import kz.greetgo.mvc.annotations.Par;
 import kz.greetgo.sandbox.controller.model.Charm;
 import kz.greetgo.sandbox.db.dao.CharmDao;
 import kz.greetgo.sandbox.db.stand.model.CharmDot;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 public interface CharmTestDao {
@@ -19,6 +21,9 @@ public interface CharmTestDao {
 
   @Select("select COUNT(*) from Charms")
   int getRecordsCount();
+
+  @Select("select * from Charms where id = #{charmId} and isActive = true")
+  Charm getCharmById(@Param("charmId") int charmId);
 
   @Delete("drop table if exists Charms cascade;" +
     "create table Accounts (\n" +
