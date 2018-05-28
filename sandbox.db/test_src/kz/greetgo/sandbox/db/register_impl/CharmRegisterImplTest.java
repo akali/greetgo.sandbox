@@ -2,11 +2,8 @@ package kz.greetgo.sandbox.db.register_impl;
 
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.sandbox.controller.errors.InvalidCharmError;
-import kz.greetgo.sandbox.controller.errors.NotFound;
 import kz.greetgo.sandbox.controller.model.Charm;
 import kz.greetgo.sandbox.controller.register.charm.CharmRegister;
-import kz.greetgo.sandbox.db.dao.CharmDao;
-import kz.greetgo.sandbox.db.stand.model.CharmDot;
 import kz.greetgo.sandbox.db.test.dao.CharmTestDao;
 import kz.greetgo.sandbox.db.test.util.ParentTestNg;
 import kz.greetgo.util.RND;
@@ -23,7 +20,7 @@ public class CharmRegisterImplTest extends ParentTestNg {
 
   @Test(expectedExceptions = InvalidCharmError.class)
   public void get_invalidId() {
-    charmTestDao.get().clearTable();
+    charmTestDao.get().truncateTable();
 
     int negativeId = -1 * RND.plusInt(10);
     int notExistingId = RND.plusInt(111);
@@ -43,7 +40,7 @@ public class CharmRegisterImplTest extends ParentTestNg {
 
   @Test
   public void get_notActive() {
-    charmTestDao.get().clearTable();
+    charmTestDao.get().truncateTable();
 
     Charm charm = new Charm();
     charm.name = RND.str(10);
@@ -63,7 +60,7 @@ public class CharmRegisterImplTest extends ParentTestNg {
 
   @Test
   public void get_dictionary() {
-    charmTestDao.get().clearTable();
+    charmTestDao.get().truncateTable();
 
     String expectedName = RND.str(10);
     Charm activeCharm = new Charm();

@@ -31,7 +31,7 @@ public interface CharmTestDao {
     "      )")
   void recreateTable();
 
-  @Delete("Delete from Charms")
-  void clearTable();
+  @Delete("Truncate Charms cascade")
+  void truncateTable();
 
 }

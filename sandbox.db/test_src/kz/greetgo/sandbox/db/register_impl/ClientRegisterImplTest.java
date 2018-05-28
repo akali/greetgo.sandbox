@@ -10,13 +10,10 @@ import kz.greetgo.sandbox.db.test.dao.ClientTestDao;
 import kz.greetgo.sandbox.db.test.dao.PhoneTestDao;
 import kz.greetgo.sandbox.db.test.util.ParentTestNg;
 import kz.greetgo.util.RND;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,18 +28,11 @@ public class ClientRegisterImplTest extends ParentTestNg {
   public BeanGetter<AddressTestDao> addressTestDao;
   public BeanGetter<PhoneTestDao> phoneTestDao;
 
-  private void recreateTables() {
-    clientTestDao.get().recreateTable();
-    charmTestDao.get().recreateTable();
-    addressTestDao.get().recreateTable();
-    phoneTestDao.get().recreateTable();
-  }
-
-  private void clearTables() {
-    clientTestDao.get().clearTable();
-    charmTestDao.get().clearTable();
-    addressTestDao.get().clearTable();
-    phoneTestDao.get().clearTable();
+  private void truncateTables() {
+    clientTestDao.get().truncateTable();
+    charmTestDao.get().truncateTable();
+    addressTestDao.get().truncateTable();
+    phoneTestDao.get().truncateTable();
   }
 
   private Charm initCharm(int charmId, boolean isActive) {
@@ -104,7 +94,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
 
   @Test
   public void getClientDetails_clientData() {
-    clearTables();
+    truncateTables();
 
     Charm charm = initCharm(RND.plusInt(10), true);
 
@@ -133,7 +123,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
 
   @Test(expectedExceptions = NotFound.class)
   public void getClientDetails_invalidId() {
-    clearTables();
+    truncateTables();
 
     //
     //
@@ -144,7 +134,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
 
   @Test
   public void getClientDetails_charmsDictionary() {
-    clearTables();
+    truncateTables();
 
     List<Charm> expected = new ArrayList<>();
     expected.add(initCharm(1, true));
@@ -169,7 +159,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
 
   @Test
   public void getClientDetails_charmsDictionary_inActiveCharms() {
-    clearTables();
+    truncateTables();
 
     List<Charm> expected = new ArrayList<>();
     expected.add(initCharm(1, true));
@@ -196,7 +186,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
 
   @Test
   public void getClientDetails_factAddress() {
-    clearTables();
+    truncateTables();
 
     Charm charm = initCharm(RND.plusInt(10), true);
     Client client = initClient(RND.plusInt(10), charm.id);
@@ -216,7 +206,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
 
   @Test
   public void getClientDetails_regAddress() {
-    clearTables();
+    truncateTables();
 
     Charm charm = initCharm(RND.plusInt(10), true);
     Client client = initClient(RND.plusInt(10), charm.id);
@@ -236,7 +226,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
 
   @Test
   public void getClientDetails_phones() {
-    clearTables();
+    truncateTables();
 
     Charm charm = initCharm(RND.plusInt(10), true);
     Client client = initClient(RND.plusInt(100), charm.id);
@@ -262,7 +252,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
 
   @Test
   public void getClientDetails_inActive_phones() {
-    clearTables();
+    truncateTables();
 
     Charm charm = initCharm(RND.plusInt(10), true);
     Client client = initClient(RND.plusInt(100), charm.id);

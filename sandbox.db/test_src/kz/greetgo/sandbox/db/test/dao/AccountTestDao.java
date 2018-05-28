@@ -21,7 +21,7 @@ public interface AccountTestDao {
     "      )")
   void recreateTable();
 
-  @Delete("Delete from Accounts")
-  void clearTable();
+  @Delete("Truncate Accounts cascade")
+  void truncateTable();
 
 }

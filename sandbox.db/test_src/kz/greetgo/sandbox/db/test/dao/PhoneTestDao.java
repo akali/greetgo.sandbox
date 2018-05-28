@@ -24,7 +24,7 @@ public interface PhoneTestDao {
     "      )")
   void recreateTable();
 
-  @Delete("Delete from Phones")
-  void clearTable();
+  @Delete("Truncate Phones cascade")
+  void truncateTable();
 
 }

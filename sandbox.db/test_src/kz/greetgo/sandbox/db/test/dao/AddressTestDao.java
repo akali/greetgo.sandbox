@@ -27,7 +27,7 @@ public interface AddressTestDao {
     "      )")
   void recreateTable();
 
-  @Delete("Delete from Addresses")
-  void clearTable();
+  @Delete("Truncate Addresses cascade")
+  void truncateTable();
 
 }

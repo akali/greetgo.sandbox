@@ -31,7 +31,7 @@ public interface ClientTestDao {
     "      )")
   void recreateTable();
 
-  @Delete("Delete from Clients")
-  void clearTable();
+  @Delete("Truncate Clients cascade")
+  void truncateTable();
 
 }
