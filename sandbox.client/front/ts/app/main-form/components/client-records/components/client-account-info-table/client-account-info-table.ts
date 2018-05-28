@@ -80,7 +80,10 @@ export class ClientAccountInfoTableComponent implements OnDestroy {
 
     this.paginator.page
       .pipe(
-        tap(() => this.requestAccountInfoList()
+        tap(() => {
+            this.selection.deselect(this.selection.selected[0]);
+            this.requestAccountInfoList()
+          }
         )
       ).subscribe();
   }
