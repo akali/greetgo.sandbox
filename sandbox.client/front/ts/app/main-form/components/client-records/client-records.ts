@@ -18,7 +18,7 @@ export class ClientRecordsComponent {
   };
 
   handleEditAccClick = function (accountInfo) {
-    this.openModal(accountInfo.id, ActionType.EDIT);
+    this.openModal(accountInfo.clientId, ActionType.EDIT);
   };
 
   openModal(clientId: number, actionType: ActionType) {

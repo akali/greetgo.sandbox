@@ -46,7 +46,7 @@ public class AccountRegisterStand implements AccountRegister {
   @Override
   public List<ClientAccountInfo> filter(List<ClientAccountInfo> list, String filterValue) {
     return list.stream()
-      .filter(a -> a.fullName.replaceAll("\\s+", "").toLowerCase()
+      .filter(a -> a.clientFullName.replaceAll("\\s+", "").toLowerCase()
         .contains(filterValue.replaceAll("\\s+", "").toLowerCase())
       ).collect(Collectors.toCollection(ArrayList::new));
   }
@@ -56,10 +56,10 @@ public class AccountRegisterStand implements AccountRegister {
 
     switch (column) {
       case FIO:
-        list.sort(Comparator.comparing(a -> a.fullName));
+        list.sort(Comparator.comparing(a -> a.clientFullName));
         break;
       case AGE:
-        list.sort(Comparator.comparingInt(a -> a.age));
+        list.sort(Comparator.comparingInt(a -> a.clientAge));
         break;
       case TOTAL:
         list.sort((ClientAccountInfo a1, ClientAccountInfo a2) -> (int) (a1.totalAccBalance - a2.totalAccBalance));
@@ -92,12 +92,12 @@ public class AccountRegisterStand implements AccountRegister {
     ClientDot clientDot = db.get().clientStorage.get(clientId);
 
     ClientAccountInfo clientAccountInfo = new ClientAccountInfo();
-    clientAccountInfo.id = clientDot.id;
-    clientAccountInfo.fullName = String.format("%s %s %s", clientDot.name, clientDot.surname, clientDot.patronymic);
-    clientAccountInfo.charm = charmRegister.get().getCharm(clientDot.charmId).name;
-    clientAccountInfo.age = calculateYearDiff(clientDot.birthDate);
+    clientAccountInfo.clientId = clientDot.id;
+    clientAccountInfo.clientFullName = String.format("%s %s %s", clientDot.name, clientDot.surname, clientDot.patronymic);
+    clientAccountInfo.clientCharmName = charmRegister.get().getCharm(clientDot.charmId).name;
+    clientAccountInfo.clientAge = calculateYearDiff(clientDot.birthDate);
 
-    List<Account> accounts = getClientAccounts(clientAccountInfo.id);
+    List<Account> accounts = getClientAccounts(clientAccountInfo.clientId);
     if (accounts.size() == 0) return null;
 
     clientAccountInfo.totalAccBalance = getTotalAccBalance(clientId);

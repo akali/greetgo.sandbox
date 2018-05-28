@@ -141,7 +141,7 @@ export class AccountTableComponent implements OnDestroy {
   }
 
   onDeleteClicked() {
-    const clientId = this.selection.selected[0].id;
+    const clientId = this.selection.selected[0].clientId;
     this.requestClientDelete(clientId);
   }
 
