@@ -44,9 +44,9 @@ public class AccountRegisterImplTest extends ParentTestNg {
       String restartClientSeq = "ALTER SEQUENCE client_id_seq RESTART WITH 1;";
       String restartAccountSeq = "ALTER SEQUENCE account_id_seq RESTART WITH 1;";
 
-      connection.prepareStatement(restartCharmSeq);
-      connection.prepareStatement(restartClientSeq);
-      connection.prepareStatement(restartAccountSeq);
+      connection.prepareStatement(restartCharmSeq).execute();
+      connection.prepareStatement(restartClientSeq).execute();
+      connection.prepareStatement(restartAccountSeq).execute();
 
       return null;
     });

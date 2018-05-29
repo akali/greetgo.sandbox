@@ -9,12 +9,11 @@ import kz.greetgo.sandbox.db.test.dao.CharmTestDao;
 import kz.greetgo.sandbox.db.test.dao.ClientTestDao;
 import kz.greetgo.sandbox.db.test.dao.PhoneTestDao;
 import kz.greetgo.sandbox.db.test.util.ParentTestNg;
+import kz.greetgo.sandbox.db.test.util.RandomDate;
 import kz.greetgo.sandbox.db.util.JdbcSandbox;
 import kz.greetgo.util.RND;
 import org.testng.annotations.Test;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,11 +46,11 @@ public class ClientRegisterImplTest extends ParentTestNg {
       String restartPhoneSeq = "ALTER SEQUENCE phone_id_seq RESTART WITH 1;";
       String restartAddressSeq = "ALTER SEQUENCE address_id_seq RESTART WITH 1;";
 
-      connection.prepareStatement(restartCharmSeq);
-      connection.prepareStatement(restartClientSeq);
-      connection.prepareStatement(restartAccountSeq);
-      connection.prepareStatement(restartPhoneSeq);
-      connection.prepareStatement(restartAddressSeq);
+      connection.prepareStatement(restartCharmSeq).execute();
+      connection.prepareStatement(restartClientSeq).execute();
+      connection.prepareStatement(restartAccountSeq).execute();
+      connection.prepareStatement(restartPhoneSeq).execute();
+      connection.prepareStatement(restartAddressSeq).execute();
 
       return null;
     });
@@ -297,6 +296,38 @@ public class ClientRegisterImplTest extends ParentTestNg {
     assertThat(actual).hasSize(3);
     assertThat(actual).contains(expected.get(0), expected.get(1), expected.get(3));
     assertThat(actual).doesNotContain(expected.get(2));
+  }
+
+  @Test
+  public void createNewClient() throws ParseException {
+    truncateTables();
+
+    initCharm(1, true);
+
+    RandomDate randomDate = new RandomDate();
+
+    ClientToSave clientToSave = new ClientToSave();
+    clientToSave.surname = RND.str(15);
+    clientToSave.name = RND.str(15);
+    clientToSave.patronymic = RND.str(15);
+    clientToSave.gender = Gender.FEMALE;
+    clientToSave.birthDate = randomDate.nextDate();
+    clientToSave.charmId = 1;
+
+    //
+    //
+    clientRegister.get().createNewClient(clientToSave);
+    Client client = clientTestDao.get().getActiveClientById(1);
+    //
+    //
+
+    assertThat(client).isNotNull();
+    assertThat(client.name).isEqualToIgnoringCase(clientToSave.name);
+    assertThat(client.surname).isEqualToIgnoringCase(clientToSave.surname);
+    assertThat(client.patronymic).isEqualToIgnoringCase(clientToSave.patronymic);
+    assertThat(client.gender).isEqualsToByComparingFields(clientToSave.gender);
+    assertThat(client.birthDate).isEqualTo(clientToSave.birthDate);
+    assertThat(client.charmId).isEqualTo(clientToSave.charmId);
   }
 
 }

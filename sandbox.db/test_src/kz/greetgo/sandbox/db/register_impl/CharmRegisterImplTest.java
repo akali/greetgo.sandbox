@@ -27,7 +27,7 @@ public class CharmRegisterImplTest extends ParentTestNg {
 
       String restartCharmSeq = "ALTER SEQUENCE charm_id_seq RESTART WITH 1;";
 
-      connection.prepareStatement(restartCharmSeq);
+      connection.prepareStatement(restartCharmSeq).execute();
 
       return null;
     });

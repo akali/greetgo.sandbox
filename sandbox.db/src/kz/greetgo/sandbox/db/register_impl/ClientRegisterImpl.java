@@ -4,11 +4,16 @@ import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.sandbox.controller.errors.NotFound;
 import kz.greetgo.sandbox.controller.model.*;
+import kz.greetgo.sandbox.controller.register.account.AccountRegister;
 import kz.greetgo.sandbox.controller.register.client.ClientRegister;
 import kz.greetgo.sandbox.db.dao.AddressDao;
 import kz.greetgo.sandbox.db.dao.CharmDao;
 import kz.greetgo.sandbox.db.dao.ClientDao;
 import kz.greetgo.sandbox.db.dao.PhoneDao;
+import kz.greetgo.sandbox.db.util.JdbcSandbox;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 @Bean
 public class ClientRegisterImpl implements ClientRegister {
@@ -17,6 +22,9 @@ public class ClientRegisterImpl implements ClientRegister {
   public BeanGetter<CharmDao> charmDao;
   public BeanGetter<AddressDao> addressDao;
   public BeanGetter<PhoneDao> phoneDao;
+
+  public BeanGetter<AccountRegister> accountRegister;
+  public BeanGetter<JdbcSandbox> jdbc;
 
   @Override
   public ClientDetails getClientDetails(int clientId) {
@@ -42,7 +50,35 @@ public class ClientRegisterImpl implements ClientRegister {
 
   @Override
   public ClientAccountRecord createNewClient(ClientToSave clientToSave) {
-    return null;
+
+    Client client = new Client();
+    client.name = clientToSave.name;
+    client.surname = clientToSave.surname;
+    client.patronymic = clientToSave.patronymic;
+    client.gender = clientToSave.gender;
+    client.birthDate = clientToSave.birthDate;
+    client.charmId = clientToSave.charmId;
+
+    jdbc.get().execute((connection)->{
+
+      String query = "SELECT nextval('client_id_seq');";
+
+      try (PreparedStatement ps = connection.prepareStatement(query)) {
+        try (ResultSet rs = ps.executeQuery()) {
+          rs.next();
+          client.id = rs.getInt("nextval");
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new RuntimeException();
+      }
+
+      return null;
+    });
+
+    clientDao.get().insertClient(client);
+
+    return accountRegister.get().getClientAccountRecord(client.id);
   }
 
   @Override
