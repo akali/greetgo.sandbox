@@ -136,21 +136,6 @@ public class AccountRegisterImpl implements AccountRegister {
   }
 
   @Override
-  public List<ClientAccountRecord> filter(List<ClientAccountRecord> list, String filterValue) {
-    return null;
-  }
-
-  @Override
-  public List<ClientAccountRecord> sort(List<ClientAccountRecord> list, SortColumn column, SortDirection direction) {
-    return null;
-  }
-
-  @Override
-  public List<ClientAccountRecord> paginate(List<ClientAccountRecord> list, int pageIndex, int pageSize) {
-    return null;
-  }
-
-  @Override
   public float getMinAccBalance(int clientId) {
     int accountCount = accountDao.get().getAccountCount(clientId);
     if(accountCount == 0) {

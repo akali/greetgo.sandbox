@@ -43,16 +43,14 @@ public class AccountRegisterStand implements AccountRegister {
     return new ClientAccountRecordPage(clientAccountInfoList, totalAccountInfoCount);
   }
 
-  @Override
-  public List<ClientAccountRecord> filter(List<ClientAccountRecord> list, String filterValue) {
+  private List<ClientAccountRecord> filter(List<ClientAccountRecord> list, String filterValue) {
     return list.stream()
       .filter(a -> a.clientFullName.replaceAll("\\s+", "").toLowerCase()
         .contains(filterValue.replaceAll("\\s+", "").toLowerCase())
       ).collect(Collectors.toCollection(ArrayList::new));
   }
 
-  @Override
-  public List<ClientAccountRecord> sort(List<ClientAccountRecord> list, SortColumn column, SortDirection direction) {
+  private List<ClientAccountRecord> sort(List<ClientAccountRecord> list, SortColumn column, SortDirection direction) {
 
     switch (column) {
       case FIO:
@@ -77,8 +75,7 @@ public class AccountRegisterStand implements AccountRegister {
     return list;
   }
 
-  @Override
-  public List<ClientAccountRecord> paginate(List<ClientAccountRecord> list, int pageIndex, int pageSize) {
+  private List<ClientAccountRecord> paginate(List<ClientAccountRecord> list, int pageIndex, int pageSize) {
     int fromIndex = pageIndex * pageSize;
     int toIndex = fromIndex + pageSize;
     if (fromIndex > list.size()) fromIndex = 0;
