@@ -338,7 +338,7 @@ public class AccountRegisterImplTest extends ParentTestNg {
     return list;
   }
 
-  private List<ClientAccountRecord> get_test_clientAccountRecordList(List<Client> clientList) {
+  private List<ClientAccountRecord> init_test_clientAccountRecordList(List<Client> clientList) {
     List<ClientAccountRecord> list = new ArrayList<>();
 
     for(Client client : clientList) {
@@ -353,49 +353,85 @@ public class AccountRegisterImplTest extends ParentTestNg {
   public static Object[][] filter_DP() {
     return new Object[][] {
       { "", 15},
-      { " ", 15},
+      { "    ", 15},
+      { null, 15},
       { "а", 11},
       { "алекСАНДр", 2},
       { "АПП", 1},
       { " миш ", 1},
-      { "r d l", 1},
+      { "r", 1},
       { "-1", 0},
       { "null", 0},
     };
   }
 
-  @Test(dataProvider = "filter_DP")
-  public void filter(String filterValue, int expectedSize) throws ParseException {
+  private TableRequestDetails initTableRequestDetails(String filter, int pageIndex, int pageSize,
+                                                     SortColumn column, SortDirection direction) {
+    TableRequestDetails details = new TableRequestDetails();
+    details.filter = filter;
+    details.pageIndex = pageIndex;
+    details.pageSize = pageSize;
+    details.sortBy = column;
+    details.sortDirection = direction;
+
+    return details;
+  }
+
+  @Test
+  public void getClientAccountRecordPage() throws ParseException {
     truncateTables();
 
     Charm charm = initCharm(1);
     List<Client> clientList = init_test_clientList(charm.id);
     initAccounts(15);
-    List<ClientAccountRecord> clientAccountRecordList = get_test_clientAccountRecordList(clientList);
+    List<ClientAccountRecord> expected = init_test_clientAccountRecordList(clientList);
+
+    TableRequestDetails details = initTableRequestDetails(null,0, 15, SortColumn.NONE, SortDirection.ASC);
 
     //
     //
-    List<ClientAccountRecord> actual = accountRegister.get().filter(clientAccountRecordList, filterValue);
+    ClientAccountRecordPage actual = accountRegister.get().getClientAccountRecordPage(details);
     //
     //
 
-    assertThat(clientList).isNotNull();
-    assertThat(actual).hasSize(expectedSize);
+    assertThat(actual).isNotNull();
+    assertThat(actual.totalItemsCount).isEqualTo(expected.size());
+    assertThat(actual.items.get(0)).isEqualsToByComparingFields(expected.get(0));
+    assertThat(actual.items.get(1)).isEqualsToByComparingFields(expected.get(1));
+    assertThat(actual.items.get(2)).isEqualsToByComparingFields(expected.get(2));
+    assertThat(actual.items.get(3)).isEqualsToByComparingFields(expected.get(3));
+    assertThat(actual.items.get(4)).isEqualsToByComparingFields(expected.get(4));
+    assertThat(actual.items.get(5)).isEqualsToByComparingFields(expected.get(5));
+    assertThat(actual.items.get(6)).isEqualsToByComparingFields(expected.get(6));
+    assertThat(actual.items.get(7)).isEqualsToByComparingFields(expected.get(7));
+    assertThat(actual.items.get(9)).isEqualsToByComparingFields(expected.get(9));
+    assertThat(actual.items.get(10)).isEqualsToByComparingFields(expected.get(10));
+    assertThat(actual.items.get(11)).isEqualsToByComparingFields(expected.get(11));
+    assertThat(actual.items.get(12)).isEqualsToByComparingFields(expected.get(12));
+    assertThat(actual.items.get(13)).isEqualsToByComparingFields(expected.get(13));
+    assertThat(actual.items.get(14)).isEqualsToByComparingFields(expected.get(14));
   }
 
-  @Test
-  public void test() {
-    TableRequestDetails details = new TableRequestDetails();
-    details.pageIndex = 2;
-    details.pageSize = 3;
-    details.sortBy = SortColumn.FIO;
-    details.sortDirection = SortDirection.ASC;
+  @Test(dataProvider = "filter_DP")
+  public void getClientAccountRecordPage_filter(String filterValue, int expectedSize) throws ParseException {
+    truncateTables();
+
+    Charm charm = initCharm(1);
+    List<Client> clientList = init_test_clientList(charm.id);
+    initAccounts(15);
+    init_test_clientAccountRecordList(clientList);
+
+    TableRequestDetails details =
+      initTableRequestDetails(filterValue,0, 15, SortColumn.NONE, SortDirection.ASC);
 
     //
     //
-    accountRegister.get().getClientAccountRecordPage(details);
+    ClientAccountRecordPage actual = accountRegister.get().getClientAccountRecordPage(details);
     //
     //
+
+    assertThat(actual).isNotNull();
+    assertThat(actual.items).hasSize(expectedSize);
   }
 
 }

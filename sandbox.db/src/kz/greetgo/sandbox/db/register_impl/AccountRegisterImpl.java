@@ -41,14 +41,15 @@ public class AccountRegisterImpl implements AccountRegister {
         "JOIN Accounts on Clients.id = Accounts.clientId\n" +
         "JOIN Charms on Clients.charmId = Charms.id");
 
-    String f = requestDetails.filter.toLowerCase().trim();
-    if(!f.isEmpty()) {
-      queryBuilder.append(" WHERE name LIKE %");
+    if(requestDetails.filter != null && !requestDetails.filter.toLowerCase().trim().isEmpty()) {
+      String f = requestDetails.filter.toLowerCase().trim();
+      queryBuilder.append(" WHERE LOWER(Clients.surname) LIKE '%");
       queryBuilder.append(f);
-      queryBuilder.append(" OR name LIKE %");
+      queryBuilder.append("%' OR LOWER(Clients.name) LIKE '%");
       queryBuilder.append(f);
-      queryBuilder.append(" OR"+ "name LIKE %");
+      queryBuilder.append("%' OR LOWER(Clients.patronymic) LIKE '%");
       queryBuilder.append(f);
+      queryBuilder.append("%'");
     }
 
     queryBuilder.append(" GROUP BY Clients.id, charmName ");
@@ -84,6 +85,8 @@ public class AccountRegisterImpl implements AccountRegister {
 
     ClientAccountRecordPage page = new ClientAccountRecordPage();
     page.items = new ArrayList<>();
+
+    System.out.println(queryBuilder.toString());
 
     jdbc.get().execute((connection)->{
 
