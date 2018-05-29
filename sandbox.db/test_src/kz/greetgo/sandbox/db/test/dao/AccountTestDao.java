@@ -7,8 +7,8 @@ import org.apache.ibatis.annotations.Insert;
 
 public interface AccountTestDao {
 
-  @Insert("insert into Accounts ( clientId, money, number, registeredAt ) " +
-    "values ( #{clientId}, #{money}, #{number}, #{registeredAt} )")
+  @Insert("insert into Accounts ( id, clientId, money, number, registeredAt ) " +
+    "values ( #{id}, #{clientId}, #{money}, #{number}, #{registeredAt} )")
   void insertAccountDot(AccountDot accountDot);
 
   @Insert("insert into Accounts ( id, clientId, money, number, registeredAt, isActive ) " +

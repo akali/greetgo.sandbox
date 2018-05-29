@@ -3,6 +3,11 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
+    <changeSet author="nkabylbai" id="create-sequence-Phone">
+        <sql endDelimiter=";;"><![CDATA[
+      create sequence phone_id_seq start 1 increment 1 no cycle;
+    ]]></sql>
+    </changeSet>
 
     <changeSet author="nkabylbai" id="create-enum-PhoneType">
         <sql endDelimiter=";;"><![CDATA[
@@ -14,7 +19,7 @@
     <changeSet author="nkabylbai" id="create-table-Phones">
         <sql endDelimiter=";;"><![CDATA[
       create table Phones (
-        id serial primary key,
+        id integer default nextval('phone_id_seq') primary key,
         clientId integer references Clients(id) on delete cascade,
         number varchar(30),
         type PhoneType,

@@ -3,6 +3,12 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
+    <changeSet author="nkabylbai" id="create-sequence-Address">
+        <sql endDelimiter=";;"><![CDATA[
+      create sequence address_id_seq start 1 increment 1 no cycle;
+    ]]></sql>
+    </changeSet>
+
     <changeSet author="nkabylbai" id="create-enum-AddressType">
         <sql endDelimiter=";;"><![CDATA[
       create type AddressType as enum ('FACT', 'REG')
@@ -12,7 +18,7 @@
     <changeSet author="nkabylbai" id="create-table-Addresses">
         <sql endDelimiter=";;"><![CDATA[
       create table Addresses (
-        id serial primary key,
+        id integer default nextval('address_id_seq') primary key,
         clientId integer references Clients(id) on delete cascade,
         type AddressType not null,
         street varchar(100) not null,

@@ -11,6 +11,7 @@ import kz.greetgo.sandbox.db.test.dao.CharmTestDao;
 import kz.greetgo.sandbox.db.test.dao.ClientTestDao;
 import kz.greetgo.sandbox.db.test.util.ParentTestNg;
 import kz.greetgo.sandbox.db.test.util.RandomDate;
+import kz.greetgo.sandbox.db.util.JdbcSandbox;
 import kz.greetgo.sandbox.db.util.YearDifference;
 import kz.greetgo.util.RND;
 import org.testng.annotations.DataProvider;
@@ -26,6 +27,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 public class AccountRegisterImplTest extends ParentTestNg {
 
   public BeanGetter<AccountRegister> accountRegister;
+  public BeanGetter<JdbcSandbox> jdbc;
 
   public BeanGetter<ClientTestDao> clientTestDao;
   public BeanGetter<AccountTestDao> accountTestDao;
@@ -35,6 +37,19 @@ public class AccountRegisterImplTest extends ParentTestNg {
     clientTestDao.get().truncateTable();
     accountTestDao.get().truncateTable();
     charmTestDao.get().truncateTable();
+
+    jdbc.get().execute((connection)->{
+
+      String restartCharmSeq = "ALTER SEQUENCE charm_id_seq RESTART WITH 1;";
+      String restartClientSeq = "ALTER SEQUENCE client_id_seq RESTART WITH 1;";
+      String restartAccountSeq = "ALTER SEQUENCE account_id_seq RESTART WITH 1;";
+
+      connection.prepareStatement(restartCharmSeq);
+      connection.prepareStatement(restartClientSeq);
+      connection.prepareStatement(restartAccountSeq);
+
+      return null;
+    });
   }
 
   private Charm initCharm(int charmId) {

@@ -10,8 +10,8 @@ import java.util.List;
 
 public interface ClientTestDao {
 
-  @Insert("insert into Clients ( surname, name, patronymic, gender, birthDate, charmId ) " +
-    "values ( #{surname}, #{name}, #{patronymic}, #{gender}::Gender, #{birthDate}, #{charmId} )")
+  @Insert("insert into Clients ( id, surname, name, patronymic, gender, birthDate, charmId ) " +
+    "values ( #{id}, #{surname}, #{name}, #{patronymic}, #{gender}::Gender, #{birthDate}, #{charmId} )")
   void insertClientDot(ClientDot clientDot);
 
   @Insert("insert into Clients ( id, surname, name, patronymic, gender, birthDate, charmId, isActive ) " +

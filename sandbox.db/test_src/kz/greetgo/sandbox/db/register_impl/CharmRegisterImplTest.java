@@ -6,6 +6,7 @@ import kz.greetgo.sandbox.controller.model.Charm;
 import kz.greetgo.sandbox.controller.register.charm.CharmRegister;
 import kz.greetgo.sandbox.db.test.dao.CharmTestDao;
 import kz.greetgo.sandbox.db.test.util.ParentTestNg;
+import kz.greetgo.sandbox.db.util.JdbcSandbox;
 import kz.greetgo.util.RND;
 import org.testng.annotations.Test;
 
@@ -17,10 +18,24 @@ public class CharmRegisterImplTest extends ParentTestNg {
 
   public BeanGetter<CharmRegister> charmRegister;
   public BeanGetter<CharmTestDao> charmTestDao;
+  public BeanGetter<JdbcSandbox> jdbc;
+
+  private void truncateTable() {
+    charmTestDao.get().truncateTable();
+
+    jdbc.get().execute((connection)->{
+
+      String restartCharmSeq = "ALTER SEQUENCE charm_id_seq RESTART WITH 1;";
+
+      connection.prepareStatement(restartCharmSeq);
+
+      return null;
+    });
+  }
 
   @Test(expectedExceptions = InvalidCharmError.class)
   public void get_invalidId() {
-    charmTestDao.get().truncateTable();
+    truncateTable();
 
     int negativeId = -1 * RND.plusInt(10);
     int notExistingId = RND.plusInt(111);
@@ -40,7 +55,7 @@ public class CharmRegisterImplTest extends ParentTestNg {
 
   @Test
   public void get_notActive() {
-    charmTestDao.get().truncateTable();
+    truncateTable();
 
     Charm charm = new Charm();
     charm.name = RND.str(10);
@@ -60,7 +75,7 @@ public class CharmRegisterImplTest extends ParentTestNg {
 
   @Test
   public void get_dictionary() {
-    charmTestDao.get().truncateTable();
+    truncateTable();
 
     String expectedName = RND.str(10);
     Charm activeCharm = new Charm();

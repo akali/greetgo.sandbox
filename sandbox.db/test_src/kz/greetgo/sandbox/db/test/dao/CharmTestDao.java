@@ -12,8 +12,8 @@ import org.apache.ibatis.annotations.Select;
 
 public interface CharmTestDao {
 
-  @Insert("insert into Charms ( id, name, description, energy, isActive) " +
-"                                                   values ( #{id}, #{name}, #{description}, #{energy}, #{isActive} )")
+  @Insert("insert into Charms ( name, description, energy, isActive) " +
+"                                                   values ( #{name}, #{description}, #{energy}, #{isActive} )")
   void insertCharm(Charm charm);
 
   @Insert("insert into Charms ( name, description, energy ) values ( #{name}, #{description}, #{energy} )")

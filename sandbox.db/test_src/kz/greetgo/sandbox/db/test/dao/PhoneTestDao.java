@@ -4,10 +4,11 @@ import kz.greetgo.sandbox.controller.model.Phone;
 import kz.greetgo.sandbox.db.stand.model.PhoneDot;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Update;
 
 public interface PhoneTestDao {
 
-  @Insert("insert into Phones ( clientId, number, type ) values ( #{clientId}, #{number}, #{type}::PhoneType )")
+  @Insert("insert into Phones ( id, clientId, number, type ) values ( #{id}, #{clientId}, #{number}, #{type}::PhoneType )")
   void insertPhoneDot(PhoneDot phoneDot);
 
   @Insert("insert into Phones ( id, clientId, number, type, isActive ) " +

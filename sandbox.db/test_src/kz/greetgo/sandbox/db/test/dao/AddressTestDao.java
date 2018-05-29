@@ -7,8 +7,8 @@ import org.apache.ibatis.annotations.Insert;
 
 public interface AddressTestDao {
 
-  @Insert("insert into Addresses ( clientId, type, street, house, flat ) " +
-    "values ( #{clientId}, #{type}::AddressType, #{street}, #{house}, #{flat} )")
+  @Insert("insert into Addresses ( id, clientId, type, street, house, flat ) " +
+    "values ( #{id}, #{clientId}, #{type}::AddressType, #{street}, #{house}, #{flat} )")
   void insertAddressDot(AddressDot addressDot);
 
   @Insert("insert into Addresses ( id, clientId, type, street, house, flat ) " +

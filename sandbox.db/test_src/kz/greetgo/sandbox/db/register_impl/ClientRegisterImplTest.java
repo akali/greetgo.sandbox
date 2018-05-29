@@ -9,9 +9,12 @@ import kz.greetgo.sandbox.db.test.dao.CharmTestDao;
 import kz.greetgo.sandbox.db.test.dao.ClientTestDao;
 import kz.greetgo.sandbox.db.test.dao.PhoneTestDao;
 import kz.greetgo.sandbox.db.test.util.ParentTestNg;
+import kz.greetgo.sandbox.db.util.JdbcSandbox;
 import kz.greetgo.util.RND;
 import org.testng.annotations.Test;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,17 +25,36 @@ import static org.fest.assertions.api.Assertions.assertThat;
 public class ClientRegisterImplTest extends ParentTestNg {
 
   public BeanGetter<ClientRegister> clientRegister;
+  public BeanGetter<JdbcSandbox> jdbc;
 
   public BeanGetter<ClientTestDao> clientTestDao;
   public BeanGetter<CharmTestDao> charmTestDao;
   public BeanGetter<AddressTestDao> addressTestDao;
   public BeanGetter<PhoneTestDao> phoneTestDao;
 
+
   private void truncateTables() {
     clientTestDao.get().truncateTable();
     charmTestDao.get().truncateTable();
     addressTestDao.get().truncateTable();
     phoneTestDao.get().truncateTable();
+
+    jdbc.get().execute((connection)->{
+
+      String restartCharmSeq = "ALTER SEQUENCE charm_id_seq RESTART WITH 1;";
+      String restartClientSeq = "ALTER SEQUENCE client_id_seq RESTART WITH 1;";
+      String restartAccountSeq = "ALTER SEQUENCE account_id_seq RESTART WITH 1;";
+      String restartPhoneSeq = "ALTER SEQUENCE phone_id_seq RESTART WITH 1;";
+      String restartAddressSeq = "ALTER SEQUENCE address_id_seq RESTART WITH 1;";
+
+      connection.prepareStatement(restartCharmSeq);
+      connection.prepareStatement(restartClientSeq);
+      connection.prepareStatement(restartAccountSeq);
+      connection.prepareStatement(restartPhoneSeq);
+      connection.prepareStatement(restartAddressSeq);
+
+      return null;
+    });
   }
 
   private Charm initCharm(int charmId, boolean isActive) {
