@@ -2,6 +2,7 @@ package kz.greetgo.sandbox.db.register_impl;
 
 import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.depinject.core.BeanGetter;
+import kz.greetgo.sandbox.controller.errors.InvalidRequestDetails;
 import kz.greetgo.sandbox.controller.errors.NoAccount;
 import kz.greetgo.sandbox.controller.errors.NotFound;
 import kz.greetgo.sandbox.controller.model.*;
@@ -29,6 +30,8 @@ public class AccountRegisterImpl implements AccountRegister {
 
   @Override
   public ClientAccountRecordPage getClientAccountRecordPage(TableRequestDetails requestDetails) {
+
+    if(requestDetails.pageSize <= 0 || requestDetails.pageIndex < 0) throw new InvalidRequestDetails();
 
     StringBuilder queryBuilder = new StringBuilder();
     queryBuilder.append(
@@ -72,6 +75,8 @@ public class AccountRegisterImpl implements AccountRegister {
           break;
       }
       queryBuilder.append(requestDetails.sortDirection);
+    } else {
+      queryBuilder.append("ORDER BY Clients.id ASC");
     }
 
     queryBuilder.append(" LIMIT ");

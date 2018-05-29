@@ -1,6 +1,7 @@
 package kz.greetgo.sandbox.db.register_impl;
 
 import kz.greetgo.depinject.core.BeanGetter;
+import kz.greetgo.sandbox.controller.errors.InvalidRequestDetails;
 import kz.greetgo.sandbox.controller.errors.NoAccount;
 import kz.greetgo.sandbox.controller.errors.NotFound;
 import kz.greetgo.sandbox.controller.model.*;
@@ -508,6 +509,109 @@ public class AccountRegisterImplTest extends ParentTestNg {
     assertThat(actual.items).isNotNull();
     assertThat(actual.items).hasSize(15);
     assertThat(actual.items).isSortedAccordingTo(comparator);
+  }
+
+  @DataProvider
+  public static Object[][] paginate_DP() {
+    return new Object[][] {
+      {
+        0, 3,
+        new ArrayList<Integer>(){{
+            add(1);
+            add(2);
+            add(3);
+          }
+        }
+      },
+      {
+        1, 3,
+        new ArrayList<Integer>(){{
+            add(4);
+            add(5);
+            add(6);
+          }
+        }
+      },
+      {
+        2, 6,
+        new ArrayList<Integer>(){{
+            add(13);
+            add(14);
+            add(15);
+          }
+        }
+      },
+      {
+        2, 7,
+        new ArrayList<Integer>(){{
+          add(15);
+        }
+        }
+      },
+      {
+        2, 7,
+        new ArrayList<Integer>(){{
+          add(15);
+          }
+        }
+      }
+    };
+  }
+
+  @Test(dataProvider = "paginate_DP")
+  public void getClientAccountRecordPage_paginate(int pageIndex, int pageSize, List<Integer> expectedIds) throws ParseException {
+      truncateTables();
+
+      Charm charm = initCharm(1);
+      List<Client> clientList = init_test_clientList(charm.id);
+      initAccounts(15);
+      init_test_clientAccountRecordList(clientList);
+
+      TableRequestDetails details =
+        initTableRequestDetails(null,pageIndex, pageSize, SortColumn.NONE, SortDirection.ASC);
+
+      //
+      //
+      ClientAccountRecordPage actual = accountRegister.get().getClientAccountRecordPage(details);
+      //
+      //
+
+      assertThat(actual).isNotNull();
+      assertThat(actual.items).isNotNull();
+      assertThat(actual.items).hasSize(expectedIds.size());
+
+      for(Integer expectedId : expectedIds) {
+        assertThat(actual.items.stream().anyMatch(o -> o.clientId == expectedId)).isTrue();
+      }
+  }
+
+  @DataProvider
+  public static Object[][] paginate_invalid_DP() {
+    return new Object[][] {
+      { -1, 3 },
+      { 0, -3 },
+      { -34, -23 },
+      { 0, 0 },
+    };
+  }
+
+  @Test(dataProvider = "paginate_invalid_DP", expectedExceptions = InvalidRequestDetails.class)
+  public void getClientAccountRecordPage_paginate_invalidRequest(int pageIndex, int pageSize) throws ParseException {
+    truncateTables();
+
+    Charm charm = initCharm(1);
+    List<Client> clientList = init_test_clientList(charm.id);
+    initAccounts(15);
+    init_test_clientAccountRecordList(clientList);
+
+    TableRequestDetails details =
+      initTableRequestDetails(null,pageIndex, pageSize, SortColumn.NONE, SortDirection.ASC);
+
+    //
+    //
+    accountRegister.get().getClientAccountRecordPage(details);
+    //
+    //
   }
 
 }
