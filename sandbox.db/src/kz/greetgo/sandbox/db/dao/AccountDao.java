@@ -13,4 +13,7 @@ public interface AccountDao {
 
   @Select("select SUM(money) from Accounts where clientId = #{clientId} and isActive = true")
   Float getTotalAccountBalance(@Param("clientId") int clientId);
+
+  @Select("select COUNT(1) from Accounts where clientId = #{clientId} and isActive = true")
+  int getAccountCount(@Param("clientId") int clientId);
 }
