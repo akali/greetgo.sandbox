@@ -10,4 +10,14 @@ public class ClientAccountRecord {
   public float minAccBalance;
 
   public ClientAccountRecord() { }
+
+  @Override
+  public String toString() {
+    return "ClientAccountRecord{" +
+      "clientId=" + clientId +
+      ", clientFullName='" + clientFullName + '\'' +
+      ", clientCharmName='" + clientCharmName + '\'' +
+      ", clientAge=" + clientAge +
+      '}';
+  }
 }

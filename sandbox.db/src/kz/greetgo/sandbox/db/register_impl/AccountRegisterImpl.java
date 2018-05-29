@@ -33,7 +33,7 @@ public class AccountRegisterImpl implements AccountRegister {
     StringBuilder queryBuilder = new StringBuilder();
     queryBuilder.append(
       "SELECT\n" +
-        "Clients.id, Clients.surname, Clients.name, Clients.patronymic, Clients.gender,\n" +
+        "Clients.id, Clients.surname, Clients.name, COALESCE(Clients.patronymic, '') as patronymic, Clients.gender,\n" +
         "DATE_PART('year', AGE(Clients.birthDate)) as age, Charms.name as charmName,\n" +
         "MIN(Accounts.money) minAccBalance, MAX(Accounts.money) maxAccBalance, SUM(Accounts.money) totalAccBalance,\n" +
         "count(*) OVER() AS totalItemsCount\n" +
@@ -42,12 +42,9 @@ public class AccountRegisterImpl implements AccountRegister {
         "JOIN Charms on Clients.charmId = Charms.id");
 
     if(requestDetails.filter != null && !requestDetails.filter.toLowerCase().trim().isEmpty()) {
-      String f = requestDetails.filter.toLowerCase().trim();
-      queryBuilder.append(" WHERE LOWER(Clients.surname) LIKE '%");
-      queryBuilder.append(f);
-      queryBuilder.append("%' OR LOWER(Clients.name) LIKE '%");
-      queryBuilder.append(f);
-      queryBuilder.append("%' OR LOWER(Clients.patronymic) LIKE '%");
+
+      String f = requestDetails.filter.toLowerCase().replaceAll("\\s+", "");
+      queryBuilder.append(" WHERE LOWER(Clients.surname || Clients.name || COALESCE(Clients.patronymic, '')) LIKE '%");
       queryBuilder.append(f);
       queryBuilder.append("%'");
     }
@@ -59,7 +56,7 @@ public class AccountRegisterImpl implements AccountRegister {
 
       switch (requestDetails.sortBy) {
         case FIO:
-          queryBuilder.append("Clients.name, Clients.surname, Clients.patronymic ");
+          queryBuilder.append("Clients.surname, Clients.name, Clients.patronymic ");
           break;
         case AGE:
           queryBuilder.append("age ");

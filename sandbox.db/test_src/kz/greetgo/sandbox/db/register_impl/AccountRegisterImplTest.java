@@ -296,7 +296,7 @@ public class AccountRegisterImplTest extends ParentTestNg {
       Gender.MALE, rd.nextDate(), charmId, true));
     list.add(new Client(4, "Аткинсон", "Уильям", "Уокер",
       Gender.MALE, rd.nextDate(), charmId, true));
-    list.add(new Client(5, "Аттербум", "Пер Даниель", "Амадеус", Gender.MALE,
+    list.add(new Client(5, "Аттербум", "Даниель", "Амадеус", Gender.MALE,
       rd.nextDate(), charmId, true));
     list.add(new Client(6, "Базинер", "Фёдор", "Иванович",
       Gender.MALE, rd.nextDate(), charmId, true));
@@ -312,11 +312,11 @@ public class AccountRegisterImplTest extends ParentTestNg {
       Gender.MALE, rd.nextDate(), charmId, true));
     list.add(new Client(12, "Александр", "Афродисийский", null,
       Gender.MALE, rd.nextDate(), charmId, true));
-    list.add(new Client(13, "John", "Entony", null,
+    list.add(new Client(13, "Мишель", "Мэнсон", null,
+      Gender.FEMALE, rd.nextDate(), charmId, true));
+    list.add(new Client(14, "Мария", "Шарапова", "Андреевна",
       Gender.MALE, rd.nextDate(), charmId, true));
-    list.add(new Client(14, "Bill", "Gates", null,
-      Gender.MALE, rd.nextDate(), charmId, true));
-    list.add(new Client(15, "Robert", "Dauny", "Little",
+    list.add(new Client(15, "Зайд", "Шейх", "Асланович",
       Gender.MALE, rd.nextDate(), charmId, true));
 
     for(Client client: list) {
@@ -330,8 +330,12 @@ public class AccountRegisterImplTest extends ParentTestNg {
     List<Account> list = new ArrayList<>();
     Random random = new Random();
 
+    int idCounter = 1;
     for(int i = 1; i <= range; i++) {
-      Account account  = initAccount(i, i, random.nextFloat(), true);
+      Account account  = initAccount(idCounter++, i, random.nextFloat(), true);
+      Account account2  = initAccount(idCounter++, i, random.nextFloat(), true);
+      Account account3  = initAccount(idCounter++, i, random.nextFloat(), true);
+
       list.add(account);
     }
 
@@ -352,16 +356,16 @@ public class AccountRegisterImplTest extends ParentTestNg {
   @DataProvider
   public static Object[][] filter_DP() {
     return new Object[][] {
+      { "сон Уо", 1},
       { "", 15},
       { "    ", 15},
       { null, 15},
-      { "а", 11},
+      { "а", 13},
       { "алекСАНДр", 2},
       { "АПП", 1},
-      { " миш ", 1},
-      { "r", 1},
+      { " миш ", 2},
+      { "r", 0},
       { "-1", 0},
-      { "null", 0},
     };
   }
 
@@ -431,7 +435,79 @@ public class AccountRegisterImplTest extends ParentTestNg {
     //
 
     assertThat(actual).isNotNull();
+    assertThat(actual.items).isNotNull();
     assertThat(actual.items).hasSize(expectedSize);
+  }
+
+  @DataProvider
+  public static Object[][] sort_DP() {
+    return new Object[][] {
+      {
+        SortColumn.FIO, SortDirection.ASC,
+        (Comparator<ClientAccountRecord>) (o1, o2) -> o1.clientFullName.compareTo(o2.clientFullName)
+      },
+      {
+        SortColumn.FIO, SortDirection.DESC,
+        (Comparator<ClientAccountRecord>) (o1, o2) -> o1.clientFullName.compareTo(o2.clientFullName)
+      },
+      {
+        SortColumn.AGE, SortDirection.ASC,
+        (Comparator<ClientAccountRecord>) (o1, o2) -> Integer.compare(o1.clientAge, o2.clientAge)
+      },
+      {
+        SortColumn.AGE, SortDirection.DESC,
+        ((Comparator<ClientAccountRecord>) (o1, o2) ->  Integer.compare(o1.clientAge, o2.clientAge)).reversed()
+      },
+      {
+        SortColumn.MIN, SortDirection.ASC,
+        (Comparator<ClientAccountRecord>) (o1, o2) -> Float.compare(o1.minAccBalance, o2.minAccBalance)
+      },
+      {
+        SortColumn.MIN, SortDirection.DESC,
+        ((Comparator<ClientAccountRecord>) (o1, o2) -> Float.compare(o1.minAccBalance, o2.minAccBalance)).reversed()
+      },
+      {
+        SortColumn.MAX, SortDirection.ASC,
+        (Comparator<ClientAccountRecord>) (o1, o2) -> Float.compare(o1.maxAccBalance, o2.maxAccBalance)
+      },
+      {
+        SortColumn.MAX, SortDirection.DESC,
+        ((Comparator<ClientAccountRecord>) (o1, o2) -> Float.compare(o1.maxAccBalance, o2.maxAccBalance)).reversed()
+      },
+      {
+        SortColumn.TOTAL, SortDirection.ASC,
+        (Comparator<ClientAccountRecord>) (o1, o2) -> Float.compare(o1.totalAccBalance, o2.totalAccBalance)
+      },
+      {
+        SortColumn.TOTAL, SortDirection.DESC,
+        ((Comparator<ClientAccountRecord>) (o1, o2) -> Float.compare(o1.totalAccBalance, o2.totalAccBalance)).reversed()
+      },
+    };
+  }
+
+  @Test(dataProvider = "sort_DP")
+  public void getClientAccountRecordPage_sort(
+    SortColumn column, SortDirection direction, Comparator<ClientAccountRecord> comparator) throws ParseException {
+    truncateTables();
+
+    Charm charm = initCharm(1);
+    List<Client> clientList = init_test_clientList(charm.id);
+    initAccounts(15);
+    init_test_clientAccountRecordList(clientList);
+
+    TableRequestDetails details =
+      initTableRequestDetails(null,0, 15, column, direction);
+
+    //
+    //
+    ClientAccountRecordPage actual = accountRegister.get().getClientAccountRecordPage(details);
+    //
+    //
+
+    assertThat(actual).isNotNull();
+    assertThat(actual.items).isNotNull();
+    assertThat(actual.items).hasSize(15);
+    assertThat(actual.items).isSortedAccordingTo(comparator);
   }
 
 }
