@@ -9,6 +9,7 @@ import kz.greetgo.sandbox.db.test.dao.AccountTestDao;
 import kz.greetgo.sandbox.db.test.dao.CharmTestDao;
 import kz.greetgo.sandbox.db.test.dao.ClientTestDao;
 import kz.greetgo.sandbox.db.test.util.ParentTestNg;
+import kz.greetgo.sandbox.db.test.util.RandomDate;
 import kz.greetgo.sandbox.db.util.YearDifference;
 import kz.greetgo.util.RND;
 import org.testng.annotations.DataProvider;
@@ -16,7 +17,7 @@ import org.testng.annotations.Test;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -279,6 +280,120 @@ public class AccountRegisterImplTest extends ParentTestNg {
     //
     //
     accountRegister.get().getTotalAccBalance(client.id);
+    //
+    //
+  }
+
+  private List<Client> init_test_clientList(int charmId) throws ParseException {
+    List<Client> list = new ArrayList<>();
+    RandomDate rd = new RandomDate();
+
+    list.add(new Client(1, "Александр", "Сергеевич", "Пушкин",
+      Gender.MALE, rd.nextDate(), charmId, true));
+    list.add(new Client(2, "Михаил", "Юрьевич", "Лермонтов",
+      Gender.MALE, rd.nextDate(), charmId, true));
+    list.add(new Client(3, "Астафьев", "Пётр", "Евгеньевич",
+      Gender.MALE, rd.nextDate(), charmId, true));
+    list.add(new Client(4, "Аткинсон", "Уильям", "Уокер",
+      Gender.MALE, rd.nextDate(), charmId, true));
+    list.add(new Client(5, "Аттербум", "Пер Даниель", "Амадеус", Gender.MALE,
+      rd.nextDate(), charmId, true));
+    list.add(new Client(6, "Базинер", "Фёдор", "Иванович",
+      Gender.MALE, rd.nextDate(), charmId, true));
+    list.add(new Client(7, "Бек", "Лео", null,
+      Gender.MALE, rd.nextDate(), charmId, true));
+    list.add(new Client(8, "Аббаньяно", "Никола", null,
+      Gender.MALE, rd.nextDate(), charmId, true));
+    list.add(new Client(9, "Анри", "Мишель", null,
+      Gender.MALE, rd.nextDate(), charmId, true));
+    list.add(new Client(10, "Аппиа", "Кваме", "Энтони",
+      Gender.MALE, rd.nextDate(), charmId, true));
+    list.add(new Client(11, "Аджита", "Кесакамбала", null,
+      Gender.MALE, rd.nextDate(), charmId, true));
+    list.add(new Client(12, "Александр", "Афродисийский", null,
+      Gender.MALE, rd.nextDate(), charmId, true));
+    list.add(new Client(13, "John", "Entony", null,
+      Gender.MALE, rd.nextDate(), charmId, true));
+    list.add(new Client(14, "Bill", "Gates", null,
+      Gender.MALE, rd.nextDate(), charmId, true));
+    list.add(new Client(15, "Robert", "Dauny", "Little",
+      Gender.MALE, rd.nextDate(), charmId, true));
+
+    for(Client client: list) {
+      clientTestDao.get().insertClient(client);
+    }
+
+    return list;
+  }
+
+  private List<Account> initAccounts(int range) {
+    List<Account> list = new ArrayList<>();
+    Random random = new Random();
+
+    for(int i = 1; i <= range; i++) {
+      Account account  = initAccount(i, i, random.nextFloat(), true);
+      list.add(account);
+    }
+
+    return list;
+  }
+
+  private List<ClientAccountRecord> get_test_clientAccountRecordList(List<Client> clientList) {
+    List<ClientAccountRecord> list = new ArrayList<>();
+
+    for(Client client : clientList) {
+      ClientAccountRecord record = accountRegister.get().getClientAccountRecord(client.id);
+      list.add(record);
+    }
+
+    return list;
+  }
+
+  @DataProvider
+  public static Object[][] filter_DP() {
+    return new Object[][] {
+      { "", 15},
+      { " ", 15},
+      { "а", 11},
+      { "алекСАНДр", 2},
+      { "АПП", 1},
+      { " миш ", 1},
+      { "r d l", 1},
+      { "-1", 0},
+      { "null", 0},
+    };
+  }
+
+  @Test(dataProvider = "filter_DP")
+  public void filter(String filterValue, int expectedSize) throws ParseException {
+    truncateTables();
+
+    Charm charm = initCharm(1);
+    List<Client> clientList = init_test_clientList(charm.id);
+    initAccounts(15);
+    List<ClientAccountRecord> clientAccountRecordList = get_test_clientAccountRecordList(clientList);
+
+    //
+    //
+    List<ClientAccountRecord> actual = accountRegister.get().filter(clientAccountRecordList, filterValue);
+    //
+    //
+
+    assertThat(clientList).isNotNull();
+    assertThat(actual).hasSize(expectedSize);
+  }
+
+  @Test
+  public void test() {
+    TableRequestDetails details = new TableRequestDetails();
+    details.pageIndex = 2;
+    details.pageSize = 3;
+    details.sortBy = SortColumn.FIO;
+    details.sortDirection = SortDirection.ASC;
+
+    //
+    //
+    accountRegister.get().getClientAccountRecordPage(details);
     //
     //
   }

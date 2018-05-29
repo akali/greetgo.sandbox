@@ -10,6 +10,7 @@ import kz.greetgo.sandbox.controller.register.client.ClientRegister;
 import kz.greetgo.sandbox.db.dao.AccountDao;
 import kz.greetgo.sandbox.db.dao.CharmDao;
 import kz.greetgo.sandbox.db.dao.ClientDao;
+import kz.greetgo.sandbox.db.util.JdbcSandbox;
 import kz.greetgo.sandbox.db.util.YearDifference;
 
 import java.time.Year;
@@ -21,9 +22,81 @@ public class AccountRegisterImpl implements AccountRegister {
   public BeanGetter<ClientDao> clientDao;
   public BeanGetter<AccountDao> accountDao;
   public BeanGetter<CharmDao> charmDao;
+  public BeanGetter<JdbcSandbox> jdbc;
 
   @Override
   public ClientAccountRecordPage getClientAccountRecordPage(TableRequestDetails requestDetails) {
+
+    StringBuilder queryBuilder = new StringBuilder();
+    queryBuilder.append(
+      "SELECT " +
+        "Clients.id, Clients.surname, Clients.name, Clients.patronymic, Clients.gender, " +
+        "DATE_PART('year', AGE(Clients.birthDate)) as age, Charms.name as charmName, " +
+      "MIN(Accounts.money) minAccBalance, MAX(Accounts.money) maxAccBalance, SUM(Accounts.money) totalAccBalance " +
+      "FROM Clients, Charms, Accounts");
+
+    String f = requestDetails.filter.toLowerCase().trim();
+    if(!f.isEmpty()) {
+      queryBuilder.append(" WHERE name LIKE %");
+      queryBuilder.append(f);
+      queryBuilder.append(" OR name LIKE %");
+      queryBuilder.append(f);
+      queryBuilder.append(" OR"+ "name LIKE %");
+      queryBuilder.append(f);
+    }
+
+    queryBuilder.append(" GROUP BY Clients.id, charmName ");
+
+    if(requestDetails.sortBy != SortColumn.NONE) {
+      queryBuilder.append(" ORDER BY ");
+
+      switch (requestDetails.sortBy) {
+        case FIO:
+          queryBuilder.append("Clients.name, Clients.surname, Clients.patronymic ");
+          break;
+        case AGE:
+          queryBuilder.append("age ");
+          break;
+        case MIN:
+          queryBuilder.append("minAccBalance ");
+          break;
+        case MAX:
+          queryBuilder.append("maxAccBalance ");
+          break;
+        case TOTAL:
+          queryBuilder.append("totalAccBalance ");
+          break;
+      }
+      queryBuilder.append(requestDetails.sortDirection);
+    }
+
+    queryBuilder.append(" LIMIT ");
+    queryBuilder.append(requestDetails.pageSize);
+    queryBuilder.append(" OFFSET ");
+    queryBuilder.append(requestDetails.pageSize * requestDetails.pageIndex);
+    queryBuilder.append(";");
+
+    //  jdbc.get().execute((connection)->{
+    //
+    //    String testSql = "select * from client;";
+    //
+    //    try(PreparedStatement ps = connection.prepareStatement(testSql)) {
+    //
+    //    try(ResultSet rs = ps.executeQuery()) {
+    //
+    //    while (rs.next()){
+    //    Client client = new Client();
+    //    client.name = rs.getString("name");
+    //    }
+    //    }
+    //
+    //    }
+    //
+    //    return null;
+    //    });
+
+
+
     return null;
   }
 
