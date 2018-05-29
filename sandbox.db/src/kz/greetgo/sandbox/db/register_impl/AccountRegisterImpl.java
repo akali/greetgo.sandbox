@@ -82,8 +82,4 @@ public class AccountRegisterImpl implements AccountRegister {
     return accountDao.get().getTotalAccountBalance(clientId);
   }
 
-  @Override
-  public List<Account> getClientAccounts(int clientId) {
-    return null;
-  }
 }

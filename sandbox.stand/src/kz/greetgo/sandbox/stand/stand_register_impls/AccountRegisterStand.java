@@ -142,8 +142,7 @@ public class AccountRegisterStand implements AccountRegister {
     return result;
   }
 
-  @Override
-  public List<Account> getClientAccounts(int clientId) {
+  private List<Account> getClientAccounts(int clientId) {
     ArrayList<Account> accounts = new ArrayList<>();
 
     for (AccountDot accountDot : db.get().accountStorage.values()) {

@@ -20,6 +20,4 @@ public interface AccountRegister {
   float getMaxAccBalance(int clientId);
 
   float getTotalAccBalance(int clientId);
-
-  List<Account> getClientAccounts(int clientId);
 }
