@@ -13,7 +13,10 @@ import kz.greetgo.sandbox.db.dao.ClientDao;
 import kz.greetgo.sandbox.db.util.JdbcSandbox;
 import kz.greetgo.sandbox.db.util.YearDifference;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.time.Year;
+import java.util.ArrayList;
 import java.util.List;
 
 @Bean
@@ -29,11 +32,14 @@ public class AccountRegisterImpl implements AccountRegister {
 
     StringBuilder queryBuilder = new StringBuilder();
     queryBuilder.append(
-      "SELECT " +
-        "Clients.id, Clients.surname, Clients.name, Clients.patronymic, Clients.gender, " +
-        "DATE_PART('year', AGE(Clients.birthDate)) as age, Charms.name as charmName, " +
-      "MIN(Accounts.money) minAccBalance, MAX(Accounts.money) maxAccBalance, SUM(Accounts.money) totalAccBalance " +
-      "FROM Clients, Charms, Accounts");
+      "SELECT\n" +
+        "Clients.id, Clients.surname, Clients.name, Clients.patronymic, Clients.gender,\n" +
+        "DATE_PART('year', AGE(Clients.birthDate)) as age, Charms.name as charmName,\n" +
+        "MIN(Accounts.money) minAccBalance, MAX(Accounts.money) maxAccBalance, SUM(Accounts.money) totalAccBalance,\n" +
+        "count(*) OVER() AS totalItemsCount\n" +
+      "FROM Clients\n" +
+        "JOIN Accounts on Clients.id = Accounts.clientId\n" +
+        "JOIN Charms on Clients.charmId = Charms.id");
 
     String f = requestDetails.filter.toLowerCase().trim();
     if(!f.isEmpty()) {
@@ -76,28 +82,36 @@ public class AccountRegisterImpl implements AccountRegister {
     queryBuilder.append(requestDetails.pageSize * requestDetails.pageIndex);
     queryBuilder.append(";");
 
-    //  jdbc.get().execute((connection)->{
-    //
-    //    String testSql = "select * from client;";
-    //
-    //    try(PreparedStatement ps = connection.prepareStatement(testSql)) {
-    //
-    //    try(ResultSet rs = ps.executeQuery()) {
-    //
-    //    while (rs.next()){
-    //    Client client = new Client();
-    //    client.name = rs.getString("name");
-    //    }
-    //    }
-    //
-    //    }
-    //
-    //    return null;
-    //    });
+    ClientAccountRecordPage page = new ClientAccountRecordPage();
+    page.items = new ArrayList<>();
 
+    jdbc.get().execute((connection)->{
 
+      try(PreparedStatement ps = connection.prepareStatement(queryBuilder.toString())) {
 
-    return null;
+        try(ResultSet rs = ps.executeQuery()) {
+          while (rs.next()) {
+            page.totalItemsCount = rs.getInt("totalItemsCount");
+
+            ClientAccountRecord record = new ClientAccountRecord();
+            record.clientId = rs.getInt("id");
+            record.clientFullName = (rs.getString("surname")+" "
+              +rs.getString("name")+" "+rs.getString("patronymic")).trim();
+            record.clientAge = rs.getInt("age");
+            record.clientCharmName = rs.getString("charmName");
+            record.minAccBalance = rs.getFloat("minAccBalance");
+            record.maxAccBalance = rs.getFloat("maxAccBalance");
+            record.totalAccBalance = rs.getFloat("totalAccBalance");
+
+            page.items.add(record);
+          }
+        }
+      }
+
+      return null;
+    });
+
+    return page;
   }
 
   @Override
