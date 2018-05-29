@@ -143,7 +143,7 @@ public class AccountRegisterImplTest extends ParentTestNg {
 
     //
     //
-    ClientAccountRecord actual = accountRegister.get().getClientAccountRecord(client.id);
+    accountRegister.get().getClientAccountRecord(client.id);
     //
     //
   }
@@ -171,12 +171,26 @@ public class AccountRegisterImplTest extends ParentTestNg {
 
     //
     //
-    ClientAccountRecord record = accountRegister.get().getClientAccountRecord(client.id);
+    float actual = accountRegister.get().getMinAccBalance(client.id);
     //
     //
 
-    assertThat(record).isNotNull();
-    assertThat(record.minAccBalance).isEqualTo(expected);
+    assertThat(actual).isNotNull();
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test(expectedExceptions = NoAccount.class)
+  public void getMinAccBalance_noAccount() {
+    truncateTables();
+
+    Charm charm = initCharm(RND.plusInt(20));
+    Client client = initClient(RND.plusInt(10), charm.id, true);
+
+    //
+    //
+    accountRegister.get().getMinAccBalance(client.id);
+    //
+    //
   }
 
   @DataProvider
@@ -202,12 +216,26 @@ public class AccountRegisterImplTest extends ParentTestNg {
 
     //
     //
-    ClientAccountRecord record = accountRegister.get().getClientAccountRecord(client.id);
+    float actual = accountRegister.get().getMaxAccBalance(client.id);
     //
     //
 
-    assertThat(record).isNotNull();
-    assertThat(record.maxAccBalance).isEqualTo(expected);
+    assertThat(actual).isNotNull();
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test(expectedExceptions = NoAccount.class)
+  public void getMaxAccBalance_noAccount() {
+    truncateTables();
+
+    Charm charm = initCharm(RND.plusInt(20));
+    Client client = initClient(RND.plusInt(10), charm.id, true);
+
+    //
+    //
+    accountRegister.get().getMaxAccBalance(client.id);
+    //
+    //
   }
 
   @DataProvider
@@ -233,12 +261,26 @@ public class AccountRegisterImplTest extends ParentTestNg {
 
     //
     //
-    ClientAccountRecord record = accountRegister.get().getClientAccountRecord(client.id);
+    float actual = accountRegister.get().getTotalAccBalance(client.id);
     //
     //
 
-    assertThat(record).isNotNull();
-    assertThat(record.totalAccBalance).isEqualTo(expected);
+    assertThat(actual).isNotNull();
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test(expectedExceptions = NoAccount.class)
+  public void getTotalAccBalance_noAccount() {
+    truncateTables();
+
+    Charm charm = initCharm(RND.plusInt(20));
+    Client client = initClient(RND.plusInt(10), charm.id, true);
+
+    //
+    //
+    accountRegister.get().getTotalAccBalance(client.id);
+    //
+    //
   }
 
 }

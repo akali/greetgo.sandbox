@@ -41,10 +41,6 @@ public class AccountRegisterImpl implements AccountRegister {
     record.clientCharmName = charm.name;
     record.clientAge = YearDifference.calculate(client.birthDate);
 
-    int accountCount = accountDao.get().getAccountCount(clientId);
-    if(accountCount == 0) {
-      throw new NoAccount(clientId);
-    }
     record.minAccBalance = getMinAccBalance(clientId);
     record.maxAccBalance = getMaxAccBalance(clientId);
     record.totalAccBalance = getTotalAccBalance(clientId);
@@ -69,16 +65,31 @@ public class AccountRegisterImpl implements AccountRegister {
 
   @Override
   public float getMinAccBalance(int clientId) {
+    int accountCount = accountDao.get().getAccountCount(clientId);
+    if(accountCount == 0) {
+      throw new NoAccount(clientId);
+    }
+
     return accountDao.get().getMinAccountBalance(clientId);
   }
 
   @Override
   public float getMaxAccBalance(int clientId) {
+    int accountCount = accountDao.get().getAccountCount(clientId);
+    if(accountCount == 0) {
+      throw new NoAccount(clientId);
+    }
+
     return accountDao.get().getMaxAccountBalance(clientId);
   }
 
   @Override
   public float getTotalAccBalance(int clientId) {
+    int accountCount = accountDao.get().getAccountCount(clientId);
+    if(accountCount == 0) {
+      throw new NoAccount(clientId);
+    }
+
     return accountDao.get().getTotalAccountBalance(clientId);
   }
 
