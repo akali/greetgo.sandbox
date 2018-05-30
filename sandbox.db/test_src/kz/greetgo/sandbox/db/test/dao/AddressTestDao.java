@@ -1,9 +1,12 @@
 package kz.greetgo.sandbox.db.test.dao;
 
 import kz.greetgo.sandbox.controller.model.Address;
+import kz.greetgo.sandbox.controller.model.AddressType;
 import kz.greetgo.sandbox.db.stand.model.AddressDot;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 public interface AddressTestDao {
 
@@ -15,17 +18,9 @@ public interface AddressTestDao {
     "values ( #{id,}, #{clientId}, #{type}::AddressType, #{street}, #{house}, #{flat} )")
   void insertAddress(Address address);
 
-  @Delete("drop table if exists Addresses cascade;" +
-    "create table Addresses (\n" +
-    "        id serial primary key,\n" +
-    "        clientId integer references Clients(id) on delete cascade,\n" +
-    "        type AddressType not null,\n" +
-    "        street varchar(100) not null,\n" +
-    "        house varchar(100) not null,\n" +
-    "        flat varchar(100),\n" +
-    "        isActive boolean default true\n" +
-    "      )")
-  void recreateTable();
+  @Select("select * from addresses where clientId = #{clientId} and type = #{type}::AddressType")
+  Address getAddressByClientIdAndType(@Param("clientId") int clientId,
+                                      @Param("type") AddressType type);
 
   @Delete("Truncate Addresses cascade")
   void truncateTable();

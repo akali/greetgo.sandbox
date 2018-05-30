@@ -19,4 +19,11 @@ public class Address {
     this.house = house;
     this.flat = flat;
   }
+
+  public Address(AddressType type, String street, String house, String flat) {
+    this.type = type;
+    this.street = street;
+    this.house = house;
+    this.flat = flat;
+  }
 }

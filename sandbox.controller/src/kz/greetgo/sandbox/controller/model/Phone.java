@@ -9,6 +9,8 @@ public class Phone {
   public PhoneType type;
   public boolean isActive = true;
 
+  public Phone() { }
+
   public Phone(int id, int clientId, String number, PhoneType type) {
     this.id = id;
     this.clientId = clientId;
@@ -16,7 +18,10 @@ public class Phone {
     this.type = type;
   }
 
-  public Phone() { }
+  public Phone(String number, PhoneType type) {
+    this.number = number;
+    this.type = type;
+  }
 
   @Override
   public boolean equals(Object o) {

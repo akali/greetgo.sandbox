@@ -1,6 +1,7 @@
 package kz.greetgo.sandbox.db.register_impl;
 
 import kz.greetgo.depinject.core.BeanGetter;
+import kz.greetgo.sandbox.controller.errors.InvalidClientData;
 import kz.greetgo.sandbox.controller.errors.NotFound;
 import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.controller.register.client.ClientRegister;
@@ -9,11 +10,13 @@ import kz.greetgo.sandbox.db.test.util.ParentTestNg;
 import kz.greetgo.sandbox.db.test.util.RandomDate;
 import kz.greetgo.sandbox.db.util.JdbcSandbox;
 import kz.greetgo.util.RND;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -36,7 +39,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
     addressTestDao.get().truncateTable();
     phoneTestDao.get().truncateTable();
 
-    jdbc.get().execute((connection)->{
+    jdbc.get().execute((connection) -> {
 
       String restartCharmSeq = "ALTER SEQUENCE charm_id_seq RESTART WITH 1;";
       String restartClientSeq = "ALTER SEQUENCE client_id_seq RESTART WITH 1;";
@@ -297,7 +300,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
   }
 
   @Test
-  public void createNewClient() throws ParseException {
+  public void createNewClient_insertData() throws ParseException {
     truncateTables();
 
     initCharm(1, true);
@@ -312,20 +315,329 @@ public class ClientRegisterImplTest extends ParentTestNg {
     clientToSave.birthDate = randomDate.nextDate();
     clientToSave.charmId = 1;
 
+    clientToSave.factAddress = new Address(AddressType.FACT, RND.str(10), RND.str(10), RND.str(10));
+    clientToSave.regAddress = new Address(AddressType.REG, RND.str(10), RND.str(10), RND.str(10));
+
+    clientToSave.phones = new ArrayList<>();
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.HOME));
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.WORK));
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+
     //
     //
     clientRegister.get().createNewClient(clientToSave);
-    Client client = clientTestDao.get().getActiveClientById(1);
+
+    Client actualClient = clientTestDao.get().getActiveClientById(1);
+
+    Address actualFactAddress = addressTestDao.get().getAddressByClientIdAndType(1, AddressType.FACT);
+    Address actualRegAddress = addressTestDao.get().getAddressByClientIdAndType(1, AddressType.REG);
+
+    Phone actualHomePhone = phoneTestDao.get().getPhoneByClientIdAndType(1, PhoneType.HOME);
+    Phone actualWorkPhone = phoneTestDao.get().getPhoneByClientIdAndType(1, PhoneType.WORK);
+    List<Phone> actualMobiles = phoneTestDao.get().getMobilesByClientId(1);
     //
     //
 
-    assertThat(client).isNotNull();
-    assertThat(client.name).isEqualToIgnoringCase(clientToSave.name);
-    assertThat(client.surname).isEqualToIgnoringCase(clientToSave.surname);
-    assertThat(client.patronymic).isEqualToIgnoringCase(clientToSave.patronymic);
-    assertThat(client.gender).isEqualsToByComparingFields(clientToSave.gender);
-    assertThat(client.birthDate).isEqualTo(clientToSave.birthDate);
-    assertThat(client.charmId).isEqualTo(clientToSave.charmId);
+    assertThat(actualClient).isNotNull();
+    assertThat(actualClient.name).isEqualToIgnoringCase(clientToSave.name);
+    assertThat(actualClient.surname).isEqualToIgnoringCase(clientToSave.surname);
+    assertThat(actualClient.patronymic).isEqualToIgnoringCase(clientToSave.patronymic);
+    assertThat(actualClient.gender).isEqualsToByComparingFields(clientToSave.gender);
+    assertThat(actualClient.birthDate).isEqualTo(clientToSave.birthDate);
+    assertThat(actualClient.charmId).isEqualTo(clientToSave.charmId);
+
+    assertThat(actualFactAddress).isNotNull();
+    assertThat(actualFactAddress).isEqualsToByComparingFields(clientToSave.factAddress);
+
+    assertThat(actualRegAddress).isNotNull();
+    assertThat(actualRegAddress).isEqualsToByComparingFields(clientToSave.regAddress);
+
+    assertThat(actualHomePhone).isNotNull();
+    assertThat(actualHomePhone).isEqualsToByComparingFields(clientToSave.phones.get(0));
+
+    assertThat(actualWorkPhone).isNotNull();
+    assertThat(actualWorkPhone).isEqualsToByComparingFields(clientToSave.phones.get(1));
+
+    assertThat(actualMobiles).isNotNull();
+    assertThat(actualMobiles).hasSize(2);
+    assertThat(actualMobiles.get(0)).isEqualsToByComparingFields(clientToSave.phones.get(2));
+    assertThat(actualMobiles.get(1)).isEqualsToByComparingFields(clientToSave.phones.get(3));
+  }
+
+  @Test
+  public void createNewClient_insertData_null_patronymic_and_factAddress() throws ParseException {
+    truncateTables();
+
+    initCharm(1, true);
+
+    RandomDate randomDate = new RandomDate();
+
+    ClientToSave clientToSave = new ClientToSave();
+    clientToSave.surname = RND.str(15);
+    clientToSave.name = RND.str(15);
+    clientToSave.patronymic = null;
+    clientToSave.gender = Gender.FEMALE;
+    clientToSave.birthDate = randomDate.nextDate();
+    clientToSave.charmId = 1;
+
+    clientToSave.regAddress = new Address(AddressType.REG, RND.str(10), RND.str(10), RND.str(10));
+
+    clientToSave.phones = new ArrayList<>();
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.HOME));
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.WORK));
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+
+    //
+    //
+    clientRegister.get().createNewClient(clientToSave);
+
+    Client actualClient = clientTestDao.get().getActiveClientById(1);
+
+    Address actualFactAddress = addressTestDao.get().getAddressByClientIdAndType(1, AddressType.FACT);
+    Address actualRegAddress = addressTestDao.get().getAddressByClientIdAndType(1, AddressType.REG);
+
+    Phone actualHomePhone = phoneTestDao.get().getPhoneByClientIdAndType(1, PhoneType.HOME);
+    Phone actualWorkPhone = phoneTestDao.get().getPhoneByClientIdAndType(1, PhoneType.WORK);
+    List<Phone> actualMobiles = phoneTestDao.get().getMobilesByClientId(1);
+    //
+    //
+
+    assertThat(actualClient).isNotNull();
+    assertThat(actualClient.name).isEqualToIgnoringCase(clientToSave.name);
+    assertThat(actualClient.surname).isEqualToIgnoringCase(clientToSave.surname);
+    assertThat(actualClient.patronymic).isNull();
+    assertThat(actualClient.gender).isEqualsToByComparingFields(clientToSave.gender);
+    assertThat(actualClient.birthDate).isEqualTo(clientToSave.birthDate);
+    assertThat(actualClient.charmId).isEqualTo(clientToSave.charmId);
+
+    assertThat(actualFactAddress).isNull();
+
+    assertThat(actualRegAddress).isNotNull();
+    assertThat(actualRegAddress).isEqualsToByComparingFields(clientToSave.regAddress);
+
+    assertThat(actualHomePhone).isNotNull();
+    assertThat(actualHomePhone).isEqualsToByComparingFields(clientToSave.phones.get(0));
+
+    assertThat(actualWorkPhone).isNotNull();
+    assertThat(actualWorkPhone).isEqualsToByComparingFields(clientToSave.phones.get(1));
+
+    assertThat(actualMobiles).isNotNull();
+    assertThat(actualMobiles).hasSize(2);
+    assertThat(actualMobiles.get(0)).isEqualsToByComparingFields(clientToSave.phones.get(2));
+    assertThat(actualMobiles.get(1)).isEqualsToByComparingFields(clientToSave.phones.get(3));
+  }
+
+  @DataProvider
+  public static Object[][] fullName_DP() {
+    return new Object[][]{
+      {"Вася", "Иван", "Пупкин", "Вася Иван Пупкин"},
+      {" Вася ", " Иван  ", "Пупкин ", "Вася Иван Пупкин"},
+      {"Вася", "Иван", null, "Вася Иван"},
+    };
+  }
+
+  @Test(dataProvider = "fullName_DP")
+  public void createNewClient_record_fullName(String surname,
+                                              String name,
+                                              String patronymic,
+                                              String expected) throws ParseException {
+    truncateTables();
+
+    initCharm(1, true);
+
+    RandomDate randomDate = new RandomDate();
+
+    ClientToSave clientToSave = new ClientToSave();
+    clientToSave.gender = Gender.FEMALE;
+    clientToSave.birthDate = randomDate.nextDate();
+    clientToSave.charmId = 1;
+    clientToSave.regAddress = new Address(AddressType.REG, RND.str(10), RND.str(10), RND.str(10));
+    clientToSave.phones = new ArrayList<>();
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.HOME));
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.WORK));
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+
+
+    clientToSave.surname = surname;
+    clientToSave.name = name;
+    clientToSave.patronymic = patronymic;
+
+    //
+    //
+    ClientAccountRecord actual = clientRegister.get().createNewClient(clientToSave);
+    //
+    //
+
+    assertThat(actual).isNotNull();
+    assertThat(actual.clientFullName).isEqualToIgnoringCase(expected);
+  }
+
+  @Test
+  public void createNewClient_record_accountBalances() throws ParseException {
+    truncateTables();
+
+    initCharm(1, true);
+
+    RandomDate randomDate = new RandomDate();
+
+    ClientToSave clientToSave = new ClientToSave();
+    clientToSave.surname = RND.str(15);
+    clientToSave.name = RND.str(15);
+    clientToSave.patronymic = RND.str(15);
+    clientToSave.gender = Gender.FEMALE;
+    clientToSave.birthDate = randomDate.nextDate();
+    clientToSave.charmId = 1;
+    clientToSave.regAddress = new Address(AddressType.REG, RND.str(10), RND.str(10), RND.str(10));
+    clientToSave.phones = new ArrayList<>();
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.HOME));
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.WORK));
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+
+
+    //
+    //
+    ClientAccountRecord actual = clientRegister.get().createNewClient(clientToSave);
+    //
+    //
+
+    assertThat(actual).isNotNull();
+    assertThat(actual.minAccBalance).isEqualTo(0f);
+    assertThat(actual.maxAccBalance).isEqualTo(0f);
+    assertThat(actual.totalAccBalance).isEqualTo(0f);
+  }
+
+
+  @DataProvider
+  public static Object[][] nullValues_DP() throws ParseException {
+    return new Object[][]{
+      {
+        null,
+        RND.str(15),
+        Gender.MALE,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
+        RND.str(15),
+        null,
+        Gender.MALE,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
+        RND.str(15),
+        RND.str(15),
+        null,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
+        RND.str(15),
+        RND.str(15),
+        Gender.MALE,
+        null,
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
+        RND.str(15),
+        RND.str(15),
+        Gender.MALE,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        null,
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
+        RND.str(15),
+        RND.str(15),
+        null,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        null,
+      },
+      {
+        RND.str(15),
+        RND.str(15),
+        null,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
+        RND.str(15),
+        RND.str(15),
+        null,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
+        RND.str(15),
+        RND.str(15),
+        null,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+        }}
+      }
+    };
+  }
+
+  @Test(dataProvider = "nullValues_DP", expectedExceptions = InvalidClientData.class)
+  public void createNewClient_nullValues(String surname, String name, Gender gender,
+                                         Date birthDate, Address regAddress, List<Phone> phones) throws ParseException {
+    truncateTables();
+
+    initCharm(1, true);
+
+    ClientToSave clientToSave = new ClientToSave();
+    clientToSave.surname = surname;
+    clientToSave.name = name;
+    clientToSave.gender = gender;
+    clientToSave.birthDate = birthDate;
+    clientToSave.charmId = 1;
+
+    clientToSave.regAddress = regAddress;
+    clientToSave.phones = phones;
+
+    //
+    //
+    clientRegister.get().createNewClient(clientToSave);
+    //
+    //
   }
 
 }

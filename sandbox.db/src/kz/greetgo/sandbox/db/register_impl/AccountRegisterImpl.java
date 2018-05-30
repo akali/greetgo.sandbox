@@ -110,32 +110,32 @@ public class AccountRegisterImpl implements AccountRegister {
   private String initQueryHeader() {
     return
       "WITH joined_clients_accounts AS (\n" +
-      "    SELECT\n" +
-      "      c.id client_id,\n" +
-      "      a.id account_id,\n" +
-      "      a.money money\n" +
-      "    FROM clients c\n" +
-      "      LEFT OUTER JOIN accounts a ON c.id = a.clientid\n" +
-      "    WHERE c.isactive = TRUE AND a.isactive = TRUE\n" +
-      "    GROUP BY c.id, a.id\n" +
-      "    ORDER BY c.id\n" +
-      ")\n" +
-      "SELECT\n" +
-      "  clients.id,\n" +
-      "  clients.surname,\n" +
-      "  clients.name,\n" +
-      "  COALESCE(clients.patronymic, '') as patronymic,\n" +
-      "  clients.gender,\n" +
-      "  DATE_PART('year', AGE(clients.birthDate)) as age,\n" +
-      "  charms.name as charmName,\n" +
-      "  count(*) OVER() AS totalItemsCount,\n" +
-      "  coalesce(MIN(money), 0) as minAccBalance,\n" +
-      "  coalesce(MAX(money), 0) as maxAccBalance,\n" +
-      "  coalesce(SUM(money), 0) as totalAccBalance\n" +
-      "FROM clients\n" +
-      "  LEFT OUTER JOIN joined_clients_accounts ON client_id = clients.id\n" +
-      "  JOIN charms on clients.charmid = charms.id\n" +
-      "WHERE clients.isactive = true";
+        "    SELECT\n" +
+        "      c.id client_id,\n" +
+        "      a.id account_id,\n" +
+        "      a.money money\n" +
+        "    FROM clients c\n" +
+        "      LEFT OUTER JOIN accounts a ON c.id = a.clientid\n" +
+        "    WHERE c.isactive = TRUE AND a.isactive = TRUE\n" +
+        "    GROUP BY c.id, a.id\n" +
+        "    ORDER BY c.id\n" +
+        ")\n" +
+        "SELECT\n" +
+        "  clients.id,\n" +
+        "  clients.surname,\n" +
+        "  clients.name,\n" +
+        "  COALESCE(clients.patronymic, '') as patronymic,\n" +
+        "  clients.gender,\n" +
+        "  DATE_PART('year', AGE(clients.birthDate)) as age,\n" +
+        "  charms.name as charmName,\n" +
+        "  count(*) OVER() AS totalItemsCount,\n" +
+        "  coalesce(MIN(money), 0) as minAccBalance,\n" +
+        "  coalesce(MAX(money), 0) as maxAccBalance,\n" +
+        "  coalesce(SUM(money), 0) as totalAccBalance\n" +
+        "FROM clients\n" +
+        "  LEFT OUTER JOIN joined_clients_accounts ON client_id = clients.id\n" +
+        "  JOIN charms on clients.charmid = charms.id\n" +
+        "WHERE clients.isactive = true";
   }
 
   @Override
@@ -148,7 +148,10 @@ public class AccountRegisterImpl implements AccountRegister {
     Charm charm = charmDao.get().getCharm(client.charmId);
 
     record.clientId = client.id;
-    record.clientFullName = String.format("%s %s %s", client.surname, client.name, client.patronymic).trim();
+
+    record.clientFullName = String.format("%s %s", client.surname, client.name).trim();
+    if (client.patronymic != null) record.clientFullName += " " + client.patronymic;
+
     record.clientCharmName = charm.name;
     record.clientAge = YearDifference.calculate(client.birthDate);
 
