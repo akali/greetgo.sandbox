@@ -14,6 +14,10 @@ public interface PhoneTestDao {
 
   @Insert("insert into Phones ( id, clientId, number, type, isActive ) " +
   "                               values ( #{id}, #{clientId}, #{number}, #{type}::PhoneType, #{isActive} )")
+  void insertPhoneWithId(Phone phone);
+
+  @Insert("insert into Phones ( clientId, number, type ) " +
+    "                               values ( #{clientId}, #{number}, #{type}::PhoneType )")
   void insertPhone(Phone phone);
 
   @Select("select * from phones where clientId = #{clientId} and type = #{type}::PhoneType")

@@ -18,6 +18,12 @@ public class Phone {
     this.type = type;
   }
 
+  public Phone(int clientId, String number, PhoneType type) {
+    this.clientId = clientId;
+    this.number = number;
+    this.type = type;
+  }
+
   public Phone(String number, PhoneType type) {
     this.number = number;
     this.type = type;

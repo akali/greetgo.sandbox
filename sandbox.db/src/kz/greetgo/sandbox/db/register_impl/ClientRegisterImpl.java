@@ -109,7 +109,8 @@ public class ClientRegisterImpl implements ClientRegister {
         && clientToSave.regAddress.street != null
         && clientToSave.regAddress.house != null
         && (clientToSave.factAddress == null
-        || (clientToSave.factAddress.street != null && clientToSave.factAddress.house != null))
+          || (clientToSave.factAddress.street != null && clientToSave.factAddress.house != null))
+        && clientToSave.phones != null
         && arePhonesValid(clientToSave.phones);
   }
 
@@ -128,6 +129,23 @@ public class ClientRegisterImpl implements ClientRegister {
 
   @Override
   public ClientAccountRecord editClient(ClientToSave clientToSave) {
+    if (!isValidClientData(clientToSave)) throw new InvalidClientData();
+
+    Client client = new Client();
+    client.id = clientToSave.id;
+    client.name = clientToSave.name.trim();
+    client.surname = clientToSave.surname.trim();
+    client.patronymic = clientToSave.patronymic != null ? clientToSave.patronymic.trim() : null;
+
+    client.gender = clientToSave.gender;
+    client.birthDate = clientToSave.birthDate;
+    client.charmId = clientToSave.charmId;
+
+    clientDao.get().updateClient(client);
+
+    addressDao.get().updateAddress(clientToSave.regAddress);
+    addressDao.get().insertAddress(clientToSave.factAddress);
+
     return null;
   }
 

@@ -1,8 +1,8 @@
 package kz.greetgo.sandbox.controller.model;
 
 public class Address {
-  public int id;
-  public int clientId;
+  public int id = -1;
+  public int clientId = -1;
   public AddressType type;
   public String street;
   public String house;
@@ -13,6 +13,14 @@ public class Address {
 
   public Address(int id, int clientId, AddressType type, String street, String house, String flat) {
     this.id = id;
+    this.clientId = clientId;
+    this.type = type;
+    this.street = street;
+    this.house = house;
+    this.flat = flat;
+  }
+
+  public Address(int clientId, AddressType type, String street, String house, String flat) {
     this.clientId = clientId;
     this.type = type;
     this.street = street;

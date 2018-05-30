@@ -4,6 +4,7 @@ import kz.greetgo.sandbox.controller.model.Client;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 public interface ClientDao {
 
@@ -14,7 +15,7 @@ public interface ClientDao {
     "values ( #{id}, #{surname}, #{name}, #{patronymic}, #{gender}::Gender, #{birthDate}, #{charmId} )")
   void insertClient(Client client);
 
-  @Select("select id from Clients order by id desc limit 1")
-  int getLastId();
-
+  @Update("update clients set name = #{name}, surname = #{surname}, patronymic = #{patronymic}," +
+    " gender = #{gender}::Gender, birthDate = #{birthDate}, charmId = #{charmId} where id = #{id} and isActive = true")
+  void updateClient(Client client);
 }

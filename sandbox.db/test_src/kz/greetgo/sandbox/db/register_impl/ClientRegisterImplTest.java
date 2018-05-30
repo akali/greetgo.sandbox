@@ -109,7 +109,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
     phone.number = RND.str(10);
     phone.isActive = isActive;
 
-    phoneTestDao.get().insertPhone(phone);
+    phoneTestDao.get().insertPhoneWithId(phone);
 
     return phone;
   }
@@ -510,7 +510,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
 
 
   @DataProvider
-  public static Object[][] nullValues_DP() throws ParseException {
+  public static Object[][] create_invalidValues_DP() throws ParseException {
     return new Object[][]{
       {
         null,
@@ -525,8 +525,56 @@ public class ClientRegisterImplTest extends ParentTestNg {
         }}
       },
       {
+        "",
+        RND.str(15),
+        Gender.MALE,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
+        "  ",
+        RND.str(15),
+        Gender.MALE,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
         RND.str(15),
         null,
+        Gender.MALE,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
+        RND.str(15),
+        "",
+        Gender.MALE,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
+        RND.str(15),
+        "  ",
         Gender.MALE,
         new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
         new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
@@ -575,7 +623,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
       {
         RND.str(15),
         RND.str(15),
-        null,
+        Gender.MALE,
         new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
         new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
         null,
@@ -583,7 +631,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
       {
         RND.str(15),
         RND.str(15),
-        null,
+        Gender.MALE,
         new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
         new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
         new ArrayList<Phone>() {{
@@ -594,7 +642,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
       {
         RND.str(15),
         RND.str(15),
-        null,
+        Gender.MALE,
         new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
         new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
         new ArrayList<Phone>() {{
@@ -605,7 +653,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
       {
         RND.str(15),
         RND.str(15),
-        null,
+        Gender.MALE,
         new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
         new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
         new ArrayList<Phone>() {{
@@ -616,8 +664,8 @@ public class ClientRegisterImplTest extends ParentTestNg {
     };
   }
 
-  @Test(dataProvider = "nullValues_DP", expectedExceptions = InvalidClientData.class)
-  public void createNewClient_nullValues(String surname, String name, Gender gender,
+  @Test(dataProvider = "create_invalidValues_DP", expectedExceptions = InvalidClientData.class)
+  public void createNewClient_invalidValues(String surname, String name, Gender gender,
                                          Date birthDate, Address regAddress, List<Phone> phones) throws ParseException {
     truncateTables();
 
@@ -640,4 +688,302 @@ public class ClientRegisterImplTest extends ParentTestNg {
     //
   }
 
+  @Test
+  public void editClient_clientData() throws ParseException {
+    truncateTables();
+
+    initCharm(1, true);
+
+    Client client = initClient(1, 1);
+    initAddress(0, AddressType.REG, 1);
+    initPhone(0, PhoneType.HOME, 1, true);
+    initPhone(1, PhoneType.WORK, 1, true);
+    initPhone(2, PhoneType.MOBILE, 1, true);
+
+    RandomDate randomDate = new RandomDate();
+
+    ClientToSave expected = new ClientToSave();
+    expected.id = client.id;
+    expected.surname = RND.str(15);
+    expected.name = RND.str(15);
+    expected.patronymic = RND.str(15);
+    expected.gender = Gender.FEMALE;
+    expected.birthDate = randomDate.nextDate();
+    expected.charmId = 1;
+
+    //
+    //
+    clientRegister.get().editClient(expected);
+
+    ClientDetails actual = clientRegister.get().getClientDetails(client.id);
+    //
+    //
+
+    assertThat(actual).isNotNull();
+    assertThat(actual.name).isEqualToIgnoringCase(expected.name);
+    assertThat(actual.surname).isEqualToIgnoringCase(expected.surname);
+    assertThat(actual.patronymic).isEqualToIgnoringCase(expected.patronymic);
+    assertThat(actual.gender).isEqualsToByComparingFields(expected.gender);
+    assertThat(actual.birthDate).isEqualTo(expected.birthDate);
+    assertThat(actual.charmId).isEqualTo(expected.charmId);
+  }
+
+  @Test
+  public void editClient_addresses() throws ParseException {
+    truncateTables();
+
+    initCharm(1, true);
+
+    Client client = initClient(1, 1);
+    initAddress(0, AddressType.REG, 1);
+
+    phoneTestDao.get().insertPhone(new Phone(1, RND.intStr(10), PhoneType.HOME));
+    phoneTestDao.get().insertPhone(new Phone(1, RND.intStr(10), PhoneType.WORK));
+    phoneTestDao.get().insertPhone(new Phone(1, RND.intStr(10), PhoneType.MOBILE));
+    phoneTestDao.get().insertPhone(new Phone(1, RND.intStr(10), PhoneType.MOBILE));
+
+    RandomDate randomDate = new RandomDate();
+
+    ClientToSave expected = new ClientToSave();
+    expected.id = client.id;
+    expected.surname = RND.str(15);
+    expected.name = RND.str(15);
+    expected.patronymic = RND.str(15);
+    expected.gender = Gender.FEMALE;
+    expected.birthDate = randomDate.nextDate();
+    expected.charmId = 1;
+
+    expected.regAddress = new Address(0, client.id, AddressType.REG, RND.str(10), RND.str(10), RND.str(10));
+    expected.factAddress = new Address(client.id, AddressType.FACT, RND.str(10), RND.str(10), RND.str(10));
+
+    expected.phones = new ArrayList<>();
+    expected.phones.add(new Phone(RND.intStr(10), PhoneType.HOME));
+    expected.phones.add(new Phone(RND.intStr(10), PhoneType.WORK));
+    expected.phones.add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+
+    //
+    //
+    clientRegister.get().editClient(expected);
+
+    ClientDetails actual = clientRegister.get().getClientDetails(client.id);
+    //
+    //
+
+    assertThat(actual.regAddress).isNotNull();
+    assertThat(actual.regAddress.type).isEqualsToByComparingFields(expected.regAddress.type);
+    assertThat(actual.regAddress.house).isEqualToIgnoringCase(expected.regAddress.house);
+    assertThat(actual.regAddress.street).isEqualToIgnoringCase(expected.regAddress.street);
+    assertThat(actual.regAddress.flat).isEqualToIgnoringCase(expected.regAddress.flat);
+
+    assertThat(actual.factAddress).isNotNull();
+    assertThat(actual.factAddress.type).isEqualsToByComparingFields(expected.factAddress.type);
+    assertThat(actual.factAddress.house).isEqualToIgnoringCase(expected.factAddress.house);
+    assertThat(actual.factAddress.street).isEqualToIgnoringCase(expected.factAddress.street);
+    assertThat(actual.factAddress.flat).isEqualToIgnoringCase(expected.factAddress.flat);
+  }
+
+  @Test
+  public void editClient_phones() throws ParseException {
+    truncateTables();
+
+    initCharm(1, true);
+
+    Client client = initClient(1, 1);
+
+    phoneTestDao.get().insertPhone(new Phone(1, RND.intStr(10), PhoneType.HOME));
+    phoneTestDao.get().insertPhone(new Phone(1, RND.intStr(10), PhoneType.WORK));
+    phoneTestDao.get().insertPhone(new Phone(1, RND.intStr(10), PhoneType.MOBILE));
+    phoneTestDao.get().insertPhone(new Phone(1, RND.intStr(10), PhoneType.MOBILE));
+
+    ClientToSave expected = new ClientToSave();
+
+    expected.phones = new ArrayList<>();
+    expected.phones.add(new Phone(RND.intStr(10), PhoneType.HOME));
+    expected.phones.add(new Phone(RND.intStr(10), PhoneType.WORK));
+    expected.phones.add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+
+    //
+    //
+    clientRegister.get().editClient(expected);
+
+    ClientDetails actual = clientRegister.get().getClientDetails(client.id);
+    //
+    //
+
+    assertThat(actual).isNotNull();
+    assertThat(actual.phones).isNotNull();
+    assertThat(actual.phones).hasSize(expected.phones.size());
+
+    for(Phone phone : expected.phones) {
+      assertThat(actual.phones.stream().anyMatch(phone::equals));
+    }
+  }
+
+
+  @DataProvider
+  public static Object[][] edit_invalidValues_DP() throws ParseException {
+    return new Object[][]{
+      {
+        1,
+        null,
+        RND.str(15),
+        Gender.MALE,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
+        1,
+        RND.str(15),
+        null,
+        Gender.MALE,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
+        1,
+        RND.str(15),
+        RND.str(15),
+        null,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
+        1,
+        RND.str(15),
+        RND.str(15),
+        Gender.MALE,
+        null,
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
+        1,
+        RND.str(15),
+        RND.str(15),
+        Gender.MALE,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        null,
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
+        1,
+        RND.str(15),
+        RND.str(15),
+        Gender.MALE,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        null,
+      },
+      {
+        1,
+        RND.str(15),
+        RND.str(15),
+        Gender.MALE,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+//          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
+        1,
+        RND.str(15),
+        RND.str(15),
+        Gender.MALE,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+//          add(new Phone(RND.intStr(10), PhoneType.WORK));
+          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      },
+      {
+        12,
+        RND.str(15),
+        RND.str(15),
+        Gender.MALE,
+        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
+        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
+        new ArrayList<Phone>() {{
+          add(new Phone(RND.intStr(10), PhoneType.HOME));
+          add(new Phone(RND.intStr(10), PhoneType.WORK));
+//          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+        }}
+      }
+    };
+  }
+
+  @Test(dataProvider = "edit_invalidValues_DP", expectedExceptions = InvalidClientData.class)
+  public void editClient_invalidValues(int clientId, String surname, String name, Gender gender,
+                                         Date birthDate, Address regAddress, List<Phone> phones) throws ParseException {
+    truncateTables();
+
+    initCharm(1, true);
+
+    RandomDate randomDate = new RandomDate();
+
+    ClientToSave clientToSave = new ClientToSave();
+    clientToSave.surname = RND.str(15);
+    clientToSave.name = RND.str(15);
+    clientToSave.patronymic = RND.str(15);
+    clientToSave.gender = Gender.FEMALE;
+    clientToSave.birthDate = randomDate.nextDate();
+    clientToSave.charmId = 1;
+
+    clientToSave.factAddress = new Address(AddressType.FACT, RND.str(10), RND.str(10), RND.str(10));
+    clientToSave.regAddress = new Address(AddressType.REG, RND.str(10), RND.str(10), RND.str(10));
+
+    clientToSave.phones = new ArrayList<>();
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.HOME));
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.WORK));
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+
+    //
+    //
+    clientRegister.get().createNewClient(clientToSave);
+
+    ClientToSave expected = new ClientToSave();
+    expected.id = clientId;
+    expected.surname = surname;
+    expected.name = name;
+    expected.gender = gender;
+    expected.birthDate = birthDate;
+    expected.charmId = 1;
+
+    expected.regAddress = regAddress;
+    expected.phones = phones;
+
+    //
+    //
+    clientRegister.get().editClient(expected);
+    //
+    //
+  }
 }
