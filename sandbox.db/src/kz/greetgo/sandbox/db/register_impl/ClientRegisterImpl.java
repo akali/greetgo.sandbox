@@ -52,7 +52,7 @@ public class ClientRegisterImpl implements ClientRegister {
 
   @Override
   public ClientAccountRecord createNewClient(ClientToSave clientToSave) {
-    if (!isValidClientData(clientToSave)) throw new InvalidClientData();
+    if (!isValidClientData(clientToSave)) throw new InvalidClientData("invalid client data");
 
     Client client = new Client();
     client.name = clientToSave.name.trim();
@@ -100,36 +100,68 @@ public class ClientRegisterImpl implements ClientRegister {
   }
 
   private boolean isValidClientData(ClientToSave clientToSave) {
-    return
-      clientToSave.name != null
-        && clientToSave.surname != null
-        && clientToSave.birthDate != null
-        && clientToSave.gender != null
-        && clientToSave.regAddress != null
-        && clientToSave.regAddress.street != null
-        && clientToSave.regAddress.house != null
-        && (clientToSave.factAddress == null
-          || (clientToSave.factAddress.street != null && clientToSave.factAddress.house != null))
-        && clientToSave.phones != null
-        && arePhonesValid(clientToSave.phones);
-  }
+    if (clientToSave.name == null) {
+      throw new InvalidClientData("'name' cannot be a null");
+    }
 
-  private boolean arePhonesValid(List<Phone> phones) {
-    for (Phone phone : phones) {
+    if (clientToSave.surname == null) {
+      throw new InvalidClientData("'surname' cannot be a null");
+    }
+
+    if (clientToSave.birthDate == null) {
+      throw new InvalidClientData("'birthDate' cannot be a null");
+    }
+
+    if (clientToSave.gender == null) {
+      throw new InvalidClientData("'gender' cannot be a null");
+    }
+
+    if (clientToSave.regAddress == null) {
+      throw new InvalidClientData("'regAddress' cannot be a null");
+
+    }
+
+    if (clientToSave.regAddress.street == null || clientToSave.regAddress.house == null) {
+      throw new InvalidClientData("'street' and 'house' of regAddress cannot be a null");
+    }
+
+    if (clientToSave.factAddress != null
+          && (clientToSave.factAddress.street == null || clientToSave.factAddress.house == null)) {
+      throw new InvalidClientData("'street' and 'house' of factAddress cannot be a null");
+    }
+
+    if (clientToSave.phones == null) {
+      throw new InvalidClientData("'phones' cannot be a null");
+    }
+
+    for (Phone phone : clientToSave.phones) {
       if (!phone.number.matches("[0-9]+")) {
-        return false;
+        throw new InvalidClientData("phone should contain only numbers");
       }
     }
 
-    return !phones.isEmpty()
-      && phones.stream().anyMatch(p -> p.type == PhoneType.HOME)
-      && phones.stream().anyMatch(p -> p.type == PhoneType.WORK)
-      && phones.stream().anyMatch(p -> p.type == PhoneType.MOBILE);
+    if (clientToSave.phones.isEmpty()) {
+      throw new InvalidClientData("no phones are specified");
+    }
+
+    if (clientToSave.phones.stream().noneMatch(p -> p.type == PhoneType.HOME)) {
+      throw new InvalidClientData("client should have at least one HOME phone");
+    }
+
+    if (clientToSave.phones.stream().noneMatch(p -> p.type == PhoneType.WORK)) {
+      throw new InvalidClientData("client should have at least one WORK phone");
+    }
+
+    if (clientToSave.phones.stream().noneMatch(p -> p.type == PhoneType.MOBILE)) {
+      throw new InvalidClientData("client should have at least one MOBILE phone");
+    }
+
+    return true;
   }
 
   @Override
   public ClientAccountRecord editClient(ClientToSave clientToSave) {
-    if (!isValidClientData(clientToSave)) throw new InvalidClientData();
+    if (!isValidClientData(clientToSave)) throw new InvalidClientData("invalid data");
 
     Client client = new Client();
     client.id = clientToSave.id;
@@ -144,7 +176,9 @@ public class ClientRegisterImpl implements ClientRegister {
     clientDao.get().updateClient(client);
 
     addressDao.get().updateAddress(clientToSave.regAddress);
-    addressDao.get().insertAddress(clientToSave.factAddress);
+
+    if(clientToSave.factAddress != null)
+      addressDao.get().insertAddress(clientToSave.factAddress);
 
     return null;
   }

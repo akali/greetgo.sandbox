@@ -106,7 +106,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
     phone.id = phoneId;
     phone.type = type;
     phone.clientId = clientId;
-    phone.number = RND.str(10);
+    phone.number = RND.intStr(10);
     phone.isActive = isActive;
 
     phoneTestDao.get().insertPhoneWithId(phone);
@@ -692,15 +692,10 @@ public class ClientRegisterImplTest extends ParentTestNg {
   public void editClient_clientData() throws ParseException {
     truncateTables();
 
+    initCharm(0, true);
     initCharm(1, true);
 
-    Client client = initClient(1, 1);
-    initAddress(0, AddressType.REG, 1);
-    initPhone(0, PhoneType.HOME, 1, true);
-    initPhone(1, PhoneType.WORK, 1, true);
-    initPhone(2, PhoneType.MOBILE, 1, true);
-
-    RandomDate randomDate = new RandomDate();
+    Client client = initClient(0, 0);
 
     ClientToSave expected = new ClientToSave();
     expected.id = client.id;
@@ -708,8 +703,13 @@ public class ClientRegisterImplTest extends ParentTestNg {
     expected.name = RND.str(15);
     expected.patronymic = RND.str(15);
     expected.gender = Gender.FEMALE;
-    expected.birthDate = randomDate.nextDate();
+    expected.birthDate = new RandomDate().nextDate();
     expected.charmId = 1;
+    expected.regAddress = initAddress(0, AddressType.REG, client.id);
+    expected.phones = new ArrayList<>();
+    expected.phones.add(initPhone(0, PhoneType.HOME, client.id, true));
+    expected.phones.add(initPhone(1, PhoneType.WORK, client.id, true));
+    expected.phones.add(initPhone(2, PhoneType.MOBILE, client.id, true));
 
     //
     //
