@@ -2,7 +2,6 @@ package kz.greetgo.sandbox.db.register_impl;
 
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.sandbox.controller.errors.InvalidRequestDetails;
-import kz.greetgo.sandbox.controller.errors.NoAccount;
 import kz.greetgo.sandbox.controller.errors.NotFound;
 import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.controller.register.account.AccountRegister;
@@ -38,7 +37,7 @@ public class AccountRegisterImplTest extends ParentTestNg {
     accountTestDao.get().truncateTable();
     charmTestDao.get().truncateTable();
 
-    jdbc.get().execute((connection)->{
+    jdbc.get().execute((connection) -> {
 
       String restartCharmSeq = "ALTER SEQUENCE charm_id_seq RESTART WITH 1;";
       String restartClientSeq = "ALTER SEQUENCE client_id_seq RESTART WITH 1;";
@@ -103,6 +102,47 @@ public class AccountRegisterImplTest extends ParentTestNg {
     return account;
   }
 
+  private List<Account> init_test_accountList(int range) {
+    List<Account> list = new ArrayList<>();
+    Random random = new Random();
+
+    int idCounter = 1;
+    for (int i = 1; i <= range; i++) {
+      Account account = initAccount(idCounter++, i, random.nextFloat(), true);
+      Account account2 = initAccount(idCounter++, i, random.nextFloat(), true);
+      Account account3 = initAccount(idCounter++, i, random.nextFloat(), true);
+
+      list.add(account);
+      list.add(account2);
+      list.add(account3);
+    }
+
+    return list;
+  }
+
+  private List<ClientAccountRecord> init_test_clientAccountRecordList(List<Client> clientList) {
+    List<ClientAccountRecord> list = new ArrayList<>();
+
+    for (Client client : clientList) {
+      ClientAccountRecord record = accountRegister.get().getClientAccountRecord(client.id);
+      list.add(record);
+    }
+
+    return list;
+  }
+
+  private TableRequestDetails initTableRequestDetails(String filter, int pageIndex, int pageSize,
+                                                      SortColumn column, SortDirection direction) {
+    TableRequestDetails details = new TableRequestDetails();
+    details.filter = filter;
+    details.pageIndex = pageIndex;
+    details.pageSize = pageSize;
+    details.sortBy = column;
+    details.sortDirection = direction;
+
+    return details;
+  }
+
   @Test
   public void getClientAccountRecord_clientData() {
     truncateTables();
@@ -151,7 +191,28 @@ public class AccountRegisterImplTest extends ParentTestNg {
     //
   }
 
-  @Test(expectedExceptions = NoAccount.class)
+  @Test
+  public void getClientAccountRecord_inActive_Account() {
+    truncateTables();
+
+    Charm charm = initCharm(RND.plusInt(20));
+    Client client = initClient(RND.plusInt(10), charm.id, true);
+    initAccount(RND.plusInt(20), client.id, 100f, false);
+
+
+    //
+    //
+    ClientAccountRecord actual = accountRegister.get().getClientAccountRecord(client.id);
+    //
+    //
+
+    assertThat(actual).isNotNull();
+    assertThat(actual.minAccBalance).isEqualTo(0f);
+    assertThat(actual.maxAccBalance).isEqualTo(0f);
+    assertThat(actual.totalAccBalance).isEqualTo(0f);
+  }
+
+  @Test
   public void getClientAccountRecord_noAccount() {
     truncateTables();
 
@@ -160,14 +221,19 @@ public class AccountRegisterImplTest extends ParentTestNg {
 
     //
     //
-    accountRegister.get().getClientAccountRecord(client.id);
+    ClientAccountRecord actual = accountRegister.get().getClientAccountRecord(client.id);
     //
     //
+
+    assertThat(actual).isNotNull();
+    assertThat(actual.minAccBalance).isEqualTo(0f);
+    assertThat(actual.maxAccBalance).isEqualTo(0f);
+    assertThat(actual.totalAccBalance).isEqualTo(0f);
   }
 
   @DataProvider
   public static Object[][] minAccBalance_DP() {
-    return new Object[][] {
+    return new Object[][]{
       {100f, -123f, 44f, -123f},
       {100f, 66f, 100f, 66f},
       {1111f, 6542f, 44f, 44f},
@@ -196,23 +262,9 @@ public class AccountRegisterImplTest extends ParentTestNg {
     assertThat(actual).isEqualTo(expected);
   }
 
-  @Test(expectedExceptions = NoAccount.class)
-  public void getMinAccBalance_noAccount() {
-    truncateTables();
-
-    Charm charm = initCharm(RND.plusInt(20));
-    Client client = initClient(RND.plusInt(10), charm.id, true);
-
-    //
-    //
-    accountRegister.get().getMinAccBalance(client.id);
-    //
-    //
-  }
-
   @DataProvider
   public static Object[][] maxAccBalance_DP() {
-    return new Object[][] {
+    return new Object[][]{
       {100f, -123f, 44f, 100f},
       {100f, 66f, 100f, 100f},
       {1111f, 6542f, 44f, 6542f},
@@ -241,23 +293,9 @@ public class AccountRegisterImplTest extends ParentTestNg {
     assertThat(actual).isEqualTo(expected);
   }
 
-  @Test(expectedExceptions = NoAccount.class)
-  public void getMaxAccBalance_noAccount() {
-    truncateTables();
-
-    Charm charm = initCharm(RND.plusInt(20));
-    Client client = initClient(RND.plusInt(10), charm.id, true);
-
-    //
-    //
-    accountRegister.get().getMaxAccBalance(client.id);
-    //
-    //
-  }
-
   @DataProvider
   public static Object[][] totalAccBalance_DP() {
-    return new Object[][] {
+    return new Object[][]{
       {100f, -123f, 44f, 21f},
       {100f, 66f, 100f, 266f},
       {1111f, 6542f, 44f, 7697},
@@ -286,18 +324,39 @@ public class AccountRegisterImplTest extends ParentTestNg {
     assertThat(actual).isEqualTo(expected);
   }
 
-  @Test(expectedExceptions = NoAccount.class)
-  public void getTotalAccBalance_noAccount() {
+  @Test
+  public void getClientAccountRecordPage() throws ParseException {
     truncateTables();
 
-    Charm charm = initCharm(RND.plusInt(20));
-    Client client = initClient(RND.plusInt(10), charm.id, true);
+    Charm charm = initCharm(1);
+    List<Client> clientList = init_test_clientList(charm.id);
+    init_test_accountList(15);
+    List<ClientAccountRecord> expected = init_test_clientAccountRecordList(clientList);
+
+    TableRequestDetails details = initTableRequestDetails(null, 0, 15, SortColumn.NONE, SortDirection.ASC);
 
     //
     //
-    accountRegister.get().getTotalAccBalance(client.id);
+    ClientAccountRecordPage actual = accountRegister.get().getClientAccountRecordPage(details);
     //
     //
+
+    assertThat(actual).isNotNull();
+    assertThat(actual.totalItemsCount).isEqualTo(expected.size());
+    assertThat(actual.items.get(0)).isEqualsToByComparingFields(expected.get(0));
+    assertThat(actual.items.get(1)).isEqualsToByComparingFields(expected.get(1));
+    assertThat(actual.items.get(2)).isEqualsToByComparingFields(expected.get(2));
+    assertThat(actual.items.get(3)).isEqualsToByComparingFields(expected.get(3));
+    assertThat(actual.items.get(4)).isEqualsToByComparingFields(expected.get(4));
+    assertThat(actual.items.get(5)).isEqualsToByComparingFields(expected.get(5));
+    assertThat(actual.items.get(6)).isEqualsToByComparingFields(expected.get(6));
+    assertThat(actual.items.get(7)).isEqualsToByComparingFields(expected.get(7));
+    assertThat(actual.items.get(9)).isEqualsToByComparingFields(expected.get(9));
+    assertThat(actual.items.get(10)).isEqualsToByComparingFields(expected.get(10));
+    assertThat(actual.items.get(11)).isEqualsToByComparingFields(expected.get(11));
+    assertThat(actual.items.get(12)).isEqualsToByComparingFields(expected.get(12));
+    assertThat(actual.items.get(13)).isEqualsToByComparingFields(expected.get(13));
+    assertThat(actual.items.get(14)).isEqualsToByComparingFields(expected.get(14));
   }
 
   private List<Client> init_test_clientList(int charmId) throws ParseException {
@@ -335,35 +394,8 @@ public class AccountRegisterImplTest extends ParentTestNg {
     list.add(new Client(15, "Зайд", "Шейх", "Асланович",
       Gender.MALE, rd.nextDate(), charmId, true));
 
-    for(Client client: list) {
+    for (Client client : list) {
       clientTestDao.get().insertClient(client);
-    }
-
-    return list;
-  }
-
-  private List<Account> initAccounts(int range) {
-    List<Account> list = new ArrayList<>();
-    Random random = new Random();
-
-    int idCounter = 1;
-    for(int i = 1; i <= range; i++) {
-      Account account  = initAccount(idCounter++, i, random.nextFloat(), true);
-      Account account2  = initAccount(idCounter++, i, random.nextFloat(), true);
-      Account account3  = initAccount(idCounter++, i, random.nextFloat(), true);
-
-      list.add(account);
-    }
-
-    return list;
-  }
-
-  private List<ClientAccountRecord> init_test_clientAccountRecordList(List<Client> clientList) {
-    List<ClientAccountRecord> list = new ArrayList<>();
-
-    for(Client client : clientList) {
-      ClientAccountRecord record = accountRegister.get().getClientAccountRecord(client.id);
-      list.add(record);
     }
 
     return list;
@@ -371,78 +403,134 @@ public class AccountRegisterImplTest extends ParentTestNg {
 
   @DataProvider
   public static Object[][] filter_DP() {
-    return new Object[][] {
-      { "сон Уо", 1},
-      { "", 15},
-      { "    ", 15},
-      { null, 15},
-      { "а", 13},
-      { "алекСАНДр", 2},
-      { "АПП", 1},
-      { " миш ", 2},
-      { "r", 0},
-      { "-1", 0},
+    return new Object[][]{
+      {
+        "он Ми",
+        new ArrayList<Integer>() {{
+          add(13);
+        }}
+      },
+      {
+        "",
+        new ArrayList<Integer>() {{
+          add(1);
+          add(2);
+          add(3);
+          add(4);
+          add(5);
+          add(6);
+          add(7);
+          add(8);
+          add(9);
+          add(10);
+          add(11);
+          add(12);
+          add(13);
+          add(14);
+          add(15);
+        }}
+      },
+      {
+        "    ",
+        new ArrayList<Integer>() {{
+          add(1);
+          add(2);
+          add(3);
+          add(4);
+          add(5);
+          add(6);
+          add(7);
+          add(8);
+          add(9);
+          add(10);
+          add(11);
+          add(12);
+          add(13);
+          add(14);
+          add(15);
+        }}
+      },
+      {
+        null,
+        new ArrayList<Integer>() {{
+          add(1);
+          add(2);
+          add(3);
+          add(4);
+          add(5);
+          add(6);
+          add(7);
+          add(8);
+          add(9);
+          add(10);
+          add(11);
+          add(12);
+          add(13);
+          add(14);
+          add(15);
+        }}
+      },
+      {
+        "а",
+        new ArrayList<Integer>() {{
+          add(1);
+          add(2);
+          add(3);
+          add(4);
+          add(5);
+          add(6);
+          add(8);
+          add(9);
+          add(10);
+          add(11);
+          add(12);
+          add(14);
+          add(15);
+        }}
+      },
+      {
+        "алекСАНДр",
+        new ArrayList<Integer>() {{
+          add(1);
+          add(12);
+        }}
+      },
+      {
+        "АПП",
+        new ArrayList<Integer>() {{
+          add(10);
+        }}
+      },
+      {
+        " миш ",
+        new ArrayList<Integer>() {{
+          add(9);
+          add(13);
+        }}
+      },
+      {
+        "r",
+        new ArrayList<Integer>()
+      },
+      {
+        "-1",
+        new ArrayList<Integer>()
+      },
     };
   }
 
-  private TableRequestDetails initTableRequestDetails(String filter, int pageIndex, int pageSize,
-                                                     SortColumn column, SortDirection direction) {
-    TableRequestDetails details = new TableRequestDetails();
-    details.filter = filter;
-    details.pageIndex = pageIndex;
-    details.pageSize = pageSize;
-    details.sortBy = column;
-    details.sortDirection = direction;
-
-    return details;
-  }
-
-  @Test
-  public void getClientAccountRecordPage() throws ParseException {
-    truncateTables();
-
-    Charm charm = initCharm(1);
-    List<Client> clientList = init_test_clientList(charm.id);
-    initAccounts(15);
-    List<ClientAccountRecord> expected = init_test_clientAccountRecordList(clientList);
-
-    TableRequestDetails details = initTableRequestDetails(null,0, 15, SortColumn.NONE, SortDirection.ASC);
-
-    //
-    //
-    ClientAccountRecordPage actual = accountRegister.get().getClientAccountRecordPage(details);
-    //
-    //
-
-    assertThat(actual).isNotNull();
-    assertThat(actual.totalItemsCount).isEqualTo(expected.size());
-    assertThat(actual.items.get(0)).isEqualsToByComparingFields(expected.get(0));
-    assertThat(actual.items.get(1)).isEqualsToByComparingFields(expected.get(1));
-    assertThat(actual.items.get(2)).isEqualsToByComparingFields(expected.get(2));
-    assertThat(actual.items.get(3)).isEqualsToByComparingFields(expected.get(3));
-    assertThat(actual.items.get(4)).isEqualsToByComparingFields(expected.get(4));
-    assertThat(actual.items.get(5)).isEqualsToByComparingFields(expected.get(5));
-    assertThat(actual.items.get(6)).isEqualsToByComparingFields(expected.get(6));
-    assertThat(actual.items.get(7)).isEqualsToByComparingFields(expected.get(7));
-    assertThat(actual.items.get(9)).isEqualsToByComparingFields(expected.get(9));
-    assertThat(actual.items.get(10)).isEqualsToByComparingFields(expected.get(10));
-    assertThat(actual.items.get(11)).isEqualsToByComparingFields(expected.get(11));
-    assertThat(actual.items.get(12)).isEqualsToByComparingFields(expected.get(12));
-    assertThat(actual.items.get(13)).isEqualsToByComparingFields(expected.get(13));
-    assertThat(actual.items.get(14)).isEqualsToByComparingFields(expected.get(14));
-  }
-
   @Test(dataProvider = "filter_DP")
-  public void getClientAccountRecordPage_filter(String filterValue, int expectedSize) throws ParseException {
+  public void getClientAccountRecordPage_filter(String filterValue,
+                                                List<Integer> expectedIds) throws ParseException {
     truncateTables();
 
     Charm charm = initCharm(1);
     List<Client> clientList = init_test_clientList(charm.id);
-    initAccounts(15);
+    init_test_accountList(15);
     init_test_clientAccountRecordList(clientList);
 
     TableRequestDetails details =
-      initTableRequestDetails(filterValue,0, 15, SortColumn.NONE, SortDirection.ASC);
+      initTableRequestDetails(filterValue, 0, 15, SortColumn.NONE, SortDirection.ASC);
 
     //
     //
@@ -452,12 +540,16 @@ public class AccountRegisterImplTest extends ParentTestNg {
 
     assertThat(actual).isNotNull();
     assertThat(actual.items).isNotNull();
-    assertThat(actual.items).hasSize(expectedSize);
+    assertThat(actual.items).hasSize(expectedIds.size());
+
+    for (Integer expectedId : expectedIds) {
+      assertThat(actual.items.stream().anyMatch(o -> o.clientId == expectedId)).isTrue();
+    }
   }
 
   @DataProvider
   public static Object[][] sort_DP() {
-    return new Object[][] {
+    return new Object[][]{
       {
         SortColumn.FIO, SortDirection.ASC,
         (Comparator<ClientAccountRecord>) (o1, o2) -> o1.clientFullName.compareTo(o2.clientFullName)
@@ -472,7 +564,7 @@ public class AccountRegisterImplTest extends ParentTestNg {
       },
       {
         SortColumn.AGE, SortDirection.DESC,
-        ((Comparator<ClientAccountRecord>) (o1, o2) ->  Integer.compare(o1.clientAge, o2.clientAge)).reversed()
+        ((Comparator<ClientAccountRecord>) (o1, o2) -> Integer.compare(o1.clientAge, o2.clientAge)).reversed()
       },
       {
         SortColumn.MIN, SortDirection.ASC,
@@ -508,11 +600,11 @@ public class AccountRegisterImplTest extends ParentTestNg {
 
     Charm charm = initCharm(1);
     List<Client> clientList = init_test_clientList(charm.id);
-    initAccounts(15);
+    init_test_accountList(15);
     init_test_clientAccountRecordList(clientList);
 
     TableRequestDetails details =
-      initTableRequestDetails(null,0, 15, column, direction);
+      initTableRequestDetails(null, 0, 15, column, direction);
 
     //
     //
@@ -528,10 +620,11 @@ public class AccountRegisterImplTest extends ParentTestNg {
 
   @DataProvider
   public static Object[][] paginate_DP() {
-    return new Object[][] {
+    return new Object[][]{
       {
         0, 3,
-        new ArrayList<Integer>(){{
+        new ArrayList<Integer>() {
+          {
             add(1);
             add(2);
             add(3);
@@ -540,7 +633,8 @@ public class AccountRegisterImplTest extends ParentTestNg {
       },
       {
         1, 3,
-        new ArrayList<Integer>(){{
+        new ArrayList<Integer>() {
+          {
             add(4);
             add(5);
             add(6);
@@ -549,7 +643,8 @@ public class AccountRegisterImplTest extends ParentTestNg {
       },
       {
         2, 6,
-        new ArrayList<Integer>(){{
+        new ArrayList<Integer>() {
+          {
             add(13);
             add(14);
             add(15);
@@ -558,15 +653,17 @@ public class AccountRegisterImplTest extends ParentTestNg {
       },
       {
         2, 7,
-        new ArrayList<Integer>(){{
-          add(15);
-        }
+        new ArrayList<Integer>() {
+          {
+            add(15);
+          }
         }
       },
       {
         2, 7,
-        new ArrayList<Integer>(){{
-          add(15);
+        new ArrayList<Integer>() {
+          {
+            add(15);
           }
         }
       }
@@ -575,38 +672,38 @@ public class AccountRegisterImplTest extends ParentTestNg {
 
   @Test(dataProvider = "paginate_DP")
   public void getClientAccountRecordPage_paginate(int pageIndex, int pageSize, List<Integer> expectedIds) throws ParseException {
-      truncateTables();
+    truncateTables();
 
-      Charm charm = initCharm(1);
-      List<Client> clientList = init_test_clientList(charm.id);
-      initAccounts(15);
-      init_test_clientAccountRecordList(clientList);
+    Charm charm = initCharm(1);
+    List<Client> clientList = init_test_clientList(charm.id);
+    init_test_accountList(15);
+    init_test_clientAccountRecordList(clientList);
 
-      TableRequestDetails details =
-        initTableRequestDetails(null,pageIndex, pageSize, SortColumn.NONE, SortDirection.ASC);
+    TableRequestDetails details =
+      initTableRequestDetails(null, pageIndex, pageSize, SortColumn.NONE, SortDirection.ASC);
 
-      //
-      //
-      ClientAccountRecordPage actual = accountRegister.get().getClientAccountRecordPage(details);
-      //
-      //
+    //
+    //
+    ClientAccountRecordPage actual = accountRegister.get().getClientAccountRecordPage(details);
+    //
+    //
 
-      assertThat(actual).isNotNull();
-      assertThat(actual.items).isNotNull();
-      assertThat(actual.items).hasSize(expectedIds.size());
+    assertThat(actual).isNotNull();
+    assertThat(actual.items).isNotNull();
+    assertThat(actual.items).hasSize(expectedIds.size());
 
-      for(Integer expectedId : expectedIds) {
-        assertThat(actual.items.stream().anyMatch(o -> o.clientId == expectedId)).isTrue();
-      }
+    for (Integer expectedId : expectedIds) {
+      assertThat(actual.items.stream().anyMatch(o -> o.clientId == expectedId)).isTrue();
+    }
   }
 
   @DataProvider
   public static Object[][] paginate_invalid_DP() {
-    return new Object[][] {
-      { -1, 3 },
-      { 0, -3 },
-      { -34, -23 },
-      { 0, 0 },
+    return new Object[][]{
+      {-1, 3},
+      {0, -3},
+      {-34, -23},
+      {0, 0},
     };
   }
 
@@ -616,11 +713,11 @@ public class AccountRegisterImplTest extends ParentTestNg {
 
     Charm charm = initCharm(1);
     List<Client> clientList = init_test_clientList(charm.id);
-    initAccounts(15);
+    init_test_accountList(15);
     init_test_clientAccountRecordList(clientList);
 
     TableRequestDetails details =
-      initTableRequestDetails(null,pageIndex, pageSize, SortColumn.NONE, SortDirection.ASC);
+      initTableRequestDetails(null, pageIndex, pageSize, SortColumn.NONE, SortDirection.ASC);
 
     //
     //

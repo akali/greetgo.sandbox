@@ -5,15 +5,13 @@ import org.apache.ibatis.annotations.Select;
 
 public interface AccountDao {
 
-  @Select("select MIN(money) from Accounts where clientId = #{clientId} and isActive = true")
+  @Select("select coalesce(MIN(money), 0) from Accounts where clientId = #{clientId} and isActive = true")
   Float getMinAccountBalance(@Param("clientId") int clientId);
 
-  @Select("select MAX(money) from Accounts where clientId = #{clientId} and isActive = true")
+  @Select("select coalesce(MAX(money), 0) from Accounts where clientId = #{clientId} and isActive = true")
   Float getMaxAccountBalance(@Param("clientId") int clientId);
 
-  @Select("select SUM(money) from Accounts where clientId = #{clientId} and isActive = true")
+  @Select("select coalesce(SUM(money), 0) from Accounts where clientId = #{clientId} and isActive = true")
   Float getTotalAccountBalance(@Param("clientId") int clientId);
 
-  @Select("select COUNT(1) from Accounts where clientId = #{clientId} and isActive = true")
-  int getAccountCount(@Param("clientId") int clientId);
 }
