@@ -57,7 +57,7 @@ public class AccountRegisterImplTest extends ParentTestNg {
     charm.id = charmId;
     charm.name = RND.str(10);
 
-    charmTestDao.get().insertCharm(charm);
+    charmTestDao.get().insertCharmWithId(charm);
 
     return charm;
   }

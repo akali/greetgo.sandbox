@@ -61,7 +61,7 @@ public class CharmRegisterImplTest extends ParentTestNg {
     charm.name = RND.str(10);
     charm.isActive = false;
 
-    charmTestDao.get().insertCharm(charm);
+    charmTestDao.get().insertCharmWithId(charm);
 
     //
     //
@@ -86,8 +86,8 @@ public class CharmRegisterImplTest extends ParentTestNg {
     inActiveCharm.name = RND.str(10);
     inActiveCharm.isActive = false;
 
-    charmTestDao.get().insertCharm(activeCharm);
-    charmTestDao.get().insertCharm(inActiveCharm);
+    charmTestDao.get().insertCharmWithId(activeCharm);
+    charmTestDao.get().insertCharmWithId(inActiveCharm);
 
     //
     //

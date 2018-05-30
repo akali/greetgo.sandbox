@@ -4,10 +4,7 @@ import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.sandbox.controller.errors.NotFound;
 import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.controller.register.client.ClientRegister;
-import kz.greetgo.sandbox.db.test.dao.AddressTestDao;
-import kz.greetgo.sandbox.db.test.dao.CharmTestDao;
-import kz.greetgo.sandbox.db.test.dao.ClientTestDao;
-import kz.greetgo.sandbox.db.test.dao.PhoneTestDao;
+import kz.greetgo.sandbox.db.test.dao.*;
 import kz.greetgo.sandbox.db.test.util.ParentTestNg;
 import kz.greetgo.sandbox.db.test.util.RandomDate;
 import kz.greetgo.sandbox.db.util.JdbcSandbox;
@@ -30,6 +27,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
   public BeanGetter<CharmTestDao> charmTestDao;
   public BeanGetter<AddressTestDao> addressTestDao;
   public BeanGetter<PhoneTestDao> phoneTestDao;
+  public BeanGetter<AccountTestDao> accountTestDao;
 
 
   private void truncateTables() {
@@ -62,7 +60,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
     charm.name = RND.str(10);
     charm.isActive = isActive;
 
-    charmTestDao.get().insertCharm(charm);
+    charmTestDao.get().insertCharmWithId(charm);
 
     return charm;
   }

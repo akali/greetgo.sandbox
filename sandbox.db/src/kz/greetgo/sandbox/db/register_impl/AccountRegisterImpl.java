@@ -34,32 +34,24 @@ public class AccountRegisterImpl implements AccountRegister {
     if(requestDetails.pageSize <= 0 || requestDetails.pageIndex < 0) throw new InvalidRequestDetails();
 
     StringBuilder queryBuilder = new StringBuilder();
-    queryBuilder.append(
-      "SELECT\n" +
-        "Clients.id, Clients.surname, Clients.name, COALESCE(Clients.patronymic, '') as patronymic, Clients.gender,\n" +
-        "DATE_PART('year', AGE(Clients.birthDate)) as age, Charms.name as charmName,\n" +
-        "MIN(Accounts.money) minAccBalance, MAX(Accounts.money) maxAccBalance, SUM(Accounts.money) totalAccBalance,\n" +
-        "count(*) OVER() AS totalItemsCount\n" +
-      "FROM Clients\n" +
-        "JOIN Accounts on Clients.id = Accounts.clientId\n" +
-        "JOIN Charms on Clients.charmId = Charms.id");
+    queryBuilder.append(initQueryHeader());
 
     if(requestDetails.filter != null && !requestDetails.filter.toLowerCase().trim().isEmpty()) {
 
       String f = requestDetails.filter.toLowerCase().replaceAll("\\s+", "");
-      queryBuilder.append(" WHERE LOWER(Clients.surname || Clients.name || COALESCE(Clients.patronymic, '')) LIKE '%");
+      queryBuilder.append(" AND LOWER(clients.surname || clients.name || COALESCE(clients.patronymic, '')) LIKE '%");
       queryBuilder.append(f);
       queryBuilder.append("%'");
     }
 
-    queryBuilder.append(" GROUP BY Clients.id, charmName ");
+    queryBuilder.append(" GROUP BY clients.id, charmName ");
 
     if(requestDetails.sortBy != SortColumn.NONE) {
       queryBuilder.append(" ORDER BY ");
 
       switch (requestDetails.sortBy) {
         case FIO:
-          queryBuilder.append("Clients.surname, Clients.name, Clients.patronymic ");
+          queryBuilder.append("clients.surname, clients.name, clients.patronymic ");
           break;
         case AGE:
           queryBuilder.append("age ");
@@ -76,7 +68,7 @@ public class AccountRegisterImpl implements AccountRegister {
       }
       queryBuilder.append(requestDetails.sortDirection);
     } else {
-      queryBuilder.append("ORDER BY Clients.id ASC");
+      queryBuilder.append("ORDER BY clients.id ASC");
     }
 
     queryBuilder.append(" LIMIT ");
@@ -117,6 +109,37 @@ public class AccountRegisterImpl implements AccountRegister {
     });
 
     return page;
+  }
+
+  private String initQueryHeader() {
+    return
+        "WITH joined_clients_accounts AS (\n" +
+        "    SELECT\n" +
+        "      c.id client_id,\n" +
+        "      a.id account_id,\n" +
+        "      a.money money\n" +
+        "    FROM clients c\n" +
+        "      LEFT OUTER JOIN accounts a ON c.id = a.clientid\n" +
+        "    WHERE c.isactive = TRUE AND a.isactive = TRUE\n" +
+        "    GROUP BY c.id, a.id\n" +
+        "    ORDER BY c.id\n" +
+        ")\n" +
+        "SELECT\n" +
+        "  clients.id,\n" +
+        "  clients.surname,\n" +
+        "  clients.name,\n" +
+        "  COALESCE(clients.patronymic, '') as patronymic,\n" +
+        "  clients.gender,\n" +
+        "  DATE_PART('year', AGE(clients.birthDate)) as age,\n" +
+        "  charms.name as charmName,\n" +
+        "  count(*) OVER() AS totalItemsCount,\n" +
+        "  coalesce(MIN(money), 0) as minAccBalance,\n" +
+        "  coalesce(MAX(money), 0) as maxAccBalance,\n" +
+        "  coalesce(SUM(money), 0) as totalAccBalance\n" +
+        "FROM clients\n" +
+        "  LEFT OUTER JOIN joined_clients_accounts ON client_id = clients.id\n" +
+        "  JOIN charms on clients.charmid = charms.id\n" +
+        "WHERE clients.isactive = true";
   }
 
   @Override
