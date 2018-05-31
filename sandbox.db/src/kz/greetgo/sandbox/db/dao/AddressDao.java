@@ -2,10 +2,7 @@ package kz.greetgo.sandbox.db.dao;
 
 import kz.greetgo.sandbox.controller.model.Address;
 import kz.greetgo.sandbox.controller.model.AddressType;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 public interface AddressDao {
 
@@ -21,4 +18,12 @@ public interface AddressDao {
     " where id = #{id}")
   void updateAddress(Address address);
 
+  @Insert("insert into addresses ( id, clientId, type, street, house, flat )" +
+    " values (coalesce(#{id}, nextval('address_id_seq')), #{clientId}, #{type}::AddressType, #{street}, #{house}, #{flat} )" +
+    " on conflict (id) do update set street = #{street}, house = #{house}, flat = #{flat}, isActive = #{isActive}" +
+    " where addresses.id = #{id}")
+  void insertOrUpdateAddress(Address address);
+
+  @Delete("update address set isActive = false where id = #{id}")
+  void deleteAddress(@Param("id") int addressId);
 }

@@ -3,11 +3,11 @@ package kz.greetgo.sandbox.controller.model;
 import java.util.Objects;
 
 public class Phone {
-  public int id;
-  public int clientId;
+  public Integer id;
+  public Integer clientId;
   public String number;
   public PhoneType type;
-  public boolean isActive = true;
+  public Boolean isActive = true;
 
   public Phone() { }
 

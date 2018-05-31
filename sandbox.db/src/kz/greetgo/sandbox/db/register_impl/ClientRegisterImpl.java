@@ -6,6 +6,7 @@ import kz.greetgo.sandbox.controller.errors.InvalidClientData;
 import kz.greetgo.sandbox.controller.errors.NotFound;
 import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.controller.register.account.AccountRegister;
+import kz.greetgo.sandbox.controller.register.charm.CharmRegister;
 import kz.greetgo.sandbox.controller.register.client.ClientRegister;
 import kz.greetgo.sandbox.db.dao.AddressDao;
 import kz.greetgo.sandbox.db.dao.CharmDao;
@@ -26,6 +27,7 @@ public class ClientRegisterImpl implements ClientRegister {
   public BeanGetter<PhoneDao> phoneDao;
 
   public BeanGetter<AccountRegister> accountRegister;
+  public BeanGetter<CharmRegister> charmRegister;
   public BeanGetter<JdbcSandbox> jdbc;
 
   @Override
@@ -36,6 +38,7 @@ public class ClientRegisterImpl implements ClientRegister {
 
     if (client == null) throw new NotFound();
 
+    clientDetails.id = clientId;
     clientDetails.name = client.name;
     clientDetails.surname = client.surname;
     clientDetails.patronymic = client.patronymic;
@@ -126,7 +129,7 @@ public class ClientRegisterImpl implements ClientRegister {
     }
 
     if (clientToSave.factAddress != null
-          && (clientToSave.factAddress.street == null || clientToSave.factAddress.house == null)) {
+      && (clientToSave.factAddress.street == null || clientToSave.factAddress.house == null)) {
       throw new InvalidClientData("'street' and 'house' of factAddress cannot be a null");
     }
 
@@ -161,24 +164,75 @@ public class ClientRegisterImpl implements ClientRegister {
 
   @Override
   public ClientAccountRecord editClient(ClientToSave clientToSave) {
-    if (!isValidClientData(clientToSave)) throw new InvalidClientData("invalid data");
+
+    ClientDetails clientDetails = getClientDetails(clientToSave.id);
 
     Client client = new Client();
-    client.id = clientToSave.id;
-    client.name = clientToSave.name.trim();
-    client.surname = clientToSave.surname.trim();
-    client.patronymic = clientToSave.patronymic != null ? clientToSave.patronymic.trim() : null;
+    client.id = clientDetails.id;
+    client.name = clientToSave.name != null ? clientToSave.name.trim() : clientDetails.name;
+    client.surname = clientToSave.surname != null ? clientToSave.surname.trim() : clientDetails.surname;
+    client.patronymic = clientToSave.patronymic != null ? clientToSave.patronymic : clientDetails.patronymic;
+    client.gender = clientToSave.gender != null ? clientToSave.gender : clientDetails.gender;
+    client.birthDate = clientToSave.birthDate != null ? clientToSave.birthDate : clientDetails.birthDate;
 
-    client.gender = clientToSave.gender;
-    client.birthDate = clientToSave.birthDate;
-    client.charmId = clientToSave.charmId;
+    Charm charm = charmRegister.get().getCharm(clientToSave.charmId);
+    client.charmId =  charm.id;
 
     clientDao.get().updateClient(client);
 
-    addressDao.get().updateAddress(clientToSave.regAddress);
+    if (clientToSave.regAddress != null && clientToSave.regAddress.isActive) {
+      Address regAddress = new Address();
 
-    if(clientToSave.factAddress != null)
-      addressDao.get().insertAddress(clientToSave.factAddress);
+      if(clientDetails.regAddress != null) regAddress.id = clientDetails.regAddress.id;
+
+      regAddress.type = AddressType.REG;
+      regAddress.clientId = clientDetails.id;
+      regAddress.street =
+        clientToSave.regAddress.street != null ? clientToSave.regAddress.street : clientDetails.regAddress.street;
+
+      regAddress.house =
+        clientToSave.regAddress.house != null ? clientToSave.regAddress.house : clientDetails.regAddress.house;
+
+      regAddress.flat =
+        clientToSave.regAddress.flat != null ? clientToSave.regAddress.flat : clientDetails.regAddress.flat;
+
+      addressDao.get().insertOrUpdateAddress(regAddress);
+
+    } else if (clientToSave.regAddress != null && !clientToSave.regAddress.isActive) {
+      throw new InvalidClientData("registration address cannot be deleted");
+    }
+
+    if (clientToSave.factAddress != null && clientToSave.factAddress.isActive) {
+      Address factAddress = new Address();
+
+      if(clientDetails.factAddress != null) factAddress.id = clientDetails.factAddress.id;
+
+      factAddress.type = AddressType.FACT;
+      factAddress.clientId = clientDetails.id;
+      factAddress.street =
+        clientToSave.factAddress.street != null ? clientToSave.factAddress.street : clientDetails.factAddress.street;
+
+      factAddress.house =
+        clientToSave.factAddress.house != null ? clientToSave.factAddress.house : clientDetails.factAddress.house;
+
+      factAddress.flat =
+        clientToSave.factAddress.flat != null ? clientToSave.factAddress.flat : clientDetails.factAddress.flat;
+
+      addressDao.get().insertOrUpdateAddress(factAddress);
+
+    } else if (clientToSave.factAddress != null && clientDetails.factAddress != null && !clientToSave.factAddress.isActive) {
+      addressDao.get().deleteAddress(clientDetails.factAddress.id);
+    }
+
+//    if (clientToSave.factAddress != null) {
+//      Address regAddress = new Address();
+//
+//      addressDao.get().updateAddress(clientToSave.regAddress);
+//    }
+//
+//
+//    if (clientToSave.factAddress != null)
+//      addressDao.get().insertAddress(clientToSave.factAddress);
 
     return null;
   }

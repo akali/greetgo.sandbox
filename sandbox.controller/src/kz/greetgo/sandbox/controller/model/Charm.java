@@ -3,11 +3,11 @@ package kz.greetgo.sandbox.controller.model;
 import java.util.Objects;
 
 public class Charm {
-  public int id;
+  public Integer id;
   public String name;
   public String description;
   public Float energy;
-  public boolean isActive = true;
+  public Boolean isActive = true;
 
   public Charm(Integer id, String name, String description, Float energy) {
     this.id = id;

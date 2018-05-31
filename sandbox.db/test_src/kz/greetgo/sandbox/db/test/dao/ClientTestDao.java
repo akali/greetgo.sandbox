@@ -13,7 +13,7 @@ public interface ClientTestDao {
   void insertClientDot(ClientDot clientDot);
 
   @Insert("insert into Clients ( id, surname, name, patronymic, gender, birthDate, charmId, isActive ) " +
-    "values ( #{id}, #{surname}, #{name}, #{patronymic}, #{gender}::Gender, #{birthDate}, #{charmId}, #{isActive} )")
+    "values ( coalesce(#{id}, nextval('client_id_seq')), #{surname}, #{name}, #{patronymic}, #{gender}::Gender, #{birthDate}, #{charmId}, #{isActive} )")
   void insertClient(Client client);
 
   @Select("select * from Clients where id = #{clientId} and isActive = true")

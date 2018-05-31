@@ -1,8 +1,8 @@
 package kz.greetgo.sandbox.controller.model;
 
 public class Address {
-  public int id = -1;
-  public int clientId = -1;
+  public Integer id;
+  public Integer clientId;
   public AddressType type;
   public String street;
   public String house;

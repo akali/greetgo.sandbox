@@ -15,7 +15,7 @@ public interface AddressTestDao {
   void insertAddressDot(AddressDot addressDot);
 
   @Insert("insert into Addresses ( id, clientId, type, street, house, flat ) " +
-    "values ( #{id,}, #{clientId}, #{type}::AddressType, #{street}, #{house}, #{flat} )")
+    "values ( coalesce(#{id}, nextval('address_id_seq')), #{clientId}, #{type}::AddressType, #{street}, #{house}, #{flat} )")
   void insertAddress(Address address);
 
   @Select("select * from addresses where clientId = #{clientId} and type = #{type}::AddressType")

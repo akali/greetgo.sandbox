@@ -57,8 +57,9 @@ public class ClientRegisterImplTest extends ParentTestNg {
     });
   }
 
-  private Charm initCharm(int charmId, boolean isActive) {
+  private Charm initCharm(Integer charmId, boolean isActive) {
     Charm charm = new Charm();
+
     charm.id = charmId;
     charm.name = RND.str(10);
     charm.isActive = isActive;
@@ -68,7 +69,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
     return charm;
   }
 
-  private Client initClient(int clientId, int charmId) {
+  private Client initClient(Integer clientId, int charmId) {
     Client expectedClient = new Client();
     expectedClient.id = clientId;
     expectedClient.name = RND.str(10);
@@ -88,7 +89,7 @@ public class ClientRegisterImplTest extends ParentTestNg {
     return expectedClient;
   }
 
-  private Address initAddress(int addressId, AddressType type, int clientId) {
+  private Address initAddress(Integer addressId, AddressType type, int clientId) {
     Address address = new Address();
     address.id = addressId;
     address.street = RND.str(20);
@@ -732,17 +733,11 @@ public class ClientRegisterImplTest extends ParentTestNg {
   public void editClient_addresses() throws ParseException {
     truncateTables();
 
-    initCharm(1, true);
+    initCharm(0, true);
 
-    Client client = initClient(1, 1);
-    initAddress(0, AddressType.REG, 1);
-
-    phoneTestDao.get().insertPhone(new Phone(1, RND.intStr(10), PhoneType.HOME));
-    phoneTestDao.get().insertPhone(new Phone(1, RND.intStr(10), PhoneType.WORK));
-    phoneTestDao.get().insertPhone(new Phone(1, RND.intStr(10), PhoneType.MOBILE));
-    phoneTestDao.get().insertPhone(new Phone(1, RND.intStr(10), PhoneType.MOBILE));
-
-    RandomDate randomDate = new RandomDate();
+    Client client = initClient(0, 0);
+    initAddress(0, AddressType.REG, client.id);
+    initAddress(1, AddressType.FACT, client.id);
 
     ClientToSave expected = new ClientToSave();
     expected.id = client.id;
@@ -750,11 +745,11 @@ public class ClientRegisterImplTest extends ParentTestNg {
     expected.name = RND.str(15);
     expected.patronymic = RND.str(15);
     expected.gender = Gender.FEMALE;
-    expected.birthDate = randomDate.nextDate();
-    expected.charmId = 1;
+    expected.birthDate = new RandomDate().nextDate();
+    expected.charmId = 0;
 
     expected.regAddress = new Address(0, client.id, AddressType.REG, RND.str(10), RND.str(10), RND.str(10));
-    expected.factAddress = new Address(client.id, AddressType.FACT, RND.str(10), RND.str(10), RND.str(10));
+    expected.factAddress = new Address(1, client.id, AddressType.FACT, RND.str(10), RND.str(10), RND.str(10));
 
     expected.phones = new ArrayList<>();
     expected.phones.add(new Phone(RND.intStr(10), PhoneType.HOME));
@@ -766,6 +761,54 @@ public class ClientRegisterImplTest extends ParentTestNg {
     clientRegister.get().editClient(expected);
 
     ClientDetails actual = clientRegister.get().getClientDetails(client.id);
+    //
+    //
+
+    assertThat(actual.regAddress).isNotNull();
+    assertThat(actual.regAddress.type).isEqualsToByComparingFields(expected.regAddress.type);
+    assertThat(actual.regAddress.house).isEqualToIgnoringCase(expected.regAddress.house);
+    assertThat(actual.regAddress.street).isEqualToIgnoringCase(expected.regAddress.street);
+    assertThat(actual.regAddress.flat).isEqualToIgnoringCase(expected.regAddress.flat);
+
+    assertThat(actual.factAddress).isNotNull();
+    assertThat(actual.factAddress.type).isEqualsToByComparingFields(expected.factAddress.type);
+    assertThat(actual.factAddress.house).isEqualToIgnoringCase(expected.factAddress.house);
+    assertThat(actual.factAddress.street).isEqualToIgnoringCase(expected.factAddress.street);
+    assertThat(actual.factAddress.flat).isEqualToIgnoringCase(expected.factAddress.flat);
+  }
+
+  @Test
+  public void editClient_addresses_create_factAddress() throws ParseException {
+    truncateTables();
+
+    initCharm(null, true);
+
+    Client client = initClient(null, 1);
+    int clientId = 1; // according to sequence
+    initAddress(null, AddressType.REG, clientId);
+
+    ClientToSave expected = new ClientToSave();
+    expected.id = clientId;
+    expected.surname = RND.str(15);
+    expected.name = RND.str(15);
+    expected.patronymic = RND.str(15);
+    expected.gender = Gender.FEMALE;
+    expected.birthDate = new RandomDate().nextDate();
+    expected.charmId = 1;
+
+    expected.regAddress = new Address(1, clientId, AddressType.REG, RND.str(10), RND.str(10), RND.str(10));
+    expected.factAddress = new Address(clientId, AddressType.FACT, RND.str(10), RND.str(10), RND.str(10));
+
+    expected.phones = new ArrayList<>();
+    expected.phones.add(new Phone(RND.intStr(10), PhoneType.HOME));
+    expected.phones.add(new Phone(RND.intStr(10), PhoneType.WORK));
+    expected.phones.add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+
+    //
+    //
+    clientRegister.get().editClient(expected);
+
+    ClientDetails actual = clientRegister.get().getClientDetails(clientId);
     //
     //
 
