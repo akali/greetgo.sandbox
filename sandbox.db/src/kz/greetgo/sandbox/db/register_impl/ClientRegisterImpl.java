@@ -226,11 +226,25 @@ public class ClientRegisterImpl implements ClientRegister {
     }
 
     if (clientToSave.phones != null) {
+      for (Phone phone : clientToSave.phones) {
+        phoneDao.get().insertOrUpdatePhone(phone);
+      }
 
+      // All other phones should be disabled
+      for (Phone phone: phoneDao.get().selectAllPhones(clientDetails.id)) {
+        if (!containsNumber(clientToSave.phones, phone.number)) {
+          phoneDao.get().deletePhone(phone.id);
+        }
+      }
     }
 
     return null;
   }
+
+  private boolean containsNumber(final List<Phone> list, final String number) {
+    return list.stream().anyMatch(o -> o.number.equals(number));
+  }
+
 
   @Override
   public ClientAccountRecordPage deleteClient(int clientId, TableRequestDetails requestDetails) {

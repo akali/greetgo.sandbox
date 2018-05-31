@@ -899,11 +899,13 @@ public class ClientRegisterImplTest extends ParentTestNg {
     phoneTestDao.get().insertPhone(new Phone(1, RND.intStr(10), PhoneType.MOBILE));
 
     ClientToSave expected = new ClientToSave();
-
+    expected.id = client.id;
     expected.phones = new ArrayList<>();
-    expected.phones.add(new Phone(RND.intStr(10), PhoneType.HOME));
-    expected.phones.add(new Phone(RND.intStr(10), PhoneType.WORK));
-    expected.phones.add(new Phone(RND.intStr(10), PhoneType.MOBILE));
+    expected.phones.add(new Phone(1, RND.intStr(10), PhoneType.HOME));
+    expected.phones.add(new Phone(1, RND.intStr(10), PhoneType.WORK));
+    expected.phones.add(new Phone(1, RND.intStr(10), PhoneType.MOBILE));
+    expected.phones.add(new Phone(1, RND.intStr(10), PhoneType.MOBILE));
+    expected.phones.add(new Phone(1, RND.intStr(10), PhoneType.MOBILE));
 
     //
     //
@@ -922,171 +924,6 @@ public class ClientRegisterImplTest extends ParentTestNg {
     }
   }
 
+  
 
-  @DataProvider
-  public static Object[][] edit_invalidValues_DP() throws ParseException {
-    return new Object[][]{
-      {
-        1,
-        null,
-        RND.str(15),
-        Gender.MALE,
-        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
-        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
-        new ArrayList<Phone>() {{
-          add(new Phone(RND.intStr(10), PhoneType.HOME));
-          add(new Phone(RND.intStr(10), PhoneType.WORK));
-          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
-        }}
-      },
-      {
-        1,
-        RND.str(15),
-        null,
-        Gender.MALE,
-        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
-        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
-        new ArrayList<Phone>() {{
-          add(new Phone(RND.intStr(10), PhoneType.HOME));
-          add(new Phone(RND.intStr(10), PhoneType.WORK));
-          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
-        }}
-      },
-      {
-        1,
-        RND.str(15),
-        RND.str(15),
-        null,
-        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
-        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
-        new ArrayList<Phone>() {{
-          add(new Phone(RND.intStr(10), PhoneType.HOME));
-          add(new Phone(RND.intStr(10), PhoneType.WORK));
-          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
-        }}
-      },
-      {
-        1,
-        RND.str(15),
-        RND.str(15),
-        Gender.MALE,
-        null,
-        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
-        new ArrayList<Phone>() {{
-          add(new Phone(RND.intStr(10), PhoneType.HOME));
-          add(new Phone(RND.intStr(10), PhoneType.WORK));
-          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
-        }}
-      },
-      {
-        1,
-        RND.str(15),
-        RND.str(15),
-        Gender.MALE,
-        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
-        null,
-        new ArrayList<Phone>() {{
-          add(new Phone(RND.intStr(10), PhoneType.HOME));
-          add(new Phone(RND.intStr(10), PhoneType.WORK));
-          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
-        }}
-      },
-      {
-        1,
-        RND.str(15),
-        RND.str(15),
-        Gender.MALE,
-        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
-        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
-        null,
-      },
-      {
-        1,
-        RND.str(15),
-        RND.str(15),
-        Gender.MALE,
-        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
-        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
-        new ArrayList<Phone>() {{
-//          add(new Phone(RND.intStr(10), PhoneType.HOME));
-          add(new Phone(RND.intStr(10), PhoneType.WORK));
-          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
-        }}
-      },
-      {
-        1,
-        RND.str(15),
-        RND.str(15),
-        Gender.MALE,
-        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
-        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
-        new ArrayList<Phone>() {{
-          add(new Phone(RND.intStr(10), PhoneType.HOME));
-//          add(new Phone(RND.intStr(10), PhoneType.WORK));
-          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
-        }}
-      },
-      {
-        12,
-        RND.str(15),
-        RND.str(15),
-        Gender.MALE,
-        new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2012"),
-        new Address(AddressType.REG, RND.str(15), RND.str(15), RND.str(15)),
-        new ArrayList<Phone>() {{
-          add(new Phone(RND.intStr(10), PhoneType.HOME));
-          add(new Phone(RND.intStr(10), PhoneType.WORK));
-//          add(new Phone(RND.intStr(10), PhoneType.MOBILE));
-        }}
-      }
-    };
-  }
-
-  @Test(dataProvider = "edit_invalidValues_DP", expectedExceptions = InvalidClientData.class)
-  public void editClient_invalidValues(int clientId, String surname, String name, Gender gender,
-                                         Date birthDate, Address regAddress, List<Phone> phones) throws ParseException {
-    truncateTables();
-
-    initCharm(1, true);
-
-    RandomDate randomDate = new RandomDate();
-
-    ClientToSave clientToSave = new ClientToSave();
-    clientToSave.surname = RND.str(15);
-    clientToSave.name = RND.str(15);
-    clientToSave.patronymic = RND.str(15);
-    clientToSave.gender = Gender.FEMALE;
-    clientToSave.birthDate = randomDate.nextDate();
-    clientToSave.charmId = 1;
-
-    clientToSave.factAddress = new Address(AddressType.FACT, RND.str(10), RND.str(10), RND.str(10));
-    clientToSave.regAddress = new Address(AddressType.REG, RND.str(10), RND.str(10), RND.str(10));
-
-    clientToSave.phones = new ArrayList<>();
-    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.HOME));
-    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.WORK));
-    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.MOBILE));
-    clientToSave.phones.add(new Phone(RND.intStr(10), PhoneType.MOBILE));
-
-    //
-    //
-    clientRegister.get().createNewClient(clientToSave);
-
-    ClientToSave expected = new ClientToSave();
-    expected.id = clientId;
-    expected.surname = surname;
-    expected.name = name;
-    expected.gender = gender;
-    expected.birthDate = birthDate;
-    expected.charmId = 1;
-
-    expected.regAddress = regAddress;
-    expected.phones = phones;
-
-    //
-    //
-    clientRegister.get().editClient(expected);
-    //
-    //
-  }
 }
