@@ -166,6 +166,7 @@ public class AccountRegisterImplTest extends ParentTestNg {
       .isEqualToIgnoringCase(charmTestDao.get().getCharmById(client.charmId).name);
   }
 
+
   @Test(expectedExceptions = NotFound.class)
   public void getClientAccountRecord_invalidClient() {
     truncateTables();
