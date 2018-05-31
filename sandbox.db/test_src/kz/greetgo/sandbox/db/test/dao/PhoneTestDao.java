@@ -1,5 +1,6 @@
 package kz.greetgo.sandbox.db.test.dao;
 
+import kz.greetgo.sandbox.controller.model.Address;
 import kz.greetgo.sandbox.controller.model.Phone;
 import kz.greetgo.sandbox.controller.model.PhoneType;
 import kz.greetgo.sandbox.db.stand.model.PhoneDot;
@@ -26,6 +27,10 @@ public interface PhoneTestDao {
 
   @Select("select * from phones where clientId = #{clientId} and type = 'MOBILE'")
   List<Phone> getMobilesByClientId(@Param("clientId") int clientId);
+
+  @Select("select * from phones where clientId = #{clientId} and isActive = true")
+  List<Phone> getClientActivePhones(@Param("clientId") int clientId);
+
 
   @Delete("Truncate Phones cascade")
   void truncateTable();

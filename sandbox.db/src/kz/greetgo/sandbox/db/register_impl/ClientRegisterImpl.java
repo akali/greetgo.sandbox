@@ -3,15 +3,13 @@ package kz.greetgo.sandbox.db.register_impl;
 import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.sandbox.controller.errors.InvalidClientData;
+import kz.greetgo.sandbox.controller.errors.InvalidRequestDetails;
 import kz.greetgo.sandbox.controller.errors.NotFound;
 import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.controller.register.account.AccountRegister;
 import kz.greetgo.sandbox.controller.register.charm.CharmRegister;
 import kz.greetgo.sandbox.controller.register.client.ClientRegister;
-import kz.greetgo.sandbox.db.dao.AddressDao;
-import kz.greetgo.sandbox.db.dao.CharmDao;
-import kz.greetgo.sandbox.db.dao.ClientDao;
-import kz.greetgo.sandbox.db.dao.PhoneDao;
+import kz.greetgo.sandbox.db.dao.*;
 import kz.greetgo.sandbox.db.util.JdbcSandbox;
 
 import java.sql.PreparedStatement;
@@ -25,6 +23,7 @@ public class ClientRegisterImpl implements ClientRegister {
   public BeanGetter<CharmDao> charmDao;
   public BeanGetter<AddressDao> addressDao;
   public BeanGetter<PhoneDao> phoneDao;
+  public BeanGetter<AccountDao> accountDao;
 
   public BeanGetter<AccountRegister> accountRegister;
   public BeanGetter<CharmRegister> charmRegister;
@@ -105,10 +104,15 @@ public class ClientRegisterImpl implements ClientRegister {
   private boolean isValidClientData(ClientToSave clientToSave) {
     if (clientToSave.name == null) {
       throw new InvalidClientData("'name' cannot be a null");
-    }
+    } else
 
     if (clientToSave.surname == null) {
       throw new InvalidClientData("'surname' cannot be a null");
+    }
+
+    if(clientToSave.name.replaceAll("\\s+", "").isEmpty()
+      || clientToSave.surname.replaceAll("\\s+", "").isEmpty()) {
+      throw new InvalidClientData("name and surname cannot be empty");
     }
 
     if (clientToSave.birthDate == null) {
@@ -172,6 +176,13 @@ public class ClientRegisterImpl implements ClientRegister {
     client.id = clientDetails.id;
     client.name = clientToSave.name != null ? clientToSave.name.trim() : clientDetails.name;
     client.surname = clientToSave.surname != null ? clientToSave.surname.trim() : clientDetails.surname;
+
+    if(client.name.replaceAll("\\s+", "").isEmpty()
+      || client.surname.replaceAll("\\s+", "").isEmpty()) {
+
+      throw new InvalidClientData("name and surname cannot be empty");
+    }
+
     client.patronymic = clientToSave.patronymic != null ? clientToSave.patronymic : clientDetails.patronymic;
     client.gender = clientToSave.gender != null ? clientToSave.gender : clientDetails.gender;
     client.birthDate = clientToSave.birthDate != null ? clientToSave.birthDate : clientDetails.birthDate;
@@ -248,6 +259,18 @@ public class ClientRegisterImpl implements ClientRegister {
 
   @Override
   public ClientAccountRecordPage deleteClient(int clientId, TableRequestDetails requestDetails) {
-    return null;
+    if (requestDetails.pageSize <= 0 || requestDetails.pageIndex < 0) throw new InvalidRequestDetails();
+
+    Client client = clientDao.get().getClientById(clientId);
+
+    if(client == null) throw new NotFound();
+
+    clientDao.get().deleteClient(client.id);
+
+    phoneDao.get().deleteClientPhones(client.id);
+    addressDao.get().deleteClientAddresses(client.id);
+    accountDao.get().deleteClientAccounts(client.id);
+
+    return accountRegister.get().getClientAccountRecordPage(requestDetails);
   }
 }

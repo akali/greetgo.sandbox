@@ -2,6 +2,7 @@ package kz.greetgo.sandbox.db.register_impl;
 
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.sandbox.controller.errors.InvalidClientData;
+import kz.greetgo.sandbox.controller.errors.InvalidRequestDetails;
 import kz.greetgo.sandbox.controller.errors.NotFound;
 import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.controller.register.client.ClientRegister;
@@ -924,6 +925,78 @@ public class ClientRegisterImplTest extends ParentTestNg {
     }
   }
 
-  
+  private TableRequestDetails initTableRequestDetails(String filter, int pageIndex, int pageSize,
+                                                      SortColumn column, SortDirection direction) {
+    TableRequestDetails details = new TableRequestDetails();
+    details.filter = filter;
+    details.pageIndex = pageIndex;
+    details.pageSize = pageSize;
+    details.sortBy = column;
+    details.sortDirection = direction;
+
+    return details;
+  }
+
+
+  @Test
+  public void delete_Client() throws ParseException {
+    truncateTables();
+
+    initCharm(0, true);
+
+    Client client = initClient(0, 0);
+    initAddress(0, AddressType.REG, client.id);
+    initAddress(1, AddressType.FACT, client.id);
+    initPhone(0, PhoneType.HOME, client.id, true);
+    initPhone(1, PhoneType.WORK, client.id, true);
+    initPhone(2, PhoneType.MOBILE, client.id, true);
+
+    TableRequestDetails details =
+      initTableRequestDetails("", 0, 15, SortColumn.NONE, SortDirection.ASC);
+
+    //
+    //
+    ClientAccountRecordPage page = clientRegister.get().deleteClient(client.id, details);
+
+    Client actual = clientTestDao.get().getActiveClientById(client.id);
+    List<Address> actualAddresses = addressTestDao.get().getClientActiveAddresses(client.id);
+    List<Account> actualAccounts = accountTestDao.get().getClientActiveAccounts(client.id);
+    List<Phone> actualPhones = phoneTestDao.get().getClientActivePhones(client.id);
+    //
+    //
+
+    assertThat(page).isNotNull();
+    assertThat(page.items).isEmpty();
+    assertThat(page.totalItemsCount).isEqualTo(0);
+    assertThat(actual).isNull();
+    assertThat(actualAddresses).isEmpty();
+    assertThat(actualAccounts).isEmpty();
+    assertThat(actualPhones).isEmpty();
+
+  }
+
+  @DataProvider
+  public static Object[][] delete_client_invalid_request_DP() {
+    return new Object[][] {
+      {-1, 0},
+      {0, 0},
+      {12, -2},
+      {-12, -22}
+    };
+  }
+
+  @Test(dataProvider = "delete_client_invalid_request_DP", expectedExceptions = InvalidRequestDetails.class)
+  public void delete_Client_invalidRequestDetails(int pageIndex, int pageSize) {
+    truncateTables();
+
+    TableRequestDetails details =
+      initTableRequestDetails("", pageIndex, pageSize, SortColumn.NONE, SortDirection.ASC);
+
+    //
+    //
+    clientRegister.get().deleteClient(0, details);
+    //
+    //
+  }
 
 }

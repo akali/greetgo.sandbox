@@ -18,4 +18,7 @@ public interface ClientDao {
   @Update("update clients set name = #{name}, surname = #{surname}, patronymic = #{patronymic}," +
     " gender = #{gender}::Gender, birthDate = #{birthDate}, charmId = #{charmId} where id = #{id} and isActive = true")
   void updateClient(Client client);
+
+  @Update("update clients set isActive = false where id = #{id}")
+  void deleteClient(@Param("id") int clientId);
 }

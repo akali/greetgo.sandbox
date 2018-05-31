@@ -22,4 +22,7 @@ public interface PhoneDao {
 
   @Select("select * from phones where clientId = #{clientId}")
   List<Phone> selectAllPhones(@Param("clientId") int clientId);
+
+  @Update("update phones set isActive = false where clientId = #{clientId}")
+  void deleteClientPhones(@Param("clientId") Integer id);
 }

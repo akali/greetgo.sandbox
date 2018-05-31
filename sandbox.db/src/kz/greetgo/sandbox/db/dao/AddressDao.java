@@ -26,4 +26,7 @@ public interface AddressDao {
 
   @Delete("update addresses set isActive = false where id = #{id}")
   void deleteAddress(@Param("id") int addressId);
+
+  @Update("update addresses set isActive = false where clientId = #{clientId}")
+  void deleteClientAddresses(@Param("clientId") Integer id);
 }
