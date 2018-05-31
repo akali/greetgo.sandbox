@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.fail;
 
 public class ClientRegisterImplTest extends ParentTestNg {
 
@@ -730,6 +731,33 @@ public class ClientRegisterImplTest extends ParentTestNg {
   }
 
   @Test
+  public void editClient_clientData_nullExcept_clientId() throws ParseException {
+    truncateTables();
+
+    initCharm(0, true);
+    Client client = initClient(0, 0);
+
+    ClientToSave toSave = new ClientToSave();
+    toSave.id = 0;
+
+    //
+    //
+    clientRegister.get().editClient(toSave);
+
+    ClientDetails actual = clientRegister.get().getClientDetails(client.id);
+    //
+    //
+
+    assertThat(actual).isNotNull();
+    assertThat(actual.name).isEqualToIgnoringCase(client.name);
+    assertThat(actual.surname).isEqualToIgnoringCase(client.surname);
+    assertThat(actual.patronymic).isEqualToIgnoringCase(client.patronymic);
+    assertThat(actual.gender).isEqualsToByComparingFields(client.gender);
+    assertThat(actual.birthDate).isEqualTo(client.birthDate);
+    assertThat(actual.charmId).isEqualTo(client.charmId);
+  }
+
+  @Test
   public void editClient_addresses() throws ParseException {
     truncateTables();
 
@@ -741,20 +769,9 @@ public class ClientRegisterImplTest extends ParentTestNg {
 
     ClientToSave expected = new ClientToSave();
     expected.id = client.id;
-    expected.surname = RND.str(15);
-    expected.name = RND.str(15);
-    expected.patronymic = RND.str(15);
-    expected.gender = Gender.FEMALE;
-    expected.birthDate = new RandomDate().nextDate();
-    expected.charmId = 0;
 
     expected.regAddress = new Address(0, client.id, AddressType.REG, RND.str(10), RND.str(10), RND.str(10));
     expected.factAddress = new Address(1, client.id, AddressType.FACT, RND.str(10), RND.str(10), RND.str(10));
-
-    expected.phones = new ArrayList<>();
-    expected.phones.add(new Phone(RND.intStr(10), PhoneType.HOME));
-    expected.phones.add(new Phone(RND.intStr(10), PhoneType.WORK));
-    expected.phones.add(new Phone(RND.intStr(10), PhoneType.MOBILE));
 
     //
     //
@@ -789,20 +806,9 @@ public class ClientRegisterImplTest extends ParentTestNg {
 
     ClientToSave expected = new ClientToSave();
     expected.id = clientId;
-    expected.surname = RND.str(15);
-    expected.name = RND.str(15);
-    expected.patronymic = RND.str(15);
-    expected.gender = Gender.FEMALE;
-    expected.birthDate = new RandomDate().nextDate();
-    expected.charmId = 1;
 
     expected.regAddress = new Address(1, clientId, AddressType.REG, RND.str(10), RND.str(10), RND.str(10));
     expected.factAddress = new Address(clientId, AddressType.FACT, RND.str(10), RND.str(10), RND.str(10));
-
-    expected.phones = new ArrayList<>();
-    expected.phones.add(new Phone(RND.intStr(10), PhoneType.HOME));
-    expected.phones.add(new Phone(RND.intStr(10), PhoneType.WORK));
-    expected.phones.add(new Phone(RND.intStr(10), PhoneType.MOBILE));
 
     //
     //
@@ -826,7 +832,61 @@ public class ClientRegisterImplTest extends ParentTestNg {
   }
 
   @Test
-  public void editClient_phones() throws ParseException {
+  public void editClient_addresses_delete_factAddress() throws ParseException {
+    truncateTables();
+
+    initCharm(null, true);
+
+    Client client = initClient(null, 1);
+    int clientId = 1; // according to sequence
+    initAddress(1, AddressType.REG, clientId); //id: 1
+    initAddress(2, AddressType.FACT, clientId); //id: 2
+
+    ClientToSave expected = new ClientToSave();
+    expected.id = clientId;
+
+    expected.factAddress = new Address(clientId, AddressType.FACT, RND.str(10), RND.str(10), RND.str(10));
+    expected.factAddress.id = 2;
+    expected.factAddress.isActive = false;
+
+    //
+    //
+    clientRegister.get().editClient(expected);
+
+    ClientDetails actual = clientRegister.get().getClientDetails(clientId);
+    //
+    //
+
+    assertThat(actual).isNotNull();
+    assertThat(actual.factAddress).isNull();
+  }
+
+  @Test(expectedExceptions = InvalidClientData.class)
+  public void editClient_addresses_delete_regAddress() throws ParseException {
+    truncateTables();
+
+    initCharm(null, true);
+
+    Client client = initClient(null, 1);
+    int clientId = 1; // according to sequence
+    initAddress(1, AddressType.REG, clientId); //id: 1
+
+    ClientToSave expected = new ClientToSave();
+    expected.id = clientId;
+
+    expected.regAddress = new Address(clientId, AddressType.REG, RND.str(10), RND.str(10), RND.str(10));
+    expected.regAddress.id = 1;
+    expected.regAddress.isActive = false;
+
+    //
+    //
+    clientRegister.get().editClient(expected);
+    //
+    //
+  }
+
+  @Test
+  public void editClient_phones() {
     truncateTables();
 
     initCharm(1, true);

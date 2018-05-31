@@ -164,6 +164,7 @@ public class ClientRegisterImpl implements ClientRegister {
 
   @Override
   public ClientAccountRecord editClient(ClientToSave clientToSave) {
+    if(clientToSave.id == null) throw new InvalidClientData("client id cannot be null");
 
     ClientDetails clientDetails = getClientDetails(clientToSave.id);
 
@@ -175,7 +176,7 @@ public class ClientRegisterImpl implements ClientRegister {
     client.gender = clientToSave.gender != null ? clientToSave.gender : clientDetails.gender;
     client.birthDate = clientToSave.birthDate != null ? clientToSave.birthDate : clientDetails.birthDate;
 
-    Charm charm = charmRegister.get().getCharm(clientToSave.charmId);
+    Charm charm = charmRegister.get().getCharm(clientToSave.charmId != null ? clientToSave.charmId : clientDetails.charmId);
     client.charmId =  charm.id;
 
     clientDao.get().updateClient(client);
@@ -224,15 +225,9 @@ public class ClientRegisterImpl implements ClientRegister {
       addressDao.get().deleteAddress(clientDetails.factAddress.id);
     }
 
-//    if (clientToSave.factAddress != null) {
-//      Address regAddress = new Address();
-//
-//      addressDao.get().updateAddress(clientToSave.regAddress);
-//    }
-//
-//
-//    if (clientToSave.factAddress != null)
-//      addressDao.get().insertAddress(clientToSave.factAddress);
+    if (clientToSave.phones != null) {
+
+    }
 
     return null;
   }

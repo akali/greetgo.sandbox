@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.*;
 
 public interface AddressDao {
 
-  @Select("select * from Addresses where clientId = #{clientId} and type = #{type}::AddressType")
+  @Select("select * from Addresses where clientId = #{clientId} and type = #{type}::AddressType and isActive = true")
   Address getAddressByClientIdAndType(@Param("clientId") int clientId,
                                       @Param("type")AddressType type);
 
@@ -24,6 +24,6 @@ public interface AddressDao {
     " where addresses.id = #{id}")
   void insertOrUpdateAddress(Address address);
 
-  @Delete("update address set isActive = false where id = #{id}")
+  @Delete("update addresses set isActive = false where id = #{id}")
   void deleteAddress(@Param("id") int addressId);
 }
