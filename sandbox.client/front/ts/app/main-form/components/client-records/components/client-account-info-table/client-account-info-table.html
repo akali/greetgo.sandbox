@@ -41,19 +41,19 @@
         <!-- FIO -->
         <ng-container matColumnDef="fio">
             <mat-header-cell *matHeaderCellDef mat-sort-header> FIO </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.fullName}} </mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.clientFullName}} </mat-cell>
         </ng-container>
 
         <!-- CHARM -->
         <ng-container matColumnDef="charm">
             <mat-header-cell *matHeaderCellDef> Charm </mat-header-cell>
-            <mat-cell mat-cell *matCellDef="let element"> {{element.charm}} </mat-cell>
+            <mat-cell mat-cell *matCellDef="let element"> {{element.clientCharmName}}</mat-cell>
         </ng-container>
 
         <!-- AGE -->
         <ng-container matColumnDef="age">
             <mat-header-cell *matHeaderCellDef mat-sort-header> Age </mat-header-cell>
-            <mat-cell mat-cell *matCellDef="let element"> {{element.age}} </mat-cell>
+            <mat-cell mat-cell *matCellDef="let element"> {{element.clientAge}}</mat-cell>
         </ng-container>
 
         <!-- TOTAL -->

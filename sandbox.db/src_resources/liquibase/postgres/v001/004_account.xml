@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet author="nkabylbai" id="create-sequence-Account">
+        <sql endDelimiter=";;"><![CDATA[
+      create sequence account_id_seq start 1 increment 1 no cycle;
+    ]]></sql>
+    </changeSet>
+
+    <changeSet author="nkabylbai" id="create-table-Accounts">
+        <sql endDelimiter=";;"><![CDATA[
+      create table Accounts (
+        id integer default nextval('account_id_seq') primary key,
+        clientId integer references Clients(id) on delete cascade,
+        money float(4),
+        number varchar(30),
+        registeredAt timestamp,
+        isActive boolean default true
+      )
+    ]]></sql>
+    </changeSet>
+
+</databaseChangeLog>

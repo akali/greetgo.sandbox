@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet author="nkabylbai" id="create-sequence-Client">
+        <sql endDelimiter=";;"><![CDATA[
+      create sequence client_id_seq start 1 increment 1 no cycle;
+    ]]></sql>
+    </changeSet>
+
+    <changeSet author="nkabylbai" id="create-enum-Gender">
+        <sql endDelimiter=";;"><![CDATA[
+      create type Gender as enum ('MALE', 'FEMALE')
+    ]]></sql>
+    </changeSet>
+
+    <changeSet author="nkabylbai" id="create-table-Client">
+        <sql endDelimiter=";;"><![CDATA[
+      create table Clients (
+        id integer default nextval('client_id_seq') primary key,
+        surname varchar(255) not null,
+        name varchar(255) not null,
+        patronymic varchar(255),
+        gender Gender not null,
+        birthDate Date not null,
+        charmId integer references Charms(id) on delete cascade not null ,
+        isActive boolean default true
+      )
+    ]]></sql>
+    </changeSet>
+
+</databaseChangeLog>

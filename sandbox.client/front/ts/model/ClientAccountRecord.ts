@@ -1,16 +1,16 @@
 export class ClientAccountInfo {
-  public id: number/*int*/;
-  public fullName: string;
-  public charm: string;
-  public age: number/*int*/;
+  public clientId: number/*int*/;
+  public clientFullName: string;
+  public clientCharmName: string;
+  public clientAge: number/*int*/;
   public totalAccBalance: number /*float*/;
   public maxAccBalance: number/*float*/;
   public minAccBalance: number/*float*/;
 
   public assign(o: any): ClientAccountInfo {
-    this.fullName = o.fullName;
-    this.charm = o.charm;
-    this.age = o.age;
+    this.clientFullName = o.fullName;
+    this.clientCharmName = o.clientCharmName;
+    this.clientAge = o.clientAge;
     this.totalAccBalance = o.totalAccBalance;
     this.maxAccBalance = o.maxAccBalance;
     this.minAccBalance = o.minAccBalance;

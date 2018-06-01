@@ -16,11 +16,11 @@ import {Constants} from "../../../../../../utils/Constants";
 import {ClientDetails} from "../../../../../../model/ClientDetails";
 
 @Component({
-  selector: 'modal-info-component',
-  template: require('./modal-info.html'),
-  styles: [require('./modal-info.css')],
+  selector: 'modal-client-details-component',
+  template: require('./modal-client-details.html'),
+  styles: [require('./modal-client-details.css')],
 })
-export class ModalInfoComponent implements OnInit {
+export class ModalClientDetailsComponent implements OnInit {
 
   actionType: ActionType;
 
@@ -46,7 +46,7 @@ export class ModalInfoComponent implements OnInit {
 
   charmsDictionary: Charm[];
 
-  DUMB_ID = 1;
+  DUMB_ID = -1;
 
   errorMessage: string | null = null;
 
@@ -64,7 +64,7 @@ export class ModalInfoComponent implements OnInit {
   }
 
   private requestClientInfo(clientId: number) {
-    this.httpService.get("/client/info", {clientId: clientId}).toPromise().then(clientInfo => {
+    this.httpService.get("/client/getClientDetails", {clientId: clientId}).toPromise().then(clientInfo => {
       this.onClientInfoRequestSuccess(clientInfo);
     }, error => {
       console.log(error);
@@ -87,7 +87,7 @@ export class ModalInfoComponent implements OnInit {
       this.form = this.fb.group({
         name: new FormControl(this.name, [Validators.required]),
         surname: new FormControl(this.surname, [Validators.required]),
-        patronymic: new FormControl(this.patronymic, [Validators.required]),
+        patronymic: new FormControl(this.patronymic),
         gender: new FormControl(this.gender, [Validators.required]),
         birthDate: new FormControl(this.birthDate, [Validators.required]),
         charm: new FormControl('', [Validators.required]),
@@ -107,7 +107,7 @@ export class ModalInfoComponent implements OnInit {
       this.form = this.fb.group({
         name: new FormControl(this.name, [Validators.required]),
         surname: new FormControl(this.surname, [Validators.required]),
-        patronymic: new FormControl(this.patronymic, [Validators.required]),
+        patronymic: new FormControl(this.patronymic),
         gender: new FormControl(this.gender, [Validators.required]),
         birthDate: new FormControl(this.birthDate, [Validators.required]),
         charm: new FormControl(this.charmId, [Validators.required]),
@@ -198,7 +198,7 @@ export class ModalInfoComponent implements OnInit {
   private createNewClient() {
     const clientInfo = this.boxClientToSave();
 
-    this.httpService.post("/client/create",
+    this.httpService.post("/client/createClient",
       {clientToSave: JSON.stringify(clientInfo)}).toPromise().then(response => {
       this.onCreateClientSuccess(response);
     }, error => {
@@ -214,7 +214,7 @@ export class ModalInfoComponent implements OnInit {
 
   private editClient() {
     const clientInfo = this.boxClientToSave();
-    this.httpService.post("/client/edit",
+    this.httpService.post("/client/editClient",
       {clientToSave: JSON.stringify(clientInfo)}).toPromise().then(response => {
       this.onEditClientSuccess(response);
     }, error => {

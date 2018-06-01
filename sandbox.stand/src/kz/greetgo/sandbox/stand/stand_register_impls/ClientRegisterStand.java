@@ -5,7 +5,7 @@ import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.sandbox.controller.errors.InvalidCharmError;
 import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.controller.register.account.AccountRegister;
-import kz.greetgo.sandbox.controller.model.ClientAccountInfoPage;
+import kz.greetgo.sandbox.controller.model.ClientAccountRecordPage;
 import kz.greetgo.sandbox.controller.register.charm.CharmRegister;
 import kz.greetgo.sandbox.controller.register.client.ClientRegister;
 import kz.greetgo.sandbox.db.stand.beans.StandDb;
@@ -52,7 +52,7 @@ public class ClientRegisterStand implements ClientRegister {
   }
 
   @Override
-  public ClientAccountInfo createNewClient(ClientToSave clientToSave) {
+  public ClientAccountRecord createNewClient(ClientToSave clientToSave) {
 
     int newClientId = db.get().clientStorage.size() + 1;
 
@@ -66,11 +66,11 @@ public class ClientRegisterStand implements ClientRegister {
     for (Phone phone : clientToSave.phones)
       createNewPhoneDot(phone.type, phone.number, newClientId);
 
-    return accountRegister.get().getAccountInfo(newClientId);
+    return accountRegister.get().getClientAccountRecord(newClientId);
   }
 
   @Override
-  public ClientAccountInfo editClient(ClientToSave clientToSave) {
+  public ClientAccountRecord editClient(ClientToSave clientToSave) {
 
     ClientDot clientDot = db.get().clientStorage.get(clientToSave.id);
     if (clientDot == null) {
@@ -84,11 +84,11 @@ public class ClientRegisterStand implements ClientRegister {
 
     updatePhones(clientDot.id, clientToSave.phones);
 
-    return accountRegister.get().getAccountInfo(clientDot.id);
+    return accountRegister.get().getClientAccountRecord(clientDot.id);
   }
 
   @Override
-  public ClientAccountInfoPage deleteClient(int clientId, TableRequestDetails requestDetails) {
+  public ClientAccountRecordPage deleteClient(int clientId, TableRequestDetails requestDetails) {
     ClientDot client = db.get().clientStorage.get(clientId);
 
     if (client == null) {
@@ -100,7 +100,7 @@ public class ClientRegisterStand implements ClientRegister {
     removeAllAddresses(clientId);
     removeAllPhones(clientId);
 
-    return accountRegister.get().getAllAccountInfo(requestDetails);
+    return accountRegister.get().getClientAccountRecordPage(requestDetails);
   }
 
   private void disableClientDot(int clientId) {
@@ -110,7 +110,7 @@ public class ClientRegisterStand implements ClientRegister {
 
   private AddressDot getAddressDot(int clientId, AddressType addressType) {
     for (AddressDot addressDot : db.get().addressStorage.values()) {
-      if (addressDot.clientId == clientId && addressDot.addressType == addressType) {
+      if (addressDot.clientId == clientId && addressDot.type == addressType) {
         return addressDot;
       }
     }

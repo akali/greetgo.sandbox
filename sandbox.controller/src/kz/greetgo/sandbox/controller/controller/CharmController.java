@@ -24,7 +24,7 @@ public class CharmController implements Controller {
   }
 
   @ToJson
-  @Mapping("/")
-  public Charm getCharmById(@Par("charmId") int charmId) { return charmRegister.get().getCharm(charmId); }
+  @Mapping("/getCharm")
+  public Charm getCharm(@Par("charmId") int charmId) { return charmRegister.get().getCharm(charmId); }
 
 }

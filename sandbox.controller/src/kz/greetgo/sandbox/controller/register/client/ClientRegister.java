@@ -6,9 +6,9 @@ import kz.greetgo.sandbox.controller.model.*;
 public interface ClientRegister {
   ClientDetails getClientDetails(int clientId);
 
-  ClientAccountInfo createNewClient(ClientToSave clientToSave);
+  ClientAccountRecord createNewClient(ClientToSave clientToSave);
 
-  ClientAccountInfo editClient(ClientToSave clientToSave);
+  ClientAccountRecord editClient(ClientToSave clientToSave);
 
-  ClientAccountInfoPage deleteClient(int clientId, TableRequestDetails requestDetails);
+  ClientAccountRecordPage deleteClient(int clientId, TableRequestDetails requestDetails);
 }

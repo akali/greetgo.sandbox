@@ -23,4 +23,10 @@ public class PhoneDot {
     this.number = number;
     this.type = type;
   }
+
+  public void showInfo() {
+    System.out.println(
+      String.format("----------: Init Address { id:%2d, clientId:%2d, %s, %s }",
+        this.id, this.clientId, this.type, this.number));
+  }
 }

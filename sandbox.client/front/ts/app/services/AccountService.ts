@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {Subject} from "rxjs/Subject";
-import {ClientAccountInfo} from "../../model/ClientAccountInfo";
+import {ClientAccountInfo} from "../../model/ClientAccountRecord";
 import {HttpService} from "../HttpService";
 
 @Injectable()

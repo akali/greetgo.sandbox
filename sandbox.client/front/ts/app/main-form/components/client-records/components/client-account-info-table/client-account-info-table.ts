@@ -1,7 +1,7 @@
 import {Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild} from '@angular/core';
 import {MatPaginator, MatSort} from "@angular/material";
 import {SelectionModel} from "@angular/cdk/collections";
-import {ClientAccountInfo} from "../../../../../../model/ClientAccountInfo";
+import {ClientAccountInfo} from "../../../../../../model/ClientAccountRecord";
 import {HttpService} from "../../../../../HttpService";
 import {GenericDataSource} from "./GenericDataSource";
 import {debounceTime, distinctUntilChanged, tap} from "rxjs/operators";
@@ -10,16 +10,16 @@ import {AccountService} from "../../../../../services/AccountService";
 import {SortDirection} from "../../../../../../model/SortDirection";
 import {TableRequestDetails} from "../../../../../../model/TableRequestDetails";
 import {SortColumn} from "../../../../../../model/SortColumn";
-import {ClientAccountInfoPage} from "../../../../../../model/ClientAccountInfoPage";
+import {ClientAccountInfoPage} from "../../../../../../model/ClientAccounRecordPage";
 import {Subject} from "rxjs/Subject";
 import 'rxjs/add/operator/takeUntil';
 
 @Component({
-  selector: 'table-basic-example',
-  styles: [require('./account-table.css')],
-  template: require('./account-table.html'),
+  selector: 'client-account-info-table',
+  styles: [require('./client-account-info-table.css')],
+  template: require('./client-account-info-table.html'),
 })
-export class AccountTableComponent implements OnDestroy {
+export class ClientAccountInfoTableComponent implements OnDestroy {
 
   private unsubscribe = new Subject<void>();
 
@@ -80,7 +80,10 @@ export class AccountTableComponent implements OnDestroy {
 
     this.paginator.page
       .pipe(
-        tap(() => this.requestAccountInfoList()
+        tap(() => {
+            this.selection.deselect(this.selection.selected[0]);
+            this.requestAccountInfoList()
+          }
         )
       ).subscribe();
   }
@@ -115,7 +118,8 @@ export class AccountTableComponent implements OnDestroy {
     console.log(requestDetails.toString());
     this.dataSource.startLoading();
 
-    this.httpService.get("/accounts/", {requestDetails: JSON.stringify(requestDetails)}).toPromise().then(response => {
+    this.httpService.get("/accounts/getClientAccountInfoPage",
+      {requestDetails: JSON.stringify(requestDetails)}).toPromise().then(response => {
       this.onAccountInfoListRequestSuccess(response);
     }, error => {
       console.log(error);
@@ -140,14 +144,14 @@ export class AccountTableComponent implements OnDestroy {
   }
 
   onDeleteClicked() {
-    const clientId = this.selection.selected[0].id;
+    const clientId = this.selection.selected[0].clientId;
     this.requestClientDelete(clientId);
   }
 
   private requestClientDelete(clientId: number) {
     const requestDetails = this.getRequestDetails();
 
-    this.httpService.post("/client/delete",
+    this.httpService.post("/client/deleteClient",
       {clientId: clientId, requestDetails: JSON.stringify(requestDetails)}).toPromise().then(response => {
       this.onClientDeleteSuccess(response);
     }, error => {

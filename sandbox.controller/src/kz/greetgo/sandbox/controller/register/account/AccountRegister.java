@@ -1,10 +1,17 @@
 package kz.greetgo.sandbox.controller.register.account;
 
-import kz.greetgo.sandbox.controller.model.ClientAccountInfo;
-import kz.greetgo.sandbox.controller.model.ClientAccountInfoPage;
-import kz.greetgo.sandbox.controller.model.TableRequestDetails;
+import kz.greetgo.sandbox.controller.model.*;
+
+import java.util.List;
 
 public interface AccountRegister {
-  ClientAccountInfoPage getAllAccountInfo(TableRequestDetails requestDetails);
-  ClientAccountInfo getAccountInfo(int clientId);
+  ClientAccountRecordPage getClientAccountRecordPage(TableRequestDetails requestDetails);
+
+  ClientAccountRecord getClientAccountRecord(int clientId);
+
+  float getMinAccBalance(int clientId);
+
+  float getMaxAccBalance(int clientId);
+
+  float getTotalAccBalance(int clientId);
 }
