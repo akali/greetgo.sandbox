@@ -18,5 +18,4 @@ import {HttpService} from "./HttpService";
   providers: [HttpService],
   entryComponents: [],
 })
-export class AppModule {
-}
+export class AppModule{}

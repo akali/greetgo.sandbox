@@ -1,0 +1,7 @@
+export enum CharacterType {
+    SANGUINE = "SANGUINE",
+    PHLEGMATIC = "PHLEGMATIC",
+    CHOLERIC = "CHOLERIC",
+    MELANCHOLIC = "MELANCHOLIC",
+}
+

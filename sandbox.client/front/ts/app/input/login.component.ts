@@ -30,7 +30,7 @@ export class LoginComponent {
 
   updateEnterButton() {
     this.enterButtonEnabled = !!this.fieldEnterLogin && !!this.fieldEnterPassword;
-    console.log("this.enterButtonEnabled = " + this.enterButtonEnabled)
+    console.log("this.enterButtonEnabled = " + this.enterButtonEnabled);
   }
 
   enterButtonClicked() {
