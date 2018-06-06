@@ -49,12 +49,14 @@
     </div>
     <div *ngIf="clients" class="table">
         <div>
-            <button>+</button>
-            <button (click)="">...</button>
-            <button>-</button>
+            <button (click)="onAddClick()">+</button>
+            <button [disabled]="!selected">...</button>
+            <button [disabled]="!selected">-</button>
         </div>
+
         <table>
             <tr>
+                <td>Selected</td>
                 <td>ФИО</td>
                 <td>Характер</td>
                 <td>Возраст</td>
@@ -62,9 +64,11 @@
                 <td>Максимальный остаток</td>
                 <td>Минимальный остаток</td>
             </tr>
-            <tr *ngFor="let client of clients">
+            <tr *ngFor="let client of clients" (click)="onItemClick(client)">
+                <td class="selected" *ngIf="selected && selected===client"></td>
+                <td *ngIf="!selected || selected!==client"></td>
                 <td>
-                    {{ client.name }}
+                    {{ client.name + ' ' + client.surname + ' ' + client.patronymic }}
                 </td>
                 <td>
                     {{ client.character }}

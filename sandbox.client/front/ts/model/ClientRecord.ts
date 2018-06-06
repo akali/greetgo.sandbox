@@ -33,5 +33,12 @@ export class ClientRecord {
         result.age = c.age;
         return result;
     }
-}
 
+    public getFIO(): string {
+        let result: string = '';
+        if (this.name !== null && this.name.length !== 0) result += this.name;
+        if (this.surname && this.name.length !== 0) result += this.surname;
+        if (this.patronymic && this.name.length !== 0) result += this.patronymic;
+        return result;
+    }
+}

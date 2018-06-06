@@ -2,8 +2,8 @@ package kz.greetgo.sandbox.controller.model;
 
 
 
-public enum GenderType {
-  MALE,
-  FEMALE,
+public enum AddressType {
+  FACT,
+  REG,
   ;
 }

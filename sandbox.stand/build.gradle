@@ -9,6 +9,7 @@ dependencies {
   compile "kz.greetgo.type_script:greetgo.ts_java_convert:0.0.2"
 
   compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+  compile "com.google.code.gson:gson:2.8.4"
 
   compile "org.eclipse.jetty:jetty-server:$jettyVersion"
   compile "org.eclipse.jetty:jetty-servlet:$jettyVersion"

@@ -2,6 +2,7 @@ package kz.greetgo.sandbox.db.stand.beans;
 
 import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.depinject.core.HasAfterInject;
+import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.db.stand.model.PersonDot;
 
 
@@ -13,35 +14,160 @@ import java.util.Map;
 @Bean
 public class StandDb implements HasAfterInject {
   public final Map<String, PersonDot> personStorage = new HashMap<>();
+  public final Map<String, Client> clientStorage = new HashMap<>();
+  public final Map<String, ClientAddress> addressStorage = new HashMap<>();
+  public final Map<String, ClientPhone> phoneStorage = new HashMap<>();
+  public final Map<String, ClientAccount> accountStorage = new HashMap<>();
+  public final Map<String, ClientAccountTransaction> transactionStorage = new HashMap<>();
+  public final Map<String, TransactionType> transactionTypeStorage = new HashMap<>();
+  public final Map<String, Charm> charmStorage = new HashMap<>();
+
+
+  public final static String CLIENTS = "StandDbClients.txt";
+  public final static String ADDRESSES = "StandDbAddresses.txt";
+  public final static String PHONES = "StandDbPhones.txt";
+  public final static String ACCOUNTS = "StandDbAccounts.txt";
+  public final static String TRANSACTIONS = "StandDbTransactions.txt";
+  public final static String TRANSACTION_TYPES = "StandDbTransactionTypes.txt";
+  public final static String CHARMS = "StandDbCharms.txt";
 
   @Override
   public void afterInject() throws Exception {
-    try (BufferedReader br = new BufferedReader(
-      new InputStreamReader(getClass().getResourceAsStream("StandDbInitData.txt"), "UTF-8"))) {
+    String[] files = new String[]{
+            CLIENTS,
+            ADDRESSES,
+            PHONES,
+            ACCOUNTS,
+            TRANSACTIONS,
+            TRANSACTION_TYPES,
+            CHARMS,
+            "StandDbInitData.txt"
+    };
 
-      int lineNo = 0;
+    for (String filename : files) {
+      try (BufferedReader br = new BufferedReader(
+              new InputStreamReader(getClass().getResourceAsStream(filename), "UTF-8"))) {
 
-      while (true) {
-        String line = br.readLine();
-        if (line == null) break;
-        lineNo++;
-        String trimmedLine = line.trim();
-        if (trimmedLine.length() == 0) continue;
-        if (trimmedLine.startsWith("#")) continue;
+        int lineNo = 0;
 
-        String[] splitLine = line.split(";");
+        while (true) {
+          String line = br.readLine();
+          if (line == null) break;
+          lineNo++;
+          String trimmedLine = line.trim();
+          if (trimmedLine.length() == 0) continue;
+          if (trimmedLine.startsWith("#")) continue;
 
-        String command = splitLine[0].trim();
-        switch (command) {
-          case "PERSON":
-            appendPerson(splitLine, line, lineNo);
-            break;
+          String[] splitLine = line.split(";");
 
-          default:
-            throw new RuntimeException("Unknown command " + command);
+          String command = splitLine[0].trim();
+          if (filename.equals(files[files.length - 1]))
+            switch (command) {
+              case "PERSON":
+                appendPerson(splitLine, line, lineNo);
+                break;
+
+              default:
+                throw new RuntimeException("Unknown command " + command);
+            }
+          else {
+            switch(filename) {
+              case CLIENTS:
+                parseClient(splitLine);
+                break;
+              case ADDRESSES:
+                parseAddress(splitLine);
+                break;
+              case PHONES:
+                parsePhone(splitLine);
+                break;
+              case ACCOUNTS:
+                parseAccount(splitLine);
+                break;
+              case TRANSACTIONS:
+                parseTransactions(splitLine);
+                break;
+              case TRANSACTION_TYPES:
+                parseTransactionTypes(splitLine);
+                break;
+              case CHARMS:
+                parseCharms(splitLine);
+                break;
+              default:
+                throw new RuntimeException("Unknown filename: " + filename);
+            }
+          }
         }
       }
     }
+    System.out.println("personStorage: ");
+    for (String key : personStorage.keySet()) {
+      System.out.println(key + " " + personStorage.get(key));
+    }
+    System.out.println("clientStorage: ");
+    for (String key : clientStorage.keySet()) {
+      System.out.println(key + " " + clientStorage.get(key));
+    }
+    System.out.println("addressStorage: ");
+    for (String key : addressStorage.keySet()) {
+      System.out.println(key + " " + addressStorage.get(key));
+    }
+    System.out.println("phoneStorage: ");
+    for (String key : phoneStorage.keySet()) {
+      System.out.println(key + " " + phoneStorage.get(key));
+    }
+    System.out.println("accountStorage: ");
+    for (String key : accountStorage.keySet()) {
+      System.out.println(key + " " + accountStorage.get(key));
+    }
+    System.out.println("transactionStorage: ");
+    for (String key : transactionStorage.keySet()) {
+      System.out.println(key + " " + transactionStorage.get(key));
+    }
+    System.out.println("transactionTypeStorage: ");
+    for (String key : transactionTypeStorage.keySet()) {
+      System.out.println(key + " " + transactionTypeStorage.get(key));
+    }
+    System.out.println("charmStorage: ");
+    for (String key : charmStorage.keySet()) {
+      System.out.println(key + " " + charmStorage.get(key));
+    }
+  }
+
+  private void parseCharms(String[] line) {
+    Charm charm = Charm.parse(line);
+    charmStorage.put(String.valueOf(charm.id), charm);
+  }
+
+
+  private void parseTransactionTypes(String[] splitLine) {
+    TransactionType type = TransactionType.parse(splitLine);
+    transactionTypeStorage.put(String.valueOf(type.id), type);
+  }
+
+  private void parseTransactions(String[] line) {
+    ClientAccountTransaction transaction = ClientAccountTransaction.parse(line);
+    transactionStorage.put(String.valueOf(transaction.id), transaction);
+  }
+
+  private void parseAccount(String[] line) {
+    ClientAccount account = ClientAccount.parse(line);
+    accountStorage.put(String.valueOf(account.id), account);
+  }
+
+  private void parsePhone(String[] splitLine) {
+    ClientPhone phone = ClientPhone.parse(splitLine);
+    phoneStorage.put(phone.getId(), phone);
+  }
+
+  private void parseAddress(String[] splitLine) {
+    ClientAddress address = ClientAddress.parse(splitLine);
+    addressStorage.put(String.valueOf(address.getId()), address);
+  }
+
+  private void parseClient(String[] splitLine) {
+    Client client = Client.parse(splitLine);
+    clientStorage.put(String.valueOf(client.id), client);
   }
 
   @SuppressWarnings("unused")

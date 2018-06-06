@@ -3,6 +3,7 @@ import {GenderType} from "./GenderType";
 import {PhoneNumber} from "./PhoneNumber";
 
 export class ClientToSave {
+    public id: string;
     public name: string;
     public surname: string;
     public patronymic: string | null;
@@ -17,6 +18,7 @@ export class ClientToSave {
     public phoneNumbers: Array<PhoneNumber>;
 
     public assign(o: any): ClientToSave {
+        this.id = o.id;
         this.name = o.name;
         this.surname = o.surname;
         this.patronymic = o.patronymic;

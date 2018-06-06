@@ -4,6 +4,7 @@ import kz.greetgo.sandbox.controller.model.CharacterType;
 import kz.greetgo.sandbox.controller.model.GenderType;
 
 public class ClientToSave {
+  public String id;
   public String name;
   public String surname;
   public String patronymic;

@@ -43,6 +43,7 @@ export class LoginComponent {
     }).toPromise().then(res => {
       this.disabled = false;
       this.httpService.token = res.text();
+      console.log(this.httpService.token);
       this.errorMessage = null;
       if (this.fieldEnterLogin == 'root') {
         localStorage.removeItem("lastGoodLogin");

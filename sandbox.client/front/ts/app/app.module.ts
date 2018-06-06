@@ -6,10 +6,21 @@ import {RootComponent} from "./root.component";
 import {LoginComponent} from "./input/login.component";
 import {MainFormComponent} from "./main_form/main_form.component";
 import {HttpService} from "./HttpService";
+import { MatInputModule, MatPaginatorModule, MatProgressSpinnerModule,
+    MatSortModule, MatTableModule } from "@angular/material";
 
 @NgModule({
   imports: [
-    BrowserModule, HttpModule, JsonpModule, FormsModule
+      BrowserModule,
+      HttpModule,
+      JsonpModule,
+      FormsModule,
+      // HttpClientModule, /* <- */
+      MatInputModule,
+      MatTableModule,
+      MatPaginatorModule,
+      MatSortModule,
+      MatProgressSpinnerModule
   ],
   declarations: [
     RootComponent, LoginComponent, MainFormComponent

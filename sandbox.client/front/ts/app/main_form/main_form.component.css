@@ -9,3 +9,6 @@ table tr:nth-child(odd) {
 table tr:nth-child(even) {
     background-color: #ffffff;
 }
+.selected {
+    background-color: red !important;
+}
