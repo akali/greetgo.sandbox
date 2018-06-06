@@ -1,7 +1,5 @@
 package kz.greetgo.sandbox.controller.model;
 
-import kz.greetgo.sandbox.controller.model.AddressType;
-
 public class ClientAddress {
   public int client;
   public AddressType type;

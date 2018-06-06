@@ -15,13 +15,13 @@ export class ClientRecord {
     public name: string;
     public surname: string;
     public patronymic: string;
-    public total: number /* int */;
-    public max: number /* int */;
-    public min: number /* int */;
-    public character: CharacterType;
+    public total: number /* float */;
+    public max: number /* float */;
+    public min: number /* float */;
+    public character: string;
     public age: number /* int */;
 
-    public static copy(c: ClientToSave): ClientRecord {
+    public static copy(c: any): ClientRecord {
         let result = new ClientRecord();
         result.name = c.name;
         result.surname = c.surname;

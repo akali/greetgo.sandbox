@@ -22,6 +22,8 @@ public class StandDb implements HasAfterInject {
   public final Map<String, TransactionType> transactionTypeStorage = new HashMap<>();
   public final Map<String, Charm> charmStorage = new HashMap<>();
 
+  public int clientId;
+  public int addressId;
 
   public final static String CLIENTS = "StandDbClients.txt";
   public final static String ADDRESSES = "StandDbAddresses.txt";
@@ -163,11 +165,13 @@ public class StandDb implements HasAfterInject {
   private void parseAddress(String[] splitLine) {
     ClientAddress address = ClientAddress.parse(splitLine);
     addressStorage.put(String.valueOf(address.getId()), address);
+    ++addressId;
   }
 
   private void parseClient(String[] splitLine) {
     Client client = Client.parse(splitLine);
     clientStorage.put(String.valueOf(client.id), client);
+    ++clientId;
   }
 
   @SuppressWarnings("unused")

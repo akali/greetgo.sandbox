@@ -201,7 +201,7 @@ public class LaunchGenerateMockObjects {
         }
     }
 
-    private void run() throws Exception {
+    private void run() {
         File srcDir = Modules.standDir().toPath().resolve("db/src/kz/greetgo/sandbox/db/stand/beans").toFile();
 
         new Printer()
@@ -211,7 +211,7 @@ public class LaunchGenerateMockObjects {
                                 "Vladimir",
                                 "Sergeevich",
                                 GenderType.MALE,
-                                new Date().getTime(),
+                                -127699200,
                                 1))
                 .setCharm(
                         new Charm(
@@ -313,7 +313,7 @@ public class LaunchGenerateMockObjects {
                                 "Aida",
                                 "Ualiyevna",
                                 GenderType.FEMALE,
-                                new Date().getTime(),
+                                913680000,
                                 3))
                 .setCharm(
                         new Charm(
