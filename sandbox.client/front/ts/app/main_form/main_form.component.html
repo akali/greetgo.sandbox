@@ -1,20 +1,17 @@
 <div>
-    <h2>Main Form Component</h2>
+  <h2>Main Form Component</h2>
 
-    <button (click)="exit.emit()">Выход</button>
+  <button (click)="exit.emit()">Выход</button>
 
-    <div *ngIf="!userInfo">
-        <button [disabled]="!loadUserInfoButtonEnabled" (click)="loadUserInfoButtonClicked()">
-            Загрузить данные пользователя
-        </button>
-        <div *ngIf="loadUserInfoError">
-            {{loadUserInfoError}}
-        </div>
+  <div *ngIf="!userInfo">
+      <button [disabled]="!loadUserInfoButtonEnabled" (click)="loadUserInfoButtonClicked()">
+      Загрузить данные пользователя
+    </button>
+    <div *ngIf="loadUserInfoError">
+      {{loadUserInfoError}}
     </div>
-
-    <!--<mat-table [dataSource]=""></mat-table>-->
-
-    <div *ngIf="userInfo">
+  </div>
+  <div *ngIf="userInfo">
         <table>
             <tbody>
                 <tr>
@@ -50,11 +47,12 @@
             </tbody>
         </table>
     </div>
+
     <div *ngIf="clients" class="table">
         <div>
             <button (click)="onAddClick()">+</button>
-            <button [disabled]="!selected">...</button>
-            <button [disabled]="!selected">-</button>
+            <button [disabled]="!selected" (click)="onEdit(selected)">...</button>
+            <button [disabled]="!selected" (click)="onRemove(selected)">-</button>
         </div>
 
         <table>
@@ -69,12 +67,12 @@
             </tr>
             <tr *ngFor="let client of clients" (click)="onItemClick(client)">
                 <td class="selected" *ngIf="selected && selected===client"></td>
-                <td *ngIf="!selected || selected!==client"></td>
+                <td *ngIf="!selected || selected !== client"></td>
                 <td>
                     {{ client.name + ' ' + client.surname + ' ' + client.patronymic }}
                 </td>
                 <td>
-                    {{ client.character }}
+                    {{ client.charm }}
                 </td>
                 <td>
                     {{ client.age }}

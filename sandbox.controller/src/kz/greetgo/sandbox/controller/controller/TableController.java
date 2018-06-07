@@ -54,22 +54,4 @@ public class TableController implements Controller {
     public ClientRecord editClient(@Par("clientToSave") @Json ClientToSave clientToSave) {
         return tableRegister.get().editClient(clientToSave);
     }
-
-    //    @ToJson
-//    @Mapping("/get")
-//    public List<ClientToSave> getTable(@ParSession("personId") String personId) {
-//        return tableRegister.get().getTable(personId);
-//    }
-
-//    @ToJson
-//    @Mapping("/change")
-//    public int changeClient(@Par("personId") String personId, @Par("clientId") int clientId) {
-//        return tableRegister.get().changeClient(personId, clientId);
-//    }
-
-//    @ToJson
-//    @Mapping("/add")
-//    public int addClient(@Par("personId") String personId, @Par("client") ClientToSave client) {
-//        return tableRegister.get().addClient(personId, client);
-//    }
 }
