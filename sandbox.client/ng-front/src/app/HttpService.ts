@@ -26,10 +26,12 @@ export class HttpService {
 
   public pageSize:number = 10;
 
+  private urlPrefix = "http://localhost:1313/access/api";
+
   constructor(private http: Http) {}
 
   private prefix(): string {
-    return (<any>window).urlPrefix;
+    return this.urlPrefix;
   }
 
   public get token(): string | null {

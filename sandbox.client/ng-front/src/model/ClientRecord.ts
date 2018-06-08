@@ -12,13 +12,14 @@ function getAge(birthDate: Date): number /* int */ {
 }
 
 export class ClientRecord {
+    public id: number;
     public name: string;
     public surname: string;
     public patronymic: string;
     public total: number /* float */;
     public max: number /* float */;
     public min: number /* float */;
-    public character: string;
+    public charm: string;
     public age: number /* int */;
 
     public static copy(c: any): ClientRecord {
@@ -29,7 +30,7 @@ export class ClientRecord {
         result.total = c.total;
         result.max = c.max;
         result.min = c.min;
-        result.character = c.character;
+        result.charm = c.charm;
         result.age = c.age;
         return result;
     }

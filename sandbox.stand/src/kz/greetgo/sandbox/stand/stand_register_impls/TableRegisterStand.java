@@ -35,7 +35,9 @@ public class TableRegisterStand implements TableRegister {
     }
 
     @Override
-    public List<ClientRecord> getRecordTable(int start, int offset) {
+    public List<ClientRecord> getRecordTable(int start, int offset, String direction, String action) {
+        System.out.println("start: " + start + "; " + "offset: " + offset);
+        System.out.println("direction: " + direction + "; " + "action: " + action);
         List<ClientRecord> list = new ArrayList<>();
 
         Map<String, Client> map = standDb.get().clientStorage;
@@ -46,7 +48,36 @@ public class TableRegisterStand implements TableRegister {
             list.add(result);
         }
 
-        return list.stream().skip(start).limit(offset).collect(Collectors.toList());
+        return list.stream().sorted(
+          (t1, t2) -> {
+              int result = 0;
+              switch(action) {
+                  case "name":
+                      result = t1.name.compareTo(t2.name);
+                      break;
+                  case "total":
+                      result = Integer.compare(t1.total, t2.total);
+                      break;
+                  case "max":
+                      result = Float.compare(t1.max, t2.max);
+                      break;
+                  case "min":
+                      result = Float.compare(t1.min, t2.min);
+                      break;
+                  case "charm":
+                      result = t1.charm.compareTo(t2.charm);
+                      break;
+                  case "age":
+                      result = Integer.compare(t1.age, t2.age);
+                      break;
+                  default:
+                      result = Integer.compare(t1.id, t2.id);
+              }
+              if (direction != null && direction.toLowerCase().equals("desc")) {
+                  result = -result;
+              }
+              return result;
+        }).skip(start).limit(offset).collect(Collectors.toList());
     }
 
     public static int calculateAge(long birthDateTs, long currentDateTs) {
