@@ -141,7 +141,6 @@ public class StandDb implements HasAfterInject {
     charmStorage.put(String.valueOf(charm.id), charm);
   }
 
-
   private void parseTransactionTypes(String[] splitLine) {
     TransactionType type = TransactionType.parse(splitLine);
     transactionTypeStorage.put(String.valueOf(type.id), type);
