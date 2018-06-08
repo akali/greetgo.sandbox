@@ -44,13 +44,33 @@ export class TableComponent implements OnInit, AfterViewInit {
   }
 
   clientDialogRef: MatDialogRef<ClientDialogComponent>;
+  selectedClientId = -1;
 
   onClientAdd() {
     this.clientDialogRef = this.dialog.open(ClientDialogComponent, {
-      width: "960px",
-      height: "850px",
-      hasBackDrop: false
+      width: "480px",
+      height: "960px",
+      data: {
+        charmsObservable: this.httpService.get("/table/getCharms")
+      }
     });
+  }
+
+  onClientRemove() {
+
+  }
+
+  onClientEdit() {
+    this.clientDialogRef = this.dialog.open(ClientDialogComponent,
+      {
+        width: "480px",
+        height: "960px",
+        data: {
+          clientDetailObservable: this.httpService.post("/table/detail", {
+            clientId: this.selectedClientId
+          })
+        }
+      });
   }
 
   private load() {
@@ -61,5 +81,11 @@ export class TableComponent implements OnInit, AfterViewInit {
       this.paginator.pageSize,
       this.sort.direction,
       this.sort.active);
+  }
+
+  onRowSelect(row) {
+    console.log(row);
+    if (this.selectedClientId === row.id) this.selectedClientId = -1;
+    else this.selectedClientId = row.id;
   }
 }

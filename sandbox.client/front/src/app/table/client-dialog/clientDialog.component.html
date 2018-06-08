@@ -1,8 +1,32 @@
-<h1 mat-dialog-title>Add file</h1>
-<mat-dialog-content>
-  Content goes here
-</mat-dialog-content>
-<mat-dialog-actions>
-  <button mat-button>Add</button>
-  <button mat-button>Cancel</button>
-</mat-dialog-actions>
+<form [formGroup]="form" (ngSubmit)="submit(form)">
+  <h1 mat-dialog-title>Add file</h1>
+  <mat-dialog-content class="root">
+    <mat-form-field>
+      <input required="required" matInput formControlName="surname" placeholder="Enter surname">
+    </mat-form-field>
+    <mat-form-field>
+      <input required="required" matInput formControlName="name" placeholder="Enter name">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput formControlName="patronymic" placeholder="Enter patronymic">
+    </mat-form-field>
+
+    <mat-select placeholder="Select gender" required>
+      <mat-option>--</mat-option>
+      <mat-option *ngFor="let gender of genders" [value]="gender">
+        {{gender}}
+      </mat-option>
+    </mat-select>
+
+    <mat-select placeholder="Select charm">
+      <mat-option *ngFor="let charm of client.charms" [value]="charm">
+        {{charm.name}}
+      </mat-option>
+    </mat-select>
+  </mat-dialog-content>
+
+  <mat-dialog-actions>
+    <button mat-button type="submit">Add</button>
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+  </mat-dialog-actions>
+</form>

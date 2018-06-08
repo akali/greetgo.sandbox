@@ -9,11 +9,11 @@ import {
   MatPaginatorModule,
   MatSortModule,
   MatDialogModule,
-  MatFormFieldModule, MatInputModule, MatButtonModule, MatCardModule, MatCardModule
+  MatFormFieldModule, MatInputModule, MatButtonModule, MatCardModule, MatDialogRef, MatRippleModule, MatSelectModule
 } from '@angular/material';
 import {LoginComponent} from "./input/login.component";
 import {HttpService} from "./HttpService";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
 import {HttpModule, JsonpModule} from "@angular/http";
 import {ClientDialogComponent} from "./table/client-dialog/clientDialog.component";
@@ -40,6 +40,9 @@ import {ClientDialogComponent} from "./table/client-dialog/clientDialog.componen
     HttpModule,
     JsonpModule,
     FormsModule,
+    ReactiveFormsModule,
+    MatRippleModule,
+    MatSelectModule
   ],
   providers: [HttpService],
   bootstrap: [AppComponent],

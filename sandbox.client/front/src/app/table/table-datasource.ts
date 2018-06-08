@@ -1,46 +1,11 @@
 import { DataSource } from '@angular/cdk/collections';
 import { MatPaginator, MatSort } from '@angular/material';
-import { map } from 'rxjs/operators';
-import {Observable, merge, BehaviorSubject} from 'rxjs';
+import {Observable, BehaviorSubject} from 'rxjs';
 import {ClientRecord} from "../../model/ClientRecord";
 import {HttpService} from "../HttpService";
 
 export class TableDatasource extends DataSource<ClientRecord> {
   data: ClientRecord[] = [];
-  // ClientRecord.copy({
-  //   age: 48436,
-  //   charm: "HAPPY",
-  //   id: 1,
-  //   max: 500,
-  //   min: 500,
-  //   name: "Vladimir",
-  //   patronymic: "Sergeevich",
-  //   surname:"Popov",
-  //   total: 500
-  // }),
-  // ClientRecord.copy({
-  //     age: 48436,
-  //     charm: "HAPPY",
-  //     id: 1,
-  //     max: 500,
-  //     min: 500,
-  //     name: "Vladimir",
-  //     patronymic: "Sergeevich",
-  //     surname:"Popov",
-  //     total: 500
-  // }),
-  // ClientRecord.copy({
-  //     age: 48436,
-  //     charm: "HAPPY",
-  //     id: 1,
-  //     max: 500,
-  //     min: 500,
-  //     name: "Vladimir",
-  //     patronymic: "Sergeevich",
-  //     surname:"Popov",
-  //     total: 500
-  //   },
-  // )];
 
   private clientsSubject = new BehaviorSubject<ClientRecord[]>([]);
 
@@ -67,4 +32,3 @@ export class TableDatasource extends DataSource<ClientRecord> {
     }).subscribe(clients => this.clientsSubject.next(clients.json()));
   }
 }
-

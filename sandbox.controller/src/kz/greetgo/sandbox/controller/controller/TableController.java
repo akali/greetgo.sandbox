@@ -20,7 +20,7 @@ public class TableController implements Controller {
 
 
     @ToJson
-    @Mapping("/get/charms")
+    @Mapping("/getCharms")
     public List<Charm> getCharms() {
         return tableRegister.get().getCharms();
     }
@@ -35,7 +35,7 @@ public class TableController implements Controller {
     }
 
     @ToJson
-    @Mapping("/get/detail")
+    @Mapping("/detail")
     public ClientDetail getClientDetail(@Par("clientId") int clientId) {
         return tableRegister.get().getClientDetail(clientId);
     }

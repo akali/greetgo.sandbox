@@ -1,8 +1,8 @@
 package kz.greetgo.sandbox.controller.model;
 
-import kz.greetgo.sandbox.controller.model.GenderType;
-
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Client {
   public int id;
@@ -38,6 +38,9 @@ public class Client {
       client.gender = GenderType.FEMALE;
     client.birthDate = Long.parseLong(line[5]);
     client.charm = Integer.parseInt(line[6]);
+
+
+
     return client;
   }
 }

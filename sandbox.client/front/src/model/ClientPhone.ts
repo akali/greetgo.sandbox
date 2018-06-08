@@ -10,4 +10,8 @@ export class ClientPhone {
     public client: number /* int */;
     public number: string;
     public type: PhoneType;
+
+  static copy(phone: any) {
+    return new ClientPhone(phone.client, phone.number, phone.type);
+  }
 }
