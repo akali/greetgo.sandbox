@@ -111,7 +111,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 
         let clientToSave = this.collect(value);
 
-        console.log(JSON.stringify(clientToSave));
+        console.log('sending to REST', JSON.stringify(clientToSave));
 
         this.httpService.post("/table/edit", {
           clientToSave: JSON.stringify(clientToSave)

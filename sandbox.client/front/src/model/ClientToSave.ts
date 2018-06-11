@@ -16,7 +16,7 @@ export class ClientToSave {
     public regAddress: ClientAddress;
     public factAddress: ClientAddress;
     public birthDate: number /* long */;
-    public phones: Array<PhoneNumber>;
+    public phones: PhoneNumber[];
     public workPhone: ClientPhone;
     public homePhone: ClientPhone;
 
@@ -33,6 +33,10 @@ export class ClientToSave {
         this.charm = o.charm;
         this.workPhone = o.workPhone;
         this.homePhone = o.homePhone;
+        this.phones = [];
+        for (let key in o.phones) {
+          this.phones.push(ClientPhone.copy(o.phones[key]))
+        }
         return this;
     }
 

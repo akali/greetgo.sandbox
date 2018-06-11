@@ -141,33 +141,50 @@ public class TableRegisterStand implements TableRegister {
         return clientDetail;
     }
 
+    private ClientRecord editClient(int clientId, ClientToSave clientToSave) {
+        Client client = getClient(clientId);
+        client.name = clientToSave.name;
+        client.birthDate = clientToSave.birthDate;
+        client.gender = clientToSave.gender;
+        client.patronymic = clientToSave.patronymic;
+        client.charm = clientToSave.charm;
+        client.surname = clientToSave.surname;
+
+        for (ClientPhone phone : clientToSave.phones) {
+            standDb.get().phoneStorage.put(phone.getId(), phone);
+        }
+
+        standDb.get().phoneStorage.put(clientToSave.homePhone.getId(), clientToSave.homePhone);
+        standDb.get().phoneStorage.put(clientToSave.workPhone.getId(), clientToSave.workPhone);
+
+        standDb.get().addressStorage.put(clientToSave.factAddress.getId(), clientToSave.factAddress);
+
+        standDb.get().addressStorage.put(clientToSave.regAddress.getId(), clientToSave.regAddress);
+
+        return getClientRecord(client.id);
+    }
+
     @Override
     public ClientRecord addClient(ClientToSave clientToSave) {
         if (!verify(clientToSave))
             throw new RuntimeException("Incorrect data");
 
-        Client client = new Client(); // getClient(clientToSave.id);
+        Client client = new Client();
         client.id = ++standDb.get().clientId;
-        client.name = clientToSave.name;
-        client.birthDate = clientToSave.birthDate;
-        client.gender = clientToSave.gender;
-        client.patronymic = clientToSave.patronymic;
-        client.surname = clientToSave.surname;
-        client.charm = clientToSave.charm;
 
-        ClientAddress reg = clientToSave.regAddress;
-        reg.client = client.id;
-        standDb.get().addressStorage.put(reg.getId(), reg);
-
-        ClientAddress fact = clientToSave.factAddress;
-        if (fact != null) {
-            fact.client = client.id;
-            standDb.get().addressStorage.put(fact.getId(), fact);
-        }
+        clientToSave.set(client.id);
 
         standDb.get().clientStorage.put(String.valueOf(client.id), client);
 
-        return getClientRecord(client.id);
+        return editClient(client.id, clientToSave);
+    }
+
+    @Override
+    public ClientRecord editClient(ClientToSave clientToSave) {
+        System.err.println(clientToSave);
+        if (!verify(clientToSave))
+            throw new RuntimeException("Incorrect data");
+        return editClient(clientToSave.id, clientToSave);
     }
 
     private ClientRecord getClientRecord(int id) {
@@ -198,27 +215,6 @@ public class TableRegisterStand implements TableRegister {
         if (clientToSave.regAddress == null) return false;
         if (clientToSave.phones == null || clientToSave.phones.isEmpty()) return false;
         return true;
-    }
-
-    @Override
-    public ClientRecord editClient(ClientToSave clientToSave) {
-        System.err.println(clientToSave);
-        if (!verify(clientToSave))
-            throw new RuntimeException("Incorrect data");
-
-        Client client = getClient(clientToSave.id);
-        client.name = clientToSave.name;
-        client.birthDate = clientToSave.birthDate;
-        client.gender = clientToSave.gender;
-        client.patronymic = clientToSave.patronymic;
-        client.charm = clientToSave.charm;
-        client.surname = clientToSave.surname;
-
-        standDb.get().addressStorage.put(clientToSave.factAddress.getId(), clientToSave.factAddress);
-
-        standDb.get().addressStorage.put(clientToSave.regAddress.getId(), clientToSave.regAddress);
-
-        return getClientRecord(client.id);
     }
 
     @Override

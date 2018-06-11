@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit} from "@angular/core";
-import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {FormArray, FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {MAT_DIALOG_DATA, MatDatepickerModule, MatDialogRef} from "@angular/material";
 import {ClientDetail} from "../../../model/ClientDetail";
 import {GenderType} from "../../../model/GenderType";
@@ -61,7 +61,11 @@ export class ClientDialogComponent implements OnInit {
       workPhone: [this.client.workPhone.number],
       homePhone: [this.client.homePhone.number],
       charm: [this.client.charm, Validators.required],
-      phones: this.formBuilder.array(this.client.phones.map(value => this.mobilePhoneGroup(value.number))),
+      phones: this.formBuilder.array([]),
+    });
+    this.client.phones.map(value => this.mobilePhoneGroup(value.number)).forEach(value => {
+      this.phonesFormArray.push(value);
+      console.log(value);
     });
     if (this.client.charm !== undefined && this.client.charm !== null) {
       let curCharm = this.client.charms.filter(value => value.id == this.client.charm.id)[0];
@@ -70,23 +74,27 @@ export class ClientDialogComponent implements OnInit {
     }
   }
 
-  addNumber() {
-    console.log('dick:', this.phonesFormArray);
-    this.phonesFormArray.push(this.mobilePhoneGroup(''));
-    console.log('dick:', this.phonesFormArray);
-  }
-
   submit(form) {
-    // console.log(form.value);
+    console.log('Submitting:', form.value);
     let result = form.value;
     result.workPhone = new ClientPhone(result.id, result.workPhone, PhoneType.WORK);
     result.homePhone = new ClientPhone(result.id, result.homePhone, PhoneType.HOME);
+    let phones = [];
+    result.phones.forEach(value => phones.push(new ClientPhone(result.id, value.number, PhoneType.MOBILE)));
+    result.phones = phones;
     this.dialogRef.close(result);
+  }
+
+  public addNumber() {
+    // console.log('dick:', this.phonesFormArray);
+    // debugger;
+    this.phonesFormArray.push(this.mobilePhoneGroup(''));
+    // console.log('dick:', this.phonesFormArray);
   }
 
   private mobilePhoneGroup(value: string) {
     return this.formBuilder.group({
-      number: new FormControl(value, [
+      number: this.formBuilder.control(value, [
         Validators.required
       ])
     })

@@ -43,4 +43,17 @@ public class Client {
 
     return client;
   }
+
+  @Override
+  public String toString() {
+    return "Client{" +
+      "id=" + id +
+      ", surname='" + surname + '\'' +
+      ", name='" + name + '\'' +
+      ", patronymic='" + patronymic + '\'' +
+      ", gender=" + gender +
+      ", birthDate=" + birthDate +
+      ", charm=" + charm +
+      '}';
+  }
 }

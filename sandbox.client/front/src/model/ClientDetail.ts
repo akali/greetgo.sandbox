@@ -36,8 +36,8 @@ export class ClientDetail {
     this.homePhone = json.homePhone;
     this.factAddress = json.factAddress;
     this.charm = json.charm;
-    this.phones = [];
     this.setCharms(json.charms);
+    this.phones = [];
     for (let key in json.phones) {
       this.phones.push(ClientPhone.copy(json.phones[key]))
     }

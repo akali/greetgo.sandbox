@@ -33,4 +33,14 @@ public class ClientToSave {
       ", homePhone=" + homePhone +
       '}';
   }
+
+  public void set(int id) {
+    for (ClientPhone p : phones) {
+      p.client = id;
+    }
+    workPhone.client = id;
+    homePhone.client = id;
+    factAddress.client = id;
+    regAddress.client = id;
+  }
 }
