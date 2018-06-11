@@ -9,7 +9,14 @@ import {
   MatPaginatorModule,
   MatSortModule,
   MatDialogModule,
-  MatFormFieldModule, MatInputModule, MatButtonModule, MatCardModule, MatDialogRef, MatRippleModule, MatSelectModule
+  MatDatepickerModule,
+  MatFormFieldModule,
+  MatInputModule,
+  MatButtonModule,
+  MatCardModule,
+  MatRippleModule,
+  MatSelectModule,
+  MatNativeDateModule,
 } from '@angular/material';
 import {LoginComponent} from "./input/login.component";
 import {HttpService} from "./HttpService";
@@ -30,6 +37,8 @@ import {ClientDialogComponent} from "./table/client-dialog/clientDialog.componen
     BrowserAnimationsModule,
     MatTableModule,
     MatCardModule,
+    MatNativeDateModule,
+    MatDatepickerModule,
     MatButtonModule,
     MatPaginatorModule,
     MatSortModule,

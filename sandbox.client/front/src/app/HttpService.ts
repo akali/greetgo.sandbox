@@ -26,7 +26,7 @@ export class HttpService {
 
   public pageSize:number = 10;
 
-  private urlPrefix = "http://localhost:1313/access/api";
+  private urlPrefix = "http://localhost:1414/access/api";
 
   constructor(private http: Http) {}
 

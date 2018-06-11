@@ -1,6 +1,6 @@
 import {Component, Inject, OnInit} from "@angular/core";
-import {FormBuilder, FormGroup} from "@angular/forms";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {MAT_DIALOG_DATA, MatDatepickerModule, MatDialogRef} from "@angular/material";
 import {ClientDetail} from "../../../model/ClientDetail";
 import {GenderType} from "../../../model/GenderType";
 import {ClientPhone} from "../../../model/ClientPhone";
@@ -20,48 +20,75 @@ export class ClientDialogComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private dialogRef: MatDialogRef<ClientDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) private data
+    @Inject(MAT_DIALOG_DATA) private data,
+    private picker: MatDatepickerModule
   ) {}
 
+  get phonesFormArray(): FormArray {
+    return this.form.get('phones') as FormArray;
+  }
+
   ngOnInit(): void {
-    if (this.data.clientDetailObservable)
-      this.data.clientDetailObservable.subscribe(value => {
-        this.client = ClientDetail.copy(value.json());
-        this.client = ClientDetail.copy({
-          id: 5,
-          name: "Aisultan",
-          surname: "Kali",
-          patronymic: "Amanzholuly",
-          gender: GenderType.MALE,
-          birthDate: 100500,
-          regAddress: new ClientAddress(5, AddressType.REG, "AkhanSeri", "13a", "32"),
-          factAddress: new ClientAddress(5, AddressType.REG, "AkhanSeri", "13a", "32"),
-          phones: [new ClientPhone(5, "+77052105967", PhoneType.MOBILE)],
-        });
-        this.form = this.formBuilder.group(<any>this.client);
-      });
-    else {
-      this.client = new ClientDetail();
-      this.data.charmsObservable.subscribe(value => {
-        this.client.setCharms(value.json());
-        this.client = ClientDetail.copy({
-          id: 5,
-          name: "Aisultan",
-          surname: "Kali",
-          patronymic: "Amanzholuly",
-          gender: GenderType.MALE,
-          birthDate: 100500,
-          regAddress: new ClientAddress(5, AddressType.REG, "AkhanSeri", "13a", "32"),
-          factAddress: new ClientAddress(5, AddressType.REG, "AkhanSeri", "13a", "32"),
-          phones: [new ClientPhone(5, "+77052105967", PhoneType.MOBILE)],
-        });
-        this.form = this.formBuilder.group(<any>this.client);
-      });
+    this.client = this.data.client;
+
+    if (this.client.workPhone === undefined || this.client.workPhone === null) {
+      this.client.workPhone = new ClientPhone(this.client.id, "", PhoneType.WORK);
+    }
+    if (this.client.homePhone === undefined || this.client.homePhone === null) {
+      this.client.homePhone = new ClientPhone(this.client.id, "", PhoneType.HOME);
+    }
+    if (this.client.regAddress === undefined || this.client.regAddress === null) {
+      this.client.regAddress = new ClientAddress(this.client.id, AddressType.REG, "", "", "");
+    }
+    if (this.client.factAddress === undefined || this.client.factAddress === null) {
+      this.client.factAddress = new ClientAddress(this.client.id, AddressType.FACT, "", "", "");
+    }
+
+    console.log(this.client);
+    this.form = this.formBuilder.group({
+      id: [this.client.id],
+      name: [this.client.name, Validators.required],
+      surname: [this.client.surname, Validators.required],
+      patronymic: this.client.patronymic,
+      gender: [this.client.gender, Validators.required],
+      birthDate: [this.client.birthDate, Validators.required],
+      regAddressStreet: [this.client.regAddress.street, Validators.required],
+      regAddressHouse: [this.client.regAddress.house, Validators.required],
+      regAddressFlat: [this.client.regAddress.flat, Validators.required],
+      factAddressStreet: this.client.factAddress.street,
+      factAddressHouse: this.client.factAddress.house,
+      factAddressFlat: this.client.factAddress.flat,
+      workPhone: [this.client.workPhone.number],
+      homePhone: [this.client.homePhone.number],
+      charm: [this.client.charm, Validators.required],
+      phones: this.formBuilder.array(this.client.phones.map(value => this.mobilePhoneGroup(value.number))),
+    });
+    if (this.client.charm !== undefined && this.client.charm !== null) {
+      let curCharm = this.client.charms.filter(value => value.id == this.client.charm.id)[0];
+      if (curCharm !== undefined && curCharm !== null)
+        this.form.controls['charm'].setValue(curCharm);
     }
   }
 
+  addNumber() {
+    console.log('dick:', this.phonesFormArray);
+    this.phonesFormArray.push(this.mobilePhoneGroup(''));
+    console.log('dick:', this.phonesFormArray);
+  }
+
   submit(form) {
-    console.log(form.value);
-    this.dialogRef.close(`${form.value.filename}`);
+    // console.log(form.value);
+    let result = form.value;
+    result.workPhone = new ClientPhone(result.id, result.workPhone, PhoneType.WORK);
+    result.homePhone = new ClientPhone(result.id, result.homePhone, PhoneType.HOME);
+    this.dialogRef.close(result);
+  }
+
+  private mobilePhoneGroup(value: string) {
+    return this.formBuilder.group({
+      number: new FormControl(value, [
+        Validators.required
+      ])
+    })
   }
 }

@@ -9,9 +9,12 @@ export class ClientDetail {
   public surname: string;
   public patronymic: string;
   public gender: GenderType;
+  public charm: Charm;
   public birthDate: number /* long */;
   public regAddress: ClientAddress;
   public factAddress: ClientAddress;
+  public workPhone: ClientPhone;
+  public homePhone: ClientPhone;
   public phones: ClientPhone[];
   public charms: Charm[];
 
@@ -29,7 +32,10 @@ export class ClientDetail {
     this.gender = json.gender;
     this.birthDate = json.birthDate;
     this.regAddress = json.regAddress;
+    this.workPhone = json.workPhone;
+    this.homePhone = json.homePhone;
     this.factAddress = json.factAddress;
+    this.charm = json.charm;
     this.phones = [];
     this.setCharms(json.charms);
     for (let key in json.phones) {

@@ -278,7 +278,7 @@ public class LaunchGenerateMockObjects {
                         ))
                 .setClientAddress(
                         new ClientAddress(
-                                1,
+                                2,
                                 AddressType.REG,
                                 "Tole-bi",
                                 "55",
@@ -329,7 +329,7 @@ public class LaunchGenerateMockObjects {
                         ))
                 .setClientAddress(
                         new ClientAddress(
-                                1,
+                                3,
                                 AddressType.REG,
                                 "Dostyk",
                                 "45b",

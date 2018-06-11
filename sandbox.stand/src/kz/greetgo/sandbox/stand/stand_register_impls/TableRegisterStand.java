@@ -48,7 +48,13 @@ public class TableRegisterStand implements TableRegister {
             list.add(result);
         }
 
-        return list.stream().sorted(
+        return list.stream()
+          .peek(clientRecord -> {
+              clientRecord.name = clientRecord.name + " " + clientRecord.surname;
+              if (clientRecord.patronymic != null)
+                clientRecord.name += " " + clientRecord.patronymic;
+          })
+          .sorted(
           (t1, t2) -> {
               int result = 0;
               switch(action) {
@@ -104,6 +110,8 @@ public class TableRegisterStand implements TableRegister {
         clientDetail.patronymic = client.patronymic;
         clientDetail.gender = client.gender;
         clientDetail.birthDate = client.birthDate;
+        clientDetail.charm = standDb.get().charmStorage.get(String.valueOf(client.charm));
+
         standDb.get().addressStorage.values().stream()
                 .filter(clientAddress -> clientAddress.client == client.id)
                 .forEach(clientAddress -> {
@@ -115,7 +123,18 @@ public class TableRegisterStand implements TableRegister {
 
         clientDetail.phones = standDb.get().phoneStorage.values().stream()
                 .filter(clientPhone -> clientPhone.client == clientId)
+                .filter(clientPhone -> clientPhone.type == PhoneType.MOBILE)
                 .collect(Collectors.toList());
+
+        standDb.get().phoneStorage.values().stream()
+          .filter(clientPhone -> clientPhone.client == clientId)
+          .filter(clientPhone -> clientPhone.type != PhoneType.MOBILE)
+          .forEach(clientPhone -> {
+              if (clientPhone.type == PhoneType.WORK)
+                  clientDetail.workPhone = clientPhone;
+              else if (clientPhone.type == PhoneType.HOME)
+                  clientDetail.homePhone = clientPhone;
+          });
 
         clientDetail.charms = new ArrayList<>(standDb.get().charmStorage.values());
 
@@ -124,7 +143,6 @@ public class TableRegisterStand implements TableRegister {
 
     @Override
     public ClientRecord addClient(ClientToSave clientToSave) {
-        System.err.println(clientToSave);
         if (!verify(clientToSave))
             throw new RuntimeException("Incorrect data");
 
@@ -137,11 +155,11 @@ public class TableRegisterStand implements TableRegister {
         client.surname = clientToSave.surname;
         client.charm = clientToSave.charm;
 
-        ClientAddress reg = clientToSave.reg;
+        ClientAddress reg = clientToSave.regAddress;
         reg.client = client.id;
         standDb.get().addressStorage.put(reg.getId(), reg);
 
-        ClientAddress fact = clientToSave.fact;
+        ClientAddress fact = clientToSave.factAddress;
         if (fact != null) {
             fact.client = client.id;
             standDb.get().addressStorage.put(fact.getId(), fact);
@@ -176,16 +194,15 @@ public class TableRegisterStand implements TableRegister {
         if (clientToSave == null) return false;
         if (clientToSave.name == null || clientToSave.name.isEmpty()) return false;
         if (clientToSave.surname == null || clientToSave.surname.isEmpty()) return false;
-        if (clientToSave.patronymic == null || clientToSave.patronymic.isEmpty()) return false;
-        if (clientToSave.charm > getCharms().size()) return false;
-        if (clientToSave.fact == null) return false;
-        if (clientToSave.phones.stream().noneMatch(clientPhone -> clientPhone.type == PhoneType.MOBILE)) return false;
+        if (getCharms().stream().noneMatch(charm -> charm.id == clientToSave.charm)) return false;
+        if (clientToSave.regAddress == null) return false;
+        if (clientToSave.phones == null || clientToSave.phones.isEmpty()) return false;
         return true;
     }
 
     @Override
     public ClientRecord editClient(ClientToSave clientToSave) {
-        // System.err.println(clientToSave);
+        System.err.println(clientToSave);
         if (!verify(clientToSave))
             throw new RuntimeException("Incorrect data");
 
@@ -197,16 +214,9 @@ public class TableRegisterStand implements TableRegister {
         client.charm = clientToSave.charm;
         client.surname = clientToSave.surname;
 
-        ClientAddress fact = standDb.get().addressStorage.get(clientToSave.fact.getId());
-        ClientAddress reg = standDb.get().addressStorage.get(clientToSave.reg.getId());
+        standDb.get().addressStorage.put(clientToSave.factAddress.getId(), clientToSave.factAddress);
 
-        fact.street = clientToSave.fact.street;
-        fact.house = clientToSave.fact.house;
-        fact.flat = clientToSave.fact.flat;
-
-        reg.street = clientToSave.reg.street;
-        reg.house = clientToSave.reg.house;
-        reg.flat = clientToSave.reg.flat;
+        standDb.get().addressStorage.put(clientToSave.regAddress.getId(), clientToSave.regAddress);
 
         return getClientRecord(client.id);
     }

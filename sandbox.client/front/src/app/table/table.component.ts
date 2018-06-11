@@ -1,11 +1,17 @@
 import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {MatDialog, MatDialogRef, MatPaginator, MatSort, MatTable} from '@angular/material';
-import { TableDatasource } from './table-datasource';
-import { HttpService} from "../HttpService";
+import {TableDatasource} from './table-datasource';
+import {HttpService} from "../HttpService";
 import {ClientRecord} from "../../model/ClientRecord";
 import {tap} from "rxjs/operators";
-import {merge} from "rxjs";
+import {BehaviorSubject, merge} from "rxjs";
 import {ClientDialogComponent} from "./client-dialog/clientDialog.component";
+import {ClientDetail} from "../../model/ClientDetail";
+import {ClientAddress} from "../../model/ClientAddress";
+import {AddressType} from "../../model/AddressType";
+import {PhoneType} from "../../model/PhoneType";
+import {ClientPhone} from "../../model/ClientPhone";
+import {ClientToSave} from "../../model/ClientToSave";
 
 @Component({
   selector: 'table-component',
@@ -23,6 +29,7 @@ export class TableComponent implements OnInit, AfterViewInit {
   displayedColumns = ['name', 'charm', 'age', 'total', 'max', 'min'];
   INIT_PAGE_SIZE = 5;
   PAGE_SIZE_OPTIONS = [1, 2, 5, 50];
+  private toReload = new BehaviorSubject([]);
 
   constructor(private httpService: HttpService, private dialog: MatDialog) {}
 
@@ -33,7 +40,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     const mutates = [
-      this.sort.sortChange, this.paginator.page
+      this.sort.sortChange, this.paginator.page, this.toReload.asObservable()
     ];
 
     merge(...mutates).pipe(
@@ -47,30 +54,93 @@ export class TableComponent implements OnInit, AfterViewInit {
   selectedClientId = -1;
 
   onClientAdd() {
-    this.clientDialogRef = this.dialog.open(ClientDialogComponent, {
-      width: "480px",
-      height: "960px",
-      data: {
-        charmsObservable: this.httpService.get("/table/getCharms")
-      }
+    let client = new ClientDetail();
+    client.id = -1;
+    client.phones = [];
+    client.phones.push(new ClientPhone(-1, "", PhoneType.MOBILE));
+    this.httpService.get("/table/getCharms").toPromise().then(value => {
+      client.setCharms(value.json());
+      this.clientDialogRef = this.dialog.open(ClientDialogComponent, {
+        data: {
+          client: ClientDetail.copy(client)
+        }
+      });
+      this.clientDialogRef.afterClosed().subscribe(value => {
+        let clientToSave = this.collect(value);
+        console.log(JSON.stringify(clientToSave));
+
+        this.httpService.post("/table/add", {
+          clientToSave: JSON.stringify(clientToSave)
+        }).subscribe(result => {
+          console.log(result.json());
+          this.toReload.next([]);
+        }, error => {
+          console.log(error.json());
+        });
+      });
+    }, error => {
+      console.log(error);
     });
+
   }
 
   onClientRemove() {
-
+    this.httpService.post("/table/remove", {
+      clientId: this.selectedClientId
+    }).toPromise().then(value => {
+      this.toReload.next([]);
+    }).catch(reason => {
+      console.log(reason);
+    });
   }
 
   onClientEdit() {
-    this.clientDialogRef = this.dialog.open(ClientDialogComponent,
-      {
-        width: "480px",
-        height: "960px",
-        data: {
-          clientDetailObservable: this.httpService.post("/table/detail", {
-            clientId: this.selectedClientId
-          })
-        }
+    this.httpService.post("/table/detail", {
+      clientId: this.selectedClientId
+    }).subscribe(value => {
+      let client = ClientDetail.copy(value.json());
+      this.clientDialogRef = this.dialog.open(ClientDialogComponent,
+        {
+          data: {
+            client: client
+          }
+        });
+      this.clientDialogRef.disableClose = true;
+      this.clientDialogRef.afterClosed().subscribe(value => {
+        if (!value) return;
+
+        let clientToSave = this.collect(value);
+
+        console.log(JSON.stringify(clientToSave));
+
+        this.httpService.post("/table/edit", {
+          clientToSave: JSON.stringify(clientToSave)
+        }).subscribe(result => {
+          console.log(result.json());
+          this.toReload.next([]);
+        }, error => {
+          console.log(error.json());
+        });
+
       });
+    }, error => {
+      alert(error);
+    });
+  }
+
+  private collect(value: any) {
+    value.regAddress = new ClientAddress(value.id,
+      AddressType.REG,
+      value.regAddressStreet,
+      value.regAddressHouse,
+      value.regAddressFlat);
+    value.factAddress = new ClientAddress(value.id,
+      AddressType.FACT,
+      value.factAddressStreet,
+      value.factAddressHouse,
+      value.factAddressFlat);
+    value.charm = value.charm.id;
+    return ClientToSave.copy(value);
   }
 
   private load() {

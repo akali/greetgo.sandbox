@@ -1,28 +1,85 @@
+<h2 mat-dialog-title> Add client </h2>
 <form [formGroup]="form" (ngSubmit)="submit(form)">
-  <h1 mat-dialog-title>Add file</h1>
   <mat-dialog-content class="root">
     <mat-form-field>
-      <input required="required" matInput formControlName="surname" placeholder="Enter surname">
+      <input matInput formControlName="surname" placeholder="Enter surname" required>
     </mat-form-field>
+
     <mat-form-field>
-      <input required="required" matInput formControlName="name" placeholder="Enter name">
+      <input required matInput formControlName="name" placeholder="Enter name">
     </mat-form-field>
+
     <mat-form-field>
       <input matInput formControlName="patronymic" placeholder="Enter patronymic">
     </mat-form-field>
 
-    <mat-select placeholder="Select gender" required>
-      <mat-option>--</mat-option>
-      <mat-option *ngFor="let gender of genders" [value]="gender">
-        {{gender}}
-      </mat-option>
-    </mat-select>
+    <mat-form-field>
+      <mat-select placeholder="Select gender" required formControlName="gender">
+        <mat-option *ngFor="let gender of genders" [value]="gender">
+          {{gender}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
-    <mat-select placeholder="Select charm">
-      <mat-option *ngFor="let charm of client.charms" [value]="charm">
-        {{charm.name}}
-      </mat-option>
-    </mat-select>
+    <mat-form-field>
+      <mat-select placeholder="Select charm" required formControlName="charm">
+        <mat-option *ngFor="let charm of client.charms" [value]="charm">
+          {{charm.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput [matDatepicker]="picker" placeholder="Choose a date">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <h3> Registration address </h3>
+    <mat-form-field>
+      <input matInput required placeholder="Enter street" formControlName="regAddressStreet">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput required placeholder="Enter house" formControlName="regAddressHouse">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput required placeholder="Enter flat" formControlName="regAddressFlat">
+    </mat-form-field>
+
+    <h3> Fact address </h3>
+    <mat-form-field>
+      <input matInput placeholder="Enter street" formControlName="factAddressStreet">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Enter house" formControlName="factAddressHouse">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Enter flat" formControlName="factAddressFlat">
+    </mat-form-field>
+
+    <h3> Phone numbers </h3>
+    <h5> Enter number in following format: <br> +X XXX XXX XX XX </h5>
+
+    <mat-form-field>
+      <input matInput type="tel" formControlName="homePhone" placeholder="Enter home phone number" maxlength="12">
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput type="tel" formControlName="workPhone" placeholder="Enter work phone number" maxlength="12">
+    </mat-form-field>
+
+    <div formArrayName="phones">
+      <div *ngFor="let phone of phonesFormArray.controls; let idx = index" [formGroupName]="idx">
+        <mat-form-field>
+          <input matInput type="tel" formControlName="number" required placeholder="Enter mobile phone number" maxlength="12"/>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <button mat-button (click)="addNumber()">
+      Add another mobile number
+    </button>
+
   </mat-dialog-content>
 
   <mat-dialog-actions>

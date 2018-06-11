@@ -12,7 +12,7 @@ public interface TableRegister {
     List<ClientRecord> getRecordTable(int start, int offset, String direction, String active);
     ClientDetail getClientDetail(int clientId);
 
-    ClientRecord addClient(ClientToSave client);
+    ClientRecord addClient(ClientToSave clientToSave);
     ClientRecord editClient(ClientToSave client);
 
     void removeClient(int clientId);

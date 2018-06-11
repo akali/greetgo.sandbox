@@ -48,8 +48,8 @@ public class TableController implements Controller {
 
     @ToJson
     @Mapping("/add")
-    public ClientRecord addClient(@Par("clientToSave") @Json ClientToSave clientToSave) {
-        return tableRegister.get().addClient(clientToSave);
+    public ClientRecord addClient(@Par("clientToSave") @Json ClientToSave client) {
+        return tableRegister.get().addClient(client);
     }
 
     @ToJson

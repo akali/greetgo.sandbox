@@ -2,6 +2,9 @@ import {CharacterType} from "./CharacterType";
 import {GenderType} from "./GenderType";
 import {PhoneNumber} from "./PhoneNumber";
 import {ClientAddress} from "./ClientAddress";
+import {ClientDetail} from "./ClientDetail";
+import {ClientPhone} from "./ClientPhone";
+import {Charm} from "./Charm";
 
 export class ClientToSave {
     public id: number /* int */;
@@ -10,13 +13,12 @@ export class ClientToSave {
     public patronymic: string;
     public charm: number /* int */;
     public gender: GenderType;
-    public reg: ClientAddress;
-    public fact: ClientAddress;
+    public regAddress: ClientAddress;
+    public factAddress: ClientAddress;
     public birthDate: number /* long */;
-    public age: number /* int */;
-    public factAddress: string;
-    public regAddress: string;
     public phones: Array<PhoneNumber>;
+    public workPhone: ClientPhone;
+    public homePhone: ClientPhone;
 
     public assign(o: any): ClientToSave {
         this.id = o.id;
@@ -24,14 +26,13 @@ export class ClientToSave {
         this.surname = o.surname;
         this.patronymic = o.patronymic;
         this.gender = o.gender;
-        this.factAddress = o.factAddress;
-        this.regAddress = o.regAddress;
         this.phones = o.phones;
-        this.age = o.age;
         this.birthDate = o.birthDate;
-        this.reg = o.reg;
-        this.fact = o.fact;
+        this.regAddress = o.regAddress;
+        this.factAddress = o.factAddress;
         this.charm = o.charm;
+        this.workPhone = o.workPhone;
+        this.homePhone = o.homePhone;
         return this;
     }
 
@@ -40,6 +41,5 @@ export class ClientToSave {
         result.assign(json);
         return result;
     }
-
 }
 

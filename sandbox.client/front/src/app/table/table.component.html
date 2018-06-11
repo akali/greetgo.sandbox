@@ -1,8 +1,8 @@
 <div class="mat-elevation-z8" style="width: 80%; padding: 60px; margin: 50px auto;">
   <div style="display: flex; align-content: center; justify-content: center; margin: 50px auto; width: 50%">
     <button class="mat-flat-button" (click)="onClientAdd()">+</button>
-    <button class="mat-flat-button" [disabled]="selectedClientId === -1">...</button>
-    <button class="mat-flat-button" [disabled]="selectedClientId === -1">-</button>
+    <button class="mat-flat-button" (click)="onClientEdit()" [disabled]="selectedClientId === -1">...</button>
+    <button class="mat-flat-button" (click)="onClientRemove()" [disabled]="selectedClientId === -1">-</button>
   </div>
   <div class="mat-elevation-z8" style="width: 80%; margin: 50px auto;">
     <mat-table #table [dataSource]="dataSource" matSort aria-label="Elements">
