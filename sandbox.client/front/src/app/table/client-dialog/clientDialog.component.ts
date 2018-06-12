@@ -7,6 +7,7 @@ import {ClientPhone} from "../../../model/ClientPhone";
 import {ClientAddress} from "../../../model/ClientAddress";
 import {AddressType} from "../../../model/AddressType";
 import {PhoneType} from "../../../model/PhoneType";
+import {ActionType} from "./actionType";
 
 @Component({
   templateUrl: './clientDialog.component.html',
@@ -16,6 +17,7 @@ export class ClientDialogComponent implements OnInit {
   form: FormGroup;
   client: ClientDetail;
   genders = [GenderType.MALE, GenderType.FEMALE];
+  action: ActionType;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -30,6 +32,7 @@ export class ClientDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.client = this.data.client;
+    this.action = this.data.action;
 
     if (this.client.workPhone === undefined || this.client.workPhone === null) {
       this.client.workPhone = new ClientPhone(this.client.id, "", PhoneType.WORK);
@@ -76,6 +79,7 @@ export class ClientDialogComponent implements OnInit {
 
   submit(form) {
     if (form.invalid) return;
+    if (form.cancelled) return;
     console.log('Submitting:', form.value);
     let result = form.value;
     result.workPhone = new ClientPhone(result.id, result.workPhone, PhoneType.WORK);
@@ -85,6 +89,11 @@ export class ClientDialogComponent implements OnInit {
     result.phones = phones;
     result.birthDate = result.birthDate.getTime();
     this.dialogRef.close(result);
+  }
+
+  cancel(form) {
+    form.reset();
+    this.dialogRef.close();
   }
 
   public addNumber() {
@@ -97,5 +106,9 @@ export class ClientDialogComponent implements OnInit {
         Validators.required
       ])
     })
+  }
+
+  isCreate() {
+    return this.action === ActionType.CREATE;
   }
 }

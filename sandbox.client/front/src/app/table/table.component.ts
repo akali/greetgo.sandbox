@@ -12,6 +12,7 @@ import {AddressType} from "../../model/AddressType";
 import {PhoneType} from "../../model/PhoneType";
 import {ClientPhone} from "../../model/ClientPhone";
 import {ClientToSave} from "../../model/ClientToSave";
+import {ActionType} from "./client-dialog/actionType";
 
 @Component({
   selector: 'table-component',
@@ -62,10 +63,13 @@ export class TableComponent implements OnInit, AfterViewInit {
       client.setCharms(value.json());
       this.clientDialogRef = this.dialog.open(ClientDialogComponent, {
         data: {
-          client: ClientDetail.copy(client)
+          client: ClientDetail.copy(client),
+          action: ActionType.CREATE
         }
       });
+      this.clientDialogRef.disableClose = true;
       this.clientDialogRef.afterClosed().subscribe(value => {
+        if (value === undefined || value === null) return;
         let clientToSave = this.collect(value);
         console.log(JSON.stringify(clientToSave));
 
@@ -81,7 +85,6 @@ export class TableComponent implements OnInit, AfterViewInit {
     }, error => {
       console.log(error);
     });
-
   }
 
   onClientRemove() {
@@ -102,7 +105,8 @@ export class TableComponent implements OnInit, AfterViewInit {
       this.clientDialogRef = this.dialog.open(ClientDialogComponent,
         {
           data: {
-            client: client
+            client: client,
+            action: ActionType.EDIT
           }
         });
       this.clientDialogRef.disableClose = true;
