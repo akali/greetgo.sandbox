@@ -51,7 +51,7 @@ export class ClientDialogComponent implements OnInit {
       surname: [this.client.surname, Validators.required],
       patronymic: this.client.patronymic,
       gender: [this.client.gender, Validators.required],
-      birthDate: [this.client.birthDate, Validators.required],
+      birthDate: [new Date(this.client.birthDate * 1000), Validators.required],
       regAddressStreet: [this.client.regAddress.street, Validators.required],
       regAddressHouse: [this.client.regAddress.house, Validators.required],
       regAddressFlat: [this.client.regAddress.flat, Validators.required],

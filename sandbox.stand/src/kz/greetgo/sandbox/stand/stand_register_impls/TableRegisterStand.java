@@ -6,6 +6,7 @@ import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.controller.register.TableRegister;
 import kz.greetgo.sandbox.db.stand.beans.StandDb;
 
+import java.sql.Timestamp;
 import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -86,18 +87,14 @@ public class TableRegisterStand implements TableRegister {
         }).skip(start).limit(offset).collect(Collectors.toList());
     }
 
-    public static int calculateAge(long birthDateTs, long currentDateTs) {
-        if ((birthDateTs != 0) && (currentDateTs != 0)) {
-            LocalDate birthDate = LocalDateTime.ofInstant(Instant.ofEpochSecond(birthDateTs),
-                    TimeZone.getDefault().toZoneId()).toLocalDate();
-            LocalDate currentDate = LocalDateTime.ofInstant(Instant.ofEpochSecond(currentDateTs),
-                    TimeZone.getDefault().toZoneId()).toLocalDate();
+    public static int calculateAge(long birthDateTs) {
+        LocalDate date = Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate date1 = new Timestamp(birthDateTs).toLocalDateTime().toLocalDate();
 
-            return Period.between(birthDate, currentDate).getYears();
-        } else {
-            return 0;
-        }
+        return date.minusYears(date1.getYear()).getYear();
     }
+
+
 
     @Override
     public ClientDetail getClientDetail(int clientId) {
@@ -203,7 +200,7 @@ public class TableRegisterStand implements TableRegister {
             result.min = accounts.stream().min((a, b) -> Float.compare(a.money, b.money)).get().money;
             result.max = accounts.stream().max((a, b) -> Float.compare(a.money, b.money)).get().money;
         }
-        result.age = calculateAge(client.birthDate, new Date().getTime());
+        result.age = calculateAge(client.birthDate);
         return result;
     }
 
