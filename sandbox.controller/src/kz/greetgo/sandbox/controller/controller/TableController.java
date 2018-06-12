@@ -3,10 +3,7 @@ package kz.greetgo.sandbox.controller.controller;
 import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.mvc.annotations.*;
-import kz.greetgo.sandbox.controller.model.Charm;
-import kz.greetgo.sandbox.controller.model.ClientDetail;
-import kz.greetgo.sandbox.controller.model.ClientRecord;
-import kz.greetgo.sandbox.controller.model.ClientToSave;
+import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.controller.register.AuthRegister;
 import kz.greetgo.sandbox.controller.register.TableRegister;
 import kz.greetgo.sandbox.controller.util.Controller;
@@ -27,11 +24,11 @@ public class TableController implements Controller {
 
     @ToJson
     @Mapping("/get")
-    public List<ClientRecord> getRecordTable(@Par("start") int start,
-                                             @Par("limit") int limit,
-                                             @Par("sort") String direction,
-                                             @Par("active") String active,
-                                             @Par("filter") String filter) {
+    public TableResponse getRecordTable(@Par("start") int start,
+                                        @Par("limit") int limit,
+                                        @Par("sort") String direction,
+                                        @Par("active") String active,
+                                        @Par("filter") String filter) {
         return tableRegister.get().getRecordTable(start, limit, direction, active, filter);
     }
 

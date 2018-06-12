@@ -3,6 +3,7 @@ import { MatPaginator, MatSort } from '@angular/material';
 import {Observable, BehaviorSubject} from 'rxjs';
 import {ClientRecord} from "../../model/ClientRecord";
 import {HttpService} from "../HttpService";
+import {TableResponse} from "./TableResponse";
 
 export class TableDatasource extends DataSource<ClientRecord> {
   data: ClientRecord[] = [];
@@ -30,6 +31,10 @@ export class TableDatasource extends DataSource<ClientRecord> {
       sort: sortDirection,
       active: active,
       filter: filter
-    }).subscribe(clients => this.clientsSubject.next(clients.json()));
+    }).subscribe(clients => {
+      let tableResponse = TableResponse.copy(clients.json());
+      this.paginator.length = tableResponse.size;
+      this.clientsSubject.next(tableResponse.list);
+    });
   }
 }

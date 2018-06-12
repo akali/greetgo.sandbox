@@ -36,7 +36,7 @@ public class TableRegisterStand implements TableRegister {
     }
 
     @Override
-    public List<ClientRecord> getRecordTable(int start, int offset, String direction, String action, String filter) {
+    public TableResponse getRecordTable(int start, int offset, String direction, String action, String filter) {
         System.out.println("start: " + start + "; " + "offset: " + offset);
         System.out.println("direction: " + direction + "; " + "action: " + action);
         List<ClientRecord> list = new ArrayList<>();
@@ -53,43 +53,7 @@ public class TableRegisterStand implements TableRegister {
         System.out.println(Arrays.toString(list.stream()
           .filter(clientRecord -> filter == null || clientRecord.getCombinedString().contains(filter)).toArray()));
 
-        return list.stream()
-          .filter(clientRecord -> filter == null || clientRecord.getCombinedString().contains(filter))
-          .peek(clientRecord -> {
-              clientRecord.name = clientRecord.name + " " + clientRecord.surname;
-              if (clientRecord.patronymic != null)
-                clientRecord.name += " " + clientRecord.patronymic;
-          })
-          .sorted(
-          (t1, t2) -> {
-              int result = 0;
-              switch(action) {
-                  case "name":
-                      result = t1.name.compareTo(t2.name);
-                      break;
-                  case "total":
-                      result = Integer.compare(t1.total, t2.total);
-                      break;
-                  case "max":
-                      result = Float.compare(t1.max, t2.max);
-                      break;
-                  case "min":
-                      result = Float.compare(t1.min, t2.min);
-                      break;
-                  case "charm":
-                      result = t1.charm.compareTo(t2.charm);
-                      break;
-                  case "age":
-                      result = Integer.compare(t1.age, t2.age);
-                      break;
-                  default:
-                      result = Integer.compare(t1.id, t2.id);
-              }
-              if (direction != null && direction.toLowerCase().equals("desc")) {
-                  result = -result;
-              }
-              return result;
-        }).skip(start).limit(offset).collect(Collectors.toList());
+        return new TableResponse(list, start, offset, direction, action, filter);
     }
 
     public static int calculateAge(long birthDateTs) {
