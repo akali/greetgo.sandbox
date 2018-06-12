@@ -1,6 +1,7 @@
 package kz.greetgo.sandbox.controller.model;
 
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 public class ClientAccount {
@@ -8,14 +9,14 @@ public class ClientAccount {
   public int client;
   public float money;
   public String number;
-  public long registeredAt;
+  public Timestamp registeredAt;
 
   public ClientAccount(int id, int client, float money, String number, long registeredAt) {
     this.id = id;
     this.client = client;
     this.money = money;
     this.number = number;
-    this.registeredAt = registeredAt;
+    this.registeredAt = new Timestamp(registeredAt);
   }
 
   public ClientAccount() { }
@@ -26,7 +27,7 @@ public class ClientAccount {
     account.client = Integer.parseInt(line[1]);
     account.money = Float.parseFloat(line[2]);
     account.number = line[3];
-    account.registeredAt = Long.parseLong(line[4]);
+    account.registeredAt = new Timestamp(Long.parseLong(line[4]));
     return account;
   }
 }

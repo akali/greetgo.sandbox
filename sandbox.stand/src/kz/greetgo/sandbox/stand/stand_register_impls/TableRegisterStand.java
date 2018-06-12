@@ -75,7 +75,7 @@ public class TableRegisterStand implements TableRegister {
         clientDetail.surname = client.surname;
         clientDetail.patronymic = client.patronymic;
         clientDetail.gender = client.gender;
-        clientDetail.birthDate = client.birthDate;
+        clientDetail.birthDate = client.birthDate.getTime();
         clientDetail.charm = standDb.get().charmStorage.get(String.valueOf(client.charm));
 
         standDb.get().addressStorage.values().stream()
@@ -99,7 +99,7 @@ public class TableRegisterStand implements TableRegister {
     private ClientRecord editClient(int clientId, ClientToSave clientToSave) {
         Client client = getClient(clientId);
         client.name = clientToSave.name;
-        client.birthDate = clientToSave.birthDate;
+        client.birthDate = new Timestamp(clientToSave.birthDate);
         client.gender = clientToSave.gender;
         client.patronymic = clientToSave.patronymic;
         client.charm = clientToSave.charm;
@@ -155,7 +155,7 @@ public class TableRegisterStand implements TableRegister {
             result.min = accounts.stream().min((a, b) -> Float.compare(a.money, b.money)).get().money;
             result.max = accounts.stream().max((a, b) -> Float.compare(a.money, b.money)).get().money;
         }
-        result.age = calculateAge(client.birthDate);
+        result.age = calculateAge(client.birthDate.getTime());
         return result;
     }
 

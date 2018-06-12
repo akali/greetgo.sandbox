@@ -1,5 +1,6 @@
 package kz.greetgo.sandbox.controller.model;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,8 +11,18 @@ public class Client {
   public String name;
   public String patronymic;
   public GenderType gender;
-  public long birthDate;
+  public Timestamp birthDate;
   public int charm;
+
+  public Client(int id, String surname, String name, String patronymic, GenderType gender, Timestamp birthDate, int charm) {
+    this.id = id;
+    this.surname = surname;
+    this.name = name;
+    this.patronymic = patronymic;
+    this.gender = gender;
+    this.birthDate = birthDate;
+    this.charm = charm;
+  }
 
   public Client(int id, String surname, String name, String patronymic, GenderType gender, long birthDate, int charm) {
     this.id = id;
@@ -19,7 +30,7 @@ public class Client {
     this.name = name;
     this.patronymic = patronymic;
     this.gender = gender;
-    this.birthDate = birthDate;
+    this.birthDate = new Timestamp(birthDate);
     this.charm = charm;
   }
 
@@ -36,10 +47,8 @@ public class Client {
       client.gender = GenderType.MALE;
     else
       client.gender = GenderType.FEMALE;
-    client.birthDate = Long.parseLong(line[5]);
+    client.birthDate = new Timestamp(Long.parseLong(line[5]));
     client.charm = Integer.parseInt(line[6]);
-
-
 
     return client;
   }
