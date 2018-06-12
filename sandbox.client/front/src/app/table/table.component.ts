@@ -31,7 +31,7 @@ export class TableComponent implements OnInit, AfterViewInit {
   displayedColumns = ['name', 'charm', 'age', 'total', 'max', 'min'];
   INIT_PAGE_SIZE = 5;
   PAGE_SIZE_OPTIONS = [1, 2, 5, 50];
-  private toReload = new BehaviorSubject([]);
+  private toReload = new BehaviorSubject({});
 
   constructor(private httpService: HttpService, private dialog: MatDialog) {}
 
@@ -42,13 +42,25 @@ export class TableComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     const mutates = [
-      this.sort.sortChange, this.paginator.page, this.toReload.asObservable()
+      this.sort.sortChange, this.paginator.page
     ];
 
     merge(...mutates).pipe(
       tap(() => {
         this.load();
       })
+    ).subscribe();
+
+    this.toReload.asObservable().pipe(
+      tap(
+        (result) => {
+          if (result === {} || result === undefined || result === null) return;
+          console.log(result);
+          if (result.hasOwnProperty('action')
+            && result.hasOwnProperty(('client')))
+            this.fakeLoad(result.action as ActionType, result.client as ClientRecord);
+        }
+      )
     ).subscribe();
 
     fromEvent(this.input.nativeElement,'keyup')
@@ -66,6 +78,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 
   clientDialogRef: MatDialogRef<ClientDialogComponent>;
   selectedClientId = -1;
+  selectedClient: ClientRecord;
 
   onClientAdd() {
     let client = new ClientDetail();
@@ -91,7 +104,7 @@ export class TableComponent implements OnInit, AfterViewInit {
           clientToSave: JSON.stringify(clientToSave)
         }).subscribe(result => {
           console.log(result.json());
-          this.toReload.next([]);
+          this.toReload.next({action: ActionType.CREATE, client: result.json()});
         }, error => {
           console.log(error.json());
         });
@@ -105,7 +118,8 @@ export class TableComponent implements OnInit, AfterViewInit {
     this.httpService.post("/table/remove", {
       clientId: this.selectedClientId
     }).toPromise().then(value => {
-      this.toReload.next([]);
+      console.log(this.selectedClient);
+      this.toReload.next({action: ActionType.REMOVE, client: this.selectedClient});
     }).catch(reason => {
       console.log(reason);
     });
@@ -135,7 +149,7 @@ export class TableComponent implements OnInit, AfterViewInit {
           clientToSave: JSON.stringify(clientToSave)
         }).subscribe(result => {
           console.log(result.json());
-          this.toReload.next([]);
+          this.toReload.next({action: ActionType.EDIT, client: result.json()});
         }, error => {
           console.log(error.json());
         });
@@ -161,6 +175,13 @@ export class TableComponent implements OnInit, AfterViewInit {
   onRowSelect(row) {
     console.log(row);
     if (this.selectedClientId === row.id) this.selectedClientId = -1;
-    else this.selectedClientId = row.id;
+    else {
+      this.selectedClientId = row.id;
+      this.selectedClient = row;
+    }
+  }
+
+  private fakeLoad(action: ActionType, client: ClientRecord) {
+    this.dataSource.fakeLoad(action, client);
   }
 }

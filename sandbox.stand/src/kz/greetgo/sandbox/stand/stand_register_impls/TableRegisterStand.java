@@ -155,6 +155,9 @@ public class TableRegisterStand implements TableRegister {
             result.min = accounts.stream().min((a, b) -> Float.compare(a.money, b.money)).get().money;
             result.max = accounts.stream().max((a, b) -> Float.compare(a.money, b.money)).get().money;
         }
+        result.name = result.name + " " + result.surname;
+        if (result.patronymic != null)
+            result.name += " " + result.patronymic;
         result.age = calculateAge(client.birthDate.getTime());
         return result;
     }

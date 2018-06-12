@@ -109,7 +109,7 @@ export class ClientDialogComponent implements OnInit {
       type: this.formBuilder.control(type),
       number: this.formBuilder.control(value, [
         Validators.required,
-        pattern("^\\+[0-9]{9,15}$")
+        pattern("^\\+[0-9]{5,11}$")
       ])
     })
   }

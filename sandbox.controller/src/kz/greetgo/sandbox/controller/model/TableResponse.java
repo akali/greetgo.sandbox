@@ -11,11 +11,6 @@ public class TableResponse {
   public TableResponse(List<ClientRecord> sample, int start, int offset, String direction, String action, String filter) {
     List<ClientRecord> total = sample.stream()
       .filter(clientRecord -> filter == null || clientRecord.getCombinedString().contains(filter))
-      .peek(clientRecord -> {
-        clientRecord.name = clientRecord.name + " " + clientRecord.surname;
-        if (clientRecord.patronymic != null)
-          clientRecord.name += " " + clientRecord.patronymic;
-      })
       .sorted(
         (t1, t2) -> {
           int result = 0;
