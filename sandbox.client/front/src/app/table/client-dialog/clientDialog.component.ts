@@ -51,7 +51,7 @@ export class ClientDialogComponent implements OnInit {
       surname: [this.client.surname, Validators.required],
       patronymic: this.client.patronymic,
       gender: [this.client.gender, Validators.required],
-      birthDate: [new Date(this.client.birthDate * 1000), Validators.required],
+      birthDate: [new Date(this.client.birthDate), Validators.required],
       regAddressStreet: [this.client.regAddress.street, Validators.required],
       regAddressHouse: [this.client.regAddress.house, Validators.required],
       regAddressFlat: [this.client.regAddress.flat, Validators.required],
@@ -75,6 +75,7 @@ export class ClientDialogComponent implements OnInit {
   }
 
   submit(form) {
+    if (form.invalid) return;
     console.log('Submitting:', form.value);
     let result = form.value;
     result.workPhone = new ClientPhone(result.id, result.workPhone, PhoneType.WORK);
@@ -82,14 +83,12 @@ export class ClientDialogComponent implements OnInit {
     let phones = [];
     result.phones.forEach(value => phones.push(new ClientPhone(result.id, value.number, PhoneType.MOBILE)));
     result.phones = phones;
+    result.birthDate = result.birthDate.getTime();
     this.dialogRef.close(result);
   }
 
   public addNumber() {
-    // console.log('dick:', this.phonesFormArray);
-    // debugger;
     this.phonesFormArray.push(this.mobilePhoneGroup(''));
-    // console.log('dick:', this.phonesFormArray);
   }
 
   private mobilePhoneGroup(value: string) {
