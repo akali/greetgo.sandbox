@@ -98,26 +98,26 @@ public class TableRegisterStand implements TableRegister {
 
     private ClientRecord editClient(int clientId, ClientToSave clientToSave) {
         Client client = getClient(clientId);
+        client.surname = clientToSave.surname;
         client.name = clientToSave.name;
+        client.patronymic = clientToSave.patronymic;
         client.birthDate = new Timestamp(clientToSave.birthDate);
         client.gender = clientToSave.gender;
-        client.patronymic = clientToSave.patronymic;
         client.charm = clientToSave.charm;
-        client.surname = clientToSave.surname;
 
         for (ClientPhone phone : clientToSave.phones) {
             standDb.get().phoneStorage.put(phone.getId(), phone);
         }
 
-        standDb.get().addressStorage.put(clientToSave.factAddress.getId(), clientToSave.factAddress);
-
         standDb.get().addressStorage.put(clientToSave.regAddress.getId(), clientToSave.regAddress);
+        standDb.get().addressStorage.put(clientToSave.factAddress.getId(), clientToSave.factAddress);
 
         return getClientRecord(client.id);
     }
 
     @Override
     public ClientRecord addClient(ClientToSave clientToSave) {
+        System.err.println(clientToSave);
         if (!verify(clientToSave))
             throw new RuntimeException("Incorrect data");
 
@@ -133,7 +133,7 @@ public class TableRegisterStand implements TableRegister {
 
     @Override
     public ClientRecord editClient(ClientToSave clientToSave) {
-        System.err.println(clientToSave.phones);
+        System.err.println(clientToSave);
         if (!verify(clientToSave))
             throw new RuntimeException("Incorrect data");
         return editClient(clientToSave.id, clientToSave);

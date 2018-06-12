@@ -31,6 +31,7 @@ public class ClientToSave {
   }
 
   public void set(int id) {
+    this.id = id;
     for (ClientPhone p : phones) {
       p.client = id;
     }

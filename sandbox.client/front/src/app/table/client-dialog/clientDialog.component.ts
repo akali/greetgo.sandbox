@@ -66,11 +66,15 @@ export class ClientDialogComponent implements OnInit {
         street: [this.client.regAddress.street, Validators.required],
         house: [this.client.regAddress.house, Validators.required],
         flat: [this.client.regAddress.flat, Validators.required],
+        type: [this.client.regAddress.type],
+        client: [this.client.id]
       }),
       factAddress: this.formBuilder.group({
         street: this.client.factAddress.street,
         house: this.client.factAddress.house,
         flat: this.client.factAddress.flat,
+        type: [this.client.factAddress.type],
+        client: [this.client.id]
       }),
       charm: [this.client.charm, Validators.required],
       phones: this.formBuilder.array(this.client.phones.map(value => this.mobilePhoneGroup(value.number, value.type))),
@@ -104,7 +108,8 @@ export class ClientDialogComponent implements OnInit {
     return this.formBuilder.group({
       type: this.formBuilder.control(type),
       number: this.formBuilder.control(value, [
-        Validators.required
+        Validators.required,
+        pattern("^\\+[0-9]{9,15}$")
       ])
     })
   }
@@ -132,5 +137,15 @@ export function atLeastOneMobileValidator(): ValidatorFn {
       }
     }
     return {atLeastOneMobile: true};
+  };
+}
+
+export function pattern(reg): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control || !control.value) {
+      return null;
+    }
+    let phone = control.value;
+    return phone.match(reg) ? null : {'pattern': phone};
   };
 }
