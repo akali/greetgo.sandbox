@@ -23,12 +23,13 @@ export class TableDatasource extends DataSource<ClientRecord> {
     this.clientsSubject.complete();
   }
 
-  public load(pageIndex=0, pageSize=1, sortDirection='ASC', active='name') {
+  public load(pageIndex = 0, pageSize = 1, sortDirection = 'ASC', active = 'name', filter: string) {
     this.httpService.post("/table/get", {
       start: pageSize * pageIndex,
       limit: pageSize,
       sort: sortDirection,
-      active: active
+      active: active,
+      filter: filter
     }).subscribe(clients => this.clientsSubject.next(clients.json()));
   }
 }

@@ -1,10 +1,10 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {MatDialog, MatDialogRef, MatPaginator, MatSort, MatTable} from '@angular/material';
 import {TableDatasource} from './table-datasource';
 import {HttpService} from "../HttpService";
 import {ClientRecord} from "../../model/ClientRecord";
-import {tap} from "rxjs/operators";
-import {BehaviorSubject, merge} from "rxjs";
+import {debounceTime, distinctUntilChanged, tap} from "rxjs/operators";
+import {BehaviorSubject, fromEvent, merge} from "rxjs";
 import {ClientDialogComponent} from "./client-dialog/clientDialog.component";
 import {ClientDetail} from "../../model/ClientDetail";
 import {ClientAddress} from "../../model/ClientAddress";
@@ -24,6 +24,7 @@ export class TableComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table: MatTable<ClientRecord>;
+  @ViewChild('input') input: ElementRef;
 
   dataSource: TableDatasource;
 
@@ -49,6 +50,18 @@ export class TableComponent implements OnInit, AfterViewInit {
         this.load();
       })
     ).subscribe();
+
+    fromEvent(this.input.nativeElement,'keyup')
+      .pipe(
+        debounceTime(150),
+        distinctUntilChanged(),
+        tap(() => {
+          // console.log(this.input.nativeElement.value.toLowerCase());
+          this.paginator.pageIndex = 0;
+          this.load();
+        })
+      )
+      .subscribe();
   }
 
   clientDialogRef: MatDialogRef<ClientDialogComponent>;
@@ -150,11 +163,13 @@ export class TableComponent implements OnInit, AfterViewInit {
   private load() {
     if (this.paginator.pageSize === undefined)
       this.paginator.pageSize = this.INIT_PAGE_SIZE;
-
-    this.dataSource.load(this.paginator.pageIndex,
-      this.paginator.pageSize,
-      this.sort.direction,
-      this.sort.active);
+      console.log("Loading");
+      this.dataSource.load(
+        this.paginator.pageIndex,
+        this.paginator.pageSize,
+        this.sort.direction,
+        this.sort.active,
+        this.input.nativeElement.value.toLowerCase());
   }
 
   onRowSelect(row) {

@@ -30,8 +30,9 @@ public class TableController implements Controller {
     public List<ClientRecord> getRecordTable(@Par("start") int start,
                                              @Par("limit") int limit,
                                              @Par("sort") String direction,
-                                             @Par("active") String active) {
-        return tableRegister.get().getRecordTable(start, limit, direction, active);
+                                             @Par("active") String active,
+                                             @Par("filter") String filter) {
+        return tableRegister.get().getRecordTable(start, limit, direction, active, filter);
     }
 
     @ToJson

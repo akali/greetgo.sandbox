@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface TableRegister {
     List<Charm> getCharms();
-    List<ClientRecord> getRecordTable(int start, int offset, String direction, String active);
+    List<ClientRecord> getRecordTable(int start, int offset, String direction, String active, String filter);
     ClientDetail getClientDetail(int clientId);
 
     ClientRecord addClient(ClientToSave clientToSave);

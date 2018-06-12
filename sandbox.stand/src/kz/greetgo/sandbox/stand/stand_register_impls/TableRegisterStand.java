@@ -36,7 +36,7 @@ public class TableRegisterStand implements TableRegister {
     }
 
     @Override
-    public List<ClientRecord> getRecordTable(int start, int offset, String direction, String action) {
+    public List<ClientRecord> getRecordTable(int start, int offset, String direction, String action, String filter) {
         System.out.println("start: " + start + "; " + "offset: " + offset);
         System.out.println("direction: " + direction + "; " + "action: " + action);
         List<ClientRecord> list = new ArrayList<>();
@@ -49,7 +49,12 @@ public class TableRegisterStand implements TableRegister {
             list.add(result);
         }
 
+
+        System.out.println(Arrays.toString(list.stream()
+          .filter(clientRecord -> filter == null || clientRecord.getCombinedString().contains(filter)).toArray()));
+
         return list.stream()
+          .filter(clientRecord -> filter == null || clientRecord.getCombinedString().contains(filter))
           .peek(clientRecord -> {
               clientRecord.name = clientRecord.name + " " + clientRecord.surname;
               if (clientRecord.patronymic != null)
