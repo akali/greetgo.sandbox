@@ -24,6 +24,7 @@ export class ClientRecord {
 
     public static copy(c: any): ClientRecord {
         let result = new ClientRecord();
+        result.id = c.id;
         result.name = c.name;
         result.surname = c.surname;
         result.patronymic = c.patronymic;

@@ -13,8 +13,6 @@ public class ClientDetail {
     public ClientAddress regAddress, factAddress;
     public List<ClientPhone> phones;
     public List<Charm> charms;
-    public ClientPhone workPhone;
-    public ClientPhone homePhone;
     public Charm charm;
 
     public ClientDetail() { }

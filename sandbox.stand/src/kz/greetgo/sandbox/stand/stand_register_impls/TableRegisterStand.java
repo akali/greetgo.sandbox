@@ -89,18 +89,7 @@ public class TableRegisterStand implements TableRegister {
 
         clientDetail.phones = standDb.get().phoneStorage.values().stream()
                 .filter(clientPhone -> clientPhone.client == clientId)
-                .filter(clientPhone -> clientPhone.type == PhoneType.MOBILE)
                 .collect(Collectors.toList());
-
-        standDb.get().phoneStorage.values().stream()
-          .filter(clientPhone -> clientPhone.client == clientId)
-          .filter(clientPhone -> clientPhone.type != PhoneType.MOBILE)
-          .forEach(clientPhone -> {
-              if (clientPhone.type == PhoneType.WORK)
-                  clientDetail.workPhone = clientPhone;
-              else if (clientPhone.type == PhoneType.HOME)
-                  clientDetail.homePhone = clientPhone;
-          });
 
         clientDetail.charms = new ArrayList<>(standDb.get().charmStorage.values());
 
@@ -119,9 +108,6 @@ public class TableRegisterStand implements TableRegister {
         for (ClientPhone phone : clientToSave.phones) {
             standDb.get().phoneStorage.put(phone.getId(), phone);
         }
-
-        standDb.get().phoneStorage.put(clientToSave.homePhone.getId(), clientToSave.homePhone);
-        standDb.get().phoneStorage.put(clientToSave.workPhone.getId(), clientToSave.workPhone);
 
         standDb.get().addressStorage.put(clientToSave.factAddress.getId(), clientToSave.factAddress);
 
@@ -147,7 +133,7 @@ public class TableRegisterStand implements TableRegister {
 
     @Override
     public ClientRecord editClient(ClientToSave clientToSave) {
-        System.err.println(clientToSave);
+        System.err.println(clientToSave.phones);
         if (!verify(clientToSave))
             throw new RuntimeException("Incorrect data");
         return editClient(clientToSave.id, clientToSave);

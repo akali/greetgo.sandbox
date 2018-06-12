@@ -81,9 +81,10 @@ export class TableComponent implements OnInit, AfterViewInit {
         }
       });
       this.clientDialogRef.disableClose = true;
+
       this.clientDialogRef.afterClosed().subscribe(value => {
         if (value === undefined || value === null) return;
-        let clientToSave = this.collect(value);
+        let clientToSave = value;
         console.log(JSON.stringify(clientToSave));
 
         this.httpService.post("/table/add", {
@@ -126,7 +127,7 @@ export class TableComponent implements OnInit, AfterViewInit {
       this.clientDialogRef.afterClosed().subscribe(value => {
         if (!value) return;
 
-        let clientToSave = this.collect(value);
+        let clientToSave = value;
 
         console.log('sending to REST', JSON.stringify(clientToSave));
 
@@ -143,21 +144,6 @@ export class TableComponent implements OnInit, AfterViewInit {
     }, error => {
       alert(error);
     });
-  }
-
-  private collect(value: any) {
-    value.regAddress = new ClientAddress(value.id,
-      AddressType.REG,
-      value.regAddressStreet,
-      value.regAddressHouse,
-      value.regAddressFlat);
-    value.factAddress = new ClientAddress(value.id,
-      AddressType.FACT,
-      value.factAddressStreet,
-      value.factAddressHouse,
-      value.factAddressFlat);
-    value.charm = value.charm.id;
-    return ClientToSave.copy(value);
   }
 
   private load() {

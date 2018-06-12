@@ -3,3 +3,9 @@
     flex-direction: column;
     padding: 50px;
 }
+
+.group {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}

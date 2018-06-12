@@ -33,6 +33,7 @@ export class TableDatasource extends DataSource<ClientRecord> {
       filter: filter
     }).subscribe(clients => {
       let tableResponse = TableResponse.copy(clients.json());
+      console.log(tableResponse.list);
       this.paginator.length = tableResponse.size;
       this.clientsSubject.next(tableResponse.list);
     });

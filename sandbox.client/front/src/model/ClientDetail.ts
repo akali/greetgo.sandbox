@@ -13,8 +13,6 @@ export class ClientDetail {
   public birthDate: number /* long */;
   public regAddress: ClientAddress;
   public factAddress: ClientAddress;
-  public workPhone: ClientPhone;
-  public homePhone: ClientPhone;
   public phones: ClientPhone[];
   public charms: Charm[];
 
@@ -32,8 +30,6 @@ export class ClientDetail {
     this.gender = json.gender;
     this.birthDate = json.birthDate;
     this.regAddress = json.regAddress;
-    this.workPhone = json.workPhone;
-    this.homePhone = json.homePhone;
     this.factAddress = json.factAddress;
     this.charm = json.charm;
     this.setCharms(json.charms);

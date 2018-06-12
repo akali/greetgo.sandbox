@@ -13,8 +13,6 @@ public class ClientToSave {
   public ClientAddress factAddress;
   public long birthDate;
   public List<ClientPhone> phones;
-  public ClientPhone workPhone;
-  public ClientPhone homePhone;
 
   @Override
   public String toString() {
@@ -29,8 +27,6 @@ public class ClientToSave {
       ", gender=" + gender +
       ", regAddress=" + regAddress +
       ", factAddress=" + factAddress +
-      ", workPhone=" + workPhone +
-      ", homePhone=" + homePhone +
       '}';
   }
 
@@ -38,8 +34,6 @@ public class ClientToSave {
     for (ClientPhone p : phones) {
       p.client = id;
     }
-    workPhone.client = id;
-    homePhone.client = id;
     factAddress.client = id;
     regAddress.client = id;
   }
