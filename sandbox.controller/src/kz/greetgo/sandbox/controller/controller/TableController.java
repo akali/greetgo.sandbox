@@ -10,6 +10,8 @@ import kz.greetgo.sandbox.controller.util.Controller;
 
 import java.util.List;
 
+//TODO: переименую контроллер. Непонятно за что контроллер отвечает
+//TODO: переименую маппинг соответственно.
 @Bean
 @Mapping("/table")
 public class TableController implements Controller {
@@ -23,6 +25,10 @@ public class TableController implements Controller {
     }
 
     @ToJson
+    //TODO: подправь наименование маппинга метода.
+    //TODO: по наименованию не понятно, рекорд чего ты достаешь
+    //TODO: если параметров больше 3-х, передавай одним объектом.
+    // А то код получается громоздким.
     @Mapping("/get")
     public TableResponse getRecordTable(@Par("start") int start,
                                         @Par("limit") int limit,
@@ -33,12 +39,17 @@ public class TableController implements Controller {
     }
 
     @ToJson
+    //TODO: подправь наименование маппинга метода.
+    //TODO: по наименованию не понятно, detail чего ты достаешь
+    //TODO: используй detail во множественном числе -> details
     @Mapping("/detail")
     public ClientDetail getClientDetail(@Par("clientId") int clientId) {
         return tableRegister.get().getClientDetail(clientId);
     }
 
     @ToJson
+    //TODO: подправь наименование маппинга метода.
+    //TODO: по наименованию не понятно, что удаляешь
     @Mapping("/remove")
     public void removeClient(@Par("clientId") int clientId) {
         tableRegister.get().removeClient(clientId);
@@ -46,11 +57,15 @@ public class TableController implements Controller {
 
     @ToJson
     @Mapping("/add")
+    //TODO: подправь наименование маппинга метода.
+    //TODO: по наименованию не понятно, что добавляешь
     public ClientRecord addClient(@Par("clientToSave") @Json ClientToSave client) {
         return tableRegister.get().addClient(client);
     }
 
     @ToJson
+    //TODO: подправь наименование маппинга метода.
+    //TODO: по наименованию не понятно, что редактируешь
     @Mapping("/edit")
     public ClientRecord editClient(@Par("clientToSave") @Json ClientToSave clientToSave) {
         return tableRegister.get().editClient(clientToSave);
