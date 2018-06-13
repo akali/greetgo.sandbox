@@ -30,6 +30,17 @@ public class ClientAddress {
     return clientAddress;
   }
 
+  @Override
+  public String toString() {
+    return "ClientAddress{" +
+      "client=" + client +
+      ", type=" + type +
+      ", street='" + street + '\'' +
+      ", house='" + house + '\'' +
+      ", flat='" + flat + '\'' +
+      '}';
+  }
+
   public String getId() {
     return client + "_" + type;
   }

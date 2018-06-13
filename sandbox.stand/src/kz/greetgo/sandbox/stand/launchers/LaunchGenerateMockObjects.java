@@ -8,8 +8,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Date;
-import java.util.Vector;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 import static kz.greetgo.sandbox.controller.model.PhoneType.MOBILE;
 
@@ -201,8 +204,31 @@ public class LaunchGenerateMockObjects {
         }
     }
 
+    public long getTimestamp(int day, int month, int year) {
+      Calendar cal = new GregorianCalendar();
+      cal.set(Calendar.YEAR, year);
+      cal.set(Calendar.MONTH, month - 1);
+      cal.set(Calendar.DATE, day);
+      return cal.getTimeInMillis();
+    }
+
     private void run() {
         File srcDir = Modules.standDir().toPath().resolve("db/src/kz/greetgo/sandbox/db/stand/beans").toFile();
+
+//        List<String> names = load(srcDir, "/names.txt");
+//        List<String> streets = load(srcDir, "/streets.txt");
+//
+//        for (int i = 1; i <= 1000; ++i) {
+//            Random rnd = new Random();
+//            Client client = new Client(i,
+//              pick(names),
+//              pick(names),
+//              pick(names),
+//              GenderType.FEMALE,
+//              rnd.nextInt(),
+//              1 + rnd.nextInt(3));
+//
+//        }
 
         new Printer()
                 .setClient(
@@ -211,7 +237,7 @@ public class LaunchGenerateMockObjects {
                                 "Vladimir",
                                 "Sergeevich",
                                 GenderType.MALE,
-                                -127699200,
+                                getTimestamp(12, 01, 1998),
                                 1))
                 .setCharm(
                         new Charm(
@@ -262,7 +288,7 @@ public class LaunchGenerateMockObjects {
                                 "Anvar",
                                 "Umarovich",
                                 GenderType.MALE,
-                                new Date().getTime(),
+                          getTimestamp(19, 2, 2006),
                                 2))
                 .setCharm(
                         new Charm(
@@ -278,7 +304,7 @@ public class LaunchGenerateMockObjects {
                         ))
                 .setClientAddress(
                         new ClientAddress(
-                                1,
+                                2,
                                 AddressType.REG,
                                 "Tole-bi",
                                 "55",
@@ -313,7 +339,7 @@ public class LaunchGenerateMockObjects {
                                 "Aida",
                                 "Ualiyevna",
                                 GenderType.FEMALE,
-                                913680000,
+                          getTimestamp(26, 6, 1965),
                                 3))
                 .setCharm(
                         new Charm(
@@ -329,7 +355,7 @@ public class LaunchGenerateMockObjects {
                         ))
                 .setClientAddress(
                         new ClientAddress(
-                                1,
+                                3,
                                 AddressType.REG,
                                 "Dostyk",
                                 "45b",
@@ -358,5 +384,21 @@ public class LaunchGenerateMockObjects {
                                 "NAME3"
                         ))
                 .setSrcDir(srcDir).execute();
+    }
+
+    private List<String> load(File srcDir, String s) {
+        ArrayList<String> names = new ArrayList<>();
+        Scanner sc = new Scanner(srcDir.getAbsolutePath() + s);
+        String line;
+        while ((line = sc.nextLine()) != null) {
+            names.add(line);
+        }
+        return names;
+    }
+
+    private String pick(List<String> names) {
+        int len = names.size();
+        Random rnd = new Random();
+        return names.get(rnd.nextInt(len));
     }
 }

@@ -14,4 +14,13 @@ public class ClientRecord {
   public int age;
 
   public ClientRecord() { }
+
+  public String getCombinedString() {
+    return (name + "$" + surname + "$" + patronymic + "$" + total + "$" + max + "$" + min + "$" + charm + "$" + age)
+      .toLowerCase();
+  }
+
+  public String toString() {
+    return getCombinedString();
+  }
 }

@@ -540,7 +540,7 @@ public class GenerateInputFiles {
     }
 
     tags.add("    <address>\n" +
-      "      " + Address.next().toTag("fact") + "\n" +
+      "      " + Address.next().toTag("factAddress") + "\n" +
       "      " + Address.next().toTag("register") + "\n" +
       "    </address>"
     );

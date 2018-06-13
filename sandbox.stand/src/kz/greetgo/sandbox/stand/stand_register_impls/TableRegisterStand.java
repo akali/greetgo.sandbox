@@ -6,6 +6,7 @@ import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.controller.register.TableRegister;
 import kz.greetgo.sandbox.db.stand.beans.StandDb;
 
+import java.sql.Timestamp;
 import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,7 +36,9 @@ public class TableRegisterStand implements TableRegister {
     }
 
     @Override
-    public List<ClientRecord> getRecordTable(int start, int offset) {
+    public TableResponse getRecordTable(int start, int offset, String direction, String action, String filter) {
+        System.out.println("start: " + start + "; " + "offset: " + offset);
+        System.out.println("direction: " + direction + "; " + "action: " + action);
         List<ClientRecord> list = new ArrayList<>();
 
         Map<String, Client> map = standDb.get().clientStorage;
@@ -46,21 +49,21 @@ public class TableRegisterStand implements TableRegister {
             list.add(result);
         }
 
-        return list.stream().skip(start).limit(offset).collect(Collectors.toList());
+
+        System.out.println(Arrays.toString(list.stream()
+          .filter(clientRecord -> filter == null || clientRecord.getCombinedString().contains(filter)).toArray()));
+
+        return new TableResponse(list, start, offset, direction, action, filter);
     }
 
-    public static int calculateAge(long birthDateTs, long currentDateTs) {
-        if ((birthDateTs != 0) && (currentDateTs != 0)) {
-            LocalDate birthDate = LocalDateTime.ofInstant(Instant.ofEpochSecond(birthDateTs),
-                    TimeZone.getDefault().toZoneId()).toLocalDate();
-            LocalDate currentDate = LocalDateTime.ofInstant(Instant.ofEpochSecond(currentDateTs),
-                    TimeZone.getDefault().toZoneId()).toLocalDate();
+    public static int calculateAge(long birthDateTs) {
+        LocalDate date = Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate date1 = new Timestamp(birthDateTs).toLocalDateTime().toLocalDate();
 
-            return Period.between(birthDate, currentDate).getYears();
-        } else {
-            return 0;
-        }
+        return date.minusYears(date1.getYear()).getYear();
     }
+
+
 
     @Override
     public ClientDetail getClientDetail(int clientId) {
@@ -72,7 +75,9 @@ public class TableRegisterStand implements TableRegister {
         clientDetail.surname = client.surname;
         clientDetail.patronymic = client.patronymic;
         clientDetail.gender = client.gender;
-        clientDetail.birthDate = client.birthDate;
+        clientDetail.birthDate = client.birthDate.getTime();
+        clientDetail.charm = standDb.get().charmStorage.get(String.valueOf(client.charm));
+
         standDb.get().addressStorage.values().stream()
                 .filter(clientAddress -> clientAddress.client == client.id)
                 .forEach(clientAddress -> {
@@ -91,34 +96,47 @@ public class TableRegisterStand implements TableRegister {
         return clientDetail;
     }
 
+    private ClientRecord editClient(int clientId, ClientToSave clientToSave) {
+        Client client = getClient(clientId);
+        client.surname = clientToSave.surname;
+        client.name = clientToSave.name;
+        client.patronymic = clientToSave.patronymic;
+        client.birthDate = new Timestamp(clientToSave.birthDate);
+        client.gender = clientToSave.gender;
+        client.charm = clientToSave.charm;
+
+        for (ClientPhone phone : clientToSave.phones) {
+            standDb.get().phoneStorage.put(phone.getId(), phone);
+        }
+
+        standDb.get().addressStorage.put(clientToSave.regAddress.getId(), clientToSave.regAddress);
+        standDb.get().addressStorage.put(clientToSave.factAddress.getId(), clientToSave.factAddress);
+
+        return getClientRecord(client.id);
+    }
+
     @Override
     public ClientRecord addClient(ClientToSave clientToSave) {
         System.err.println(clientToSave);
         if (!verify(clientToSave))
             throw new RuntimeException("Incorrect data");
 
-        Client client = new Client(); // getClient(clientToSave.id);
+        Client client = new Client();
         client.id = ++standDb.get().clientId;
-        client.name = clientToSave.name;
-        client.birthDate = clientToSave.birthDate;
-        client.gender = clientToSave.gender;
-        client.patronymic = clientToSave.patronymic;
-        client.surname = clientToSave.surname;
-        client.charm = clientToSave.charm;
 
-        ClientAddress reg = clientToSave.reg;
-        reg.client = client.id;
-        standDb.get().addressStorage.put(reg.getId(), reg);
-
-        ClientAddress fact = clientToSave.fact;
-        if (fact != null) {
-            fact.client = client.id;
-            standDb.get().addressStorage.put(fact.getId(), fact);
-        }
+        clientToSave.set(client.id);
 
         standDb.get().clientStorage.put(String.valueOf(client.id), client);
 
-        return getClientRecord(client.id);
+        return editClient(client.id, clientToSave);
+    }
+
+    @Override
+    public ClientRecord editClient(ClientToSave clientToSave) {
+        System.err.println(clientToSave);
+        if (!verify(clientToSave))
+            throw new RuntimeException("Incorrect data");
+        return editClient(clientToSave.id, clientToSave);
     }
 
     private ClientRecord getClientRecord(int id) {
@@ -137,7 +155,10 @@ public class TableRegisterStand implements TableRegister {
             result.min = accounts.stream().min((a, b) -> Float.compare(a.money, b.money)).get().money;
             result.max = accounts.stream().max((a, b) -> Float.compare(a.money, b.money)).get().money;
         }
-        result.age = calculateAge(client.birthDate, new Date().getTime());
+        result.name = result.name + " " + result.surname;
+        if (result.patronymic != null)
+            result.name += " " + result.patronymic;
+        result.age = calculateAge(client.birthDate.getTime());
         return result;
     }
 
@@ -145,39 +166,10 @@ public class TableRegisterStand implements TableRegister {
         if (clientToSave == null) return false;
         if (clientToSave.name == null || clientToSave.name.isEmpty()) return false;
         if (clientToSave.surname == null || clientToSave.surname.isEmpty()) return false;
-        if (clientToSave.patronymic == null || clientToSave.patronymic.isEmpty()) return false;
-        if (clientToSave.charm > getCharms().size()) return false;
-        if (clientToSave.fact == null) return false;
-        if (clientToSave.phones.stream().noneMatch(clientPhone -> clientPhone.type == PhoneType.MOBILE)) return false;
+        if (getCharms().stream().noneMatch(charm -> charm.id == clientToSave.charm)) return false;
+        if (clientToSave.regAddress == null) return false;
+        if (clientToSave.phones == null || clientToSave.phones.isEmpty()) return false;
         return true;
-    }
-
-    @Override
-    public ClientRecord editClient(ClientToSave clientToSave) {
-        // System.err.println(clientToSave);
-        if (!verify(clientToSave))
-            throw new RuntimeException("Incorrect data");
-
-        Client client = getClient(clientToSave.id);
-        client.name = clientToSave.name;
-        client.birthDate = clientToSave.birthDate;
-        client.gender = clientToSave.gender;
-        client.patronymic = clientToSave.patronymic;
-        client.charm = clientToSave.charm;
-        client.surname = clientToSave.surname;
-
-        ClientAddress fact = standDb.get().addressStorage.get(clientToSave.fact.getId());
-        ClientAddress reg = standDb.get().addressStorage.get(clientToSave.reg.getId());
-
-        fact.street = clientToSave.fact.street;
-        fact.house = clientToSave.fact.house;
-        fact.flat = clientToSave.fact.flat;
-
-        reg.street = clientToSave.reg.street;
-        reg.house = clientToSave.reg.house;
-        reg.flat = clientToSave.reg.flat;
-
-        return getClientRecord(client.id);
     }
 
     @Override

@@ -1,0 +1,105 @@
+<h2 mat-dialog-title>
+  <div *ngIf="isCreate()">Add client</div>
+  <div *ngIf="!isCreate()">Edit client</div>
+</h2>
+<div [formGroup]="form">
+  <mat-dialog-content class="root">
+    <mat-form-field>
+      <input matInput formControlName="surname" placeholder="Enter surname" required>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input required matInput formControlName="name" placeholder="Enter name">
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput formControlName="patronymic" placeholder="Enter patronymic">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-select placeholder="Select gender" required formControlName="gender">
+        <mat-option *ngFor="let gender of genders" [value]="gender">
+          {{gender}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-select placeholder="Select charm" required formControlName="charm" [compareWith]="charmsCmp">
+        <mat-option *ngFor="let charm of client.charms" [value]="charm">
+          {{charm.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput required [matDatepicker]="picker" placeholder="Choose a date" formControlName="birthDate">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <div formGroupName="regAddress">
+      <h3> Registration address </h3>
+      <div class="group">
+        <mat-form-field>
+          <input matInput required placeholder="Enter street" formControlName="street">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput required placeholder="Enter house" formControlName="house">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput required placeholder="Enter flat" formControlName="flat">
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div formGroupName="factAddress">
+      <h3> Fact address </h3>
+      <div class="group">
+        <mat-form-field>
+          <input matInput placeholder="Enter street" formControlName="street">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Enter house" formControlName="house">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Enter flat" formControlName="flat">
+        </mat-form-field>
+      </div>
+    </div>
+    <h3> Phone numbers </h3>
+    <h5> Enter number in following format: <br> +X XXX XXX XX XX </h5>
+
+    <div formArrayName="phones">
+      <div class="group" *ngFor="let phone of phonesFormArray.controls; let idx = index" [formGroupName]="idx">
+        <mat-form-field>
+          <mat-select placeholder="Select phone type" required formControlName="type">
+            <mat-option *ngFor="let type of phoneTypes" [value]="type">
+              {{type}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput type="tel" formControlName="number" required placeholder="Enter phone number" maxlength="12"/>
+        </mat-form-field>
+        <button mat-button (click)="deleteNumber(idx)">Delete phone number</button>
+      </div>
+      <div [hidden]="!form.controls['phones'].hasError('atLeastOneMobile')">
+        <h3 class="mat-error">You must fill at least one mobile phone.</h3>
+      </div>
+    </div>
+
+    <button mat-button (click)="addNumber()">
+      Add another mobile number
+    </button>
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions>
+    <button mat-button type="submit" (click)="submit(form)" [disabled]="!form.valid">
+      <div *ngIf="isCreate()">Add</div>
+      <div *ngIf="!isCreate()">Save</div>
+    </button>
+    <button mat-button type="button" (click)="cancel(form)">Cancel</button>
+  </mat-dialog-actions>
+</div>

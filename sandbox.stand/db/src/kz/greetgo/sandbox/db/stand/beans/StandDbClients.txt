@@ -1,3 +1,3 @@
-1;Popov;Vladimir;Sergeevich;MALE;-127699200;1;
-2;Umarov;Anvar;Umarovich;MALE;1528277714893;2;
-3;Ualibekova;Aida;Ualiyevna;FEMALE;913680000;3;
+1;Popov;Vladimir;Sergeevich;MALE;884576444507;1;
+2;Umarov;Anvar;Umarovich;MALE;1140320444513;2;
+3;Ualibekova;Aida;Ualiyevna;FEMALE;-142546755487;3;

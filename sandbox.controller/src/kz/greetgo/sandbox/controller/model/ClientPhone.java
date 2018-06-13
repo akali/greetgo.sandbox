@@ -1,7 +1,5 @@
 package kz.greetgo.sandbox.controller.model;
 
-import kz.greetgo.sandbox.controller.model.PhoneType;
-
 public class ClientPhone {
   public int client;
   public String number;
@@ -30,10 +28,21 @@ public class ClientPhone {
       phone.type = PhoneType.EMBEDDED;
     } else phone.type = PhoneType.WORK;
 
+    System.out.println("|"+splitLine[2]+"|" + " " + "|"+PhoneType.MOBILE.toString()+"|" + " " + splitLine[2].equals(PhoneType.MOBILE.toString()));
+    System.out.println(phone);
     return phone;
   }
 
   public String getId() {
     return client + "_" + number;
+  }
+
+  @Override
+  public String toString() {
+    return "ClientPhone{" +
+      "client=" + client +
+      ", number='" + number + '\'' +
+      ", type=" + type +
+      '}';
   }
 }

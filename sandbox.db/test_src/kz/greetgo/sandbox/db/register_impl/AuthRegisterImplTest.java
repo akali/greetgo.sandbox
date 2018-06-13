@@ -39,11 +39,6 @@ public class AuthRegisterImplTest extends ParentTestNg {
 
   public BeanGetter<PoliceCheckServiceForTests> policeCheckService;
 
-  @BeforeMethod
-  public void cleanPoliceCheckService() throws Exception {
-    policeCheckService.get().clean();
-  }
-
   @DataProvider
   public Object[][] saveParam_DP() {
     return Arrays.stream(UserParamName.values())
@@ -70,7 +65,9 @@ public class AuthRegisterImplTest extends ParentTestNg {
     {
       String actualValue = authTestDao.get().loadParamValue(personId, paramName);
       assertThat(actualValue).isEqualTo(expectedValue);
+      assertThat(actualValue).isEmpty();
     }
+
   }
 
   @Test(dataProvider = "saveParam_DP")

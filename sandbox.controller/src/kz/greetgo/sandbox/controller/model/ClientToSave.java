@@ -1,8 +1,5 @@
 package kz.greetgo.sandbox.controller.model;
 
-import kz.greetgo.sandbox.controller.model.CharacterType;
-import kz.greetgo.sandbox.controller.model.GenderType;
-
 import java.util.List;
 
 public class ClientToSave {
@@ -11,24 +8,34 @@ public class ClientToSave {
   public String surname;
   public String patronymic;
   public int charm;
-  public List<ClientPhone> phones;
-  public long birthDate;
   public GenderType gender;
-  public ClientAddress reg, fact;
+  public ClientAddress regAddress;
+  public ClientAddress factAddress;
+  public long birthDate;
+  public List<ClientPhone> phones;
 
   @Override
   public String toString() {
     return "ClientToSave{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", surname='" + surname + '\'' +
-            ", patronymic='" + patronymic + '\'' +
-            ", charm=" + charm +
-            ", phones=" + phones +
-            ", birthDate=" + birthDate +
-            ", gender=" + gender +
-            ", reg=" + reg +
-            ", fact=" + fact +
-            '}';
+      "id=" + id +
+      ", name='" + name + '\'' +
+      ", surname='" + surname + '\'' +
+      ", patronymic='" + patronymic + '\'' +
+      ", charm=" + charm +
+      ", phones=" + phones +
+      ", birthDate=" + birthDate +
+      ", gender=" + gender +
+      ", regAddress=" + regAddress +
+      ", factAddress=" + factAddress +
+      '}';
+  }
+
+  public void set(int id) {
+    this.id = id;
+    for (ClientPhone p : phones) {
+      p.client = id;
+    }
+    factAddress.client = id;
+    regAddress.client = id;
   }
 }
