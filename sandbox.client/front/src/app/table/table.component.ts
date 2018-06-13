@@ -4,7 +4,7 @@ import {TableDatasource} from './table-datasource';
 import {HttpService} from "../HttpService";
 import {ClientRecord} from "../../model/ClientRecord";
 import {debounceTime, distinctUntilChanged, tap} from "rxjs/operators";
-import {BehaviorSubject, fromEvent, merge} from "rxjs";
+import {BehaviorSubject, fromEvent, merge, ReplaySubject} from "rxjs";
 import {ClientDialogComponent} from "./client-dialog/clientDialog.component";
 import {ClientDetail} from "../../model/ClientDetail";
 import {ClientAddress} from "../../model/ClientAddress";
@@ -31,7 +31,7 @@ export class TableComponent implements OnInit, AfterViewInit {
   displayedColumns = ['name', 'charm', 'age', 'total', 'max', 'min'];
   INIT_PAGE_SIZE = 5;
   PAGE_SIZE_OPTIONS = [1, 2, 5, 50];
-  private toReload = new BehaviorSubject({});
+  private toReload = new BehaviorSubject(undefined);
 
   constructor(private httpService: HttpService, private dialog: MatDialog) {}
 

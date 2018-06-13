@@ -31,7 +31,7 @@ task beanContainerJar(type: Jar) {
 }
 
 war {
-  dependsOn project(':sandbox.client').build
+  dependsOn project(':sandbox.client:front').build
   dependsOn beanContainerJar
 
   doFirst {
@@ -44,7 +44,7 @@ war {
 
   classpath beanContainerJar
 
-  from project(':sandbox.client').buildDir.toPath().resolve('product').toFile()
+  from project(':sandbox.client:front').projectDir.toPath().resolve('dist').toFile()
 }
 
 static def addExcludes(rootSpec) {

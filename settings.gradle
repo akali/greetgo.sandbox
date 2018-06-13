@@ -1,4 +1,4 @@
-include 'sandbox.client'
+include 'sandbox.client:front'
 include 'sandbox.controller'
 include 'sandbox.stand'
 include 'sandbox.stand:db'

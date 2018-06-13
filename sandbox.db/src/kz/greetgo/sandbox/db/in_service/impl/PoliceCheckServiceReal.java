@@ -1,5 +1,6 @@
 package kz.greetgo.sandbox.db.in_service.impl;
 
+import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.sandbox.db.in_service.PoliceCheckService;
 import kz.greetgo.sandbox.db.in_service.model.CheckPoliceResponse;
 import kz.greetgo.sandbox.db.in_service.model.LegalPersonCheckParams;
@@ -11,16 +12,21 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.URL;
 
+@Bean
 public class PoliceCheckServiceReal implements PoliceCheckService {
 
-  private final String url;
-  private final String username;
-  private final String password;
+  private String url;
+  private String username;
+  private String password;
 
   public PoliceCheckServiceReal(String url, String username, String password) {
     this.url = url;
     this.username = username;
     this.password = password;
+  }
+
+  public PoliceCheckServiceReal() {
+
   }
 
   @Override
