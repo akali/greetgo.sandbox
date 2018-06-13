@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet author="pompei" id="create-table-UserParams">
+        <sql endDelimiter=";;"><![CDATA[
+
+        create table Charm (
+            id integer primary key,
+            name varchar(50) not null,
+            description varchar(50) not null,
+            energy numeric not null
+        );
+
+        create table Client (
+            id integer primary key,
+            surname varchar(50) not null,
+            name varchar(50) not null,
+            patronymic varchar(50),
+            gender varchar(20) not null,
+            birth_date date not null,
+            charm integer references Charm
+        );
+
+        create table ClientAddress (
+            client integer references Client,
+            type varchar(50) not null,
+            street varchar(50),
+            house varchar(50),
+            flat varchar(50),
+            primary key(client, type)
+        );
+
+        create table ClientPhone (
+            client integer references Client,
+            number varchar(50) not null,
+            type varchar(50) not null,
+            primary key(client, number)
+        );
+
+        create table ClientAccount (
+            id integer primary key,
+            client integer references Client,
+            money numeric not null,
+            number varchar(50) not null,
+            registered_at timestamp not null
+        );
+
+        create table ClientAccountTransaction (
+            id integer primary key,
+            account integer not null,
+            money numeric not null,
+            finished_at timestamp not null,
+            type integer not null
+        );
+
+        create table TransactionType (
+            id integer primary key,
+            code varchar(50) not null,
+            name varchar(50) not null
+        );
+    ]]></sql>
+    </changeSet>
+
+    <!--<changeSet author="pompei" id="create-table-Person">-->
+        <!--<sql endDelimiter=";;"><![CDATA[-->
+      <!--create table Person (-->
+        <!--id varchar(30) not null primary key,-->
+        <!--accountName varchar(100) not null,-->
+        <!--surname varchar(255),-->
+        <!--name varchar(255),-->
+        <!--patronymic varchar(255),-->
+        <!--encryptedPassword varchar(255),-->
+        <!--blocked smallint not null default 1-->
+      <!--)-->
+    <!--]]></sql>-->
+    <!--</changeSet>-->
+
+
+</databaseChangeLog>
