@@ -19,6 +19,7 @@ public class TableController implements Controller {
 
 
     @ToJson
+    //TODO: если здесь поток приостановить на 5 сек, то форма добавления отрабатывает неверно.
     @Mapping("/getCharms")
     public List<Charm> getCharms() {
         return tableRegister.get().getCharms();
