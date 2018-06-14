@@ -5,39 +5,40 @@ import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.controller.register.AuthRegister;
 import kz.greetgo.sandbox.controller.register.TableRegister;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
 
 @Bean
-public class TableRegisterImpl implements TableRegister {
+public class ClientsRegisterImpl implements TableRegister {
 
   @Override
   public List<Charm> getCharms() {
-    return null;
+    throw new NotImplementedException();
   }
 
   @Override
-  public TableResponse getClientRecords(int start, int offset, String direction, String active, String filter) {
-    return null;
+  public TableResponse getClientRecords(QueryFilter queryFilter) {
+    throw new NotImplementedException();
   }
 
   @Override
   public ClientDetail getClientDetailsById(int clientId) {
-    return null;
+    throw new NotImplementedException();
   }
 
   @Override
   public ClientRecord addClientToSave(ClientToSave clientToSave) {
-    return null;
+    throw new NotImplementedException();
   }
 
   @Override
   public ClientRecord editClientToSave(ClientToSave client) {
-    return null;
+    throw new NotImplementedException();
   }
 
   @Override
   public void removeClientById(int clientId) {
-
+    throw new NotImplementedException();
   }
 }
