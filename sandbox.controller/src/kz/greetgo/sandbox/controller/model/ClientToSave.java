@@ -23,7 +23,7 @@ public class ClientToSave {
       ", patronymic='" + patronymic + '\'' +
       ", charm=" + charm +
       ", phones=" + phones +
-      ", birthDate=" + birthDate +
+      ", birth_date=" + birthDate +
       ", gender=" + gender +
       ", regAddress=" + regAddress +
       ", factAddress=" + factAddress +

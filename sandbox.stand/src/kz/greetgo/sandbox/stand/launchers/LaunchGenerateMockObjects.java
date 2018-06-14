@@ -8,10 +8,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static kz.greetgo.sandbox.controller.model.PhoneType.MOBILE;
@@ -130,7 +126,7 @@ public class LaunchGenerateMockObjects {
             sb.append(clientAccountTransaction.id).append(";")
                     .append(clientAccountTransaction.account).append(";")
                     .append(clientAccountTransaction.money).append(";")
-                    .append(clientAccountTransaction.finishedAt).append(";")
+                    .append(clientAccountTransaction.finished_at).append(";")
                     .append(clientAccountTransaction.type).append(";");
             printFile(sb.toString(), TRANSACTIONS);
         }
@@ -142,7 +138,7 @@ public class LaunchGenerateMockObjects {
                     .append(clientAccount.client).append(";")
                     .append(clientAccount.money).append(";")
                     .append(clientAccount.number).append(";")
-                    .append(clientAccount.registeredAt).append(";");
+                    .append(clientAccount.registered_at).append(";");
             printFile(sb.toString(), ACCOUNTS);
         }
 
@@ -174,7 +170,7 @@ public class LaunchGenerateMockObjects {
             .append(client.name).append(";")
             .append(client.patronymic).append(";")
             .append(client.gender).append(";")
-            .append(client.birthDate).append(";")
+            .append(client.birth_date).append(";")
             .append(client.charm).append(";");
             printFile(sb.toString(), CLIENTS);
         }

@@ -33,6 +33,24 @@ public class DbLoader {
     standDb.get().charmStorage.values()
       .forEach(tableTestDao.get()::insertCharm);
 
+    standDb.get().clientStorage.values()
+      .forEach(tableTestDao.get()::insertClient);
+
+    standDb.get().addressStorage.values()
+      .forEach(tableTestDao.get()::insertClientAddress);
+
+    standDb.get().phoneStorage.values()
+      .forEach(tableTestDao.get()::insertClientPhone);
+
+    standDb.get().accountStorage.values()
+      .forEach(tableTestDao.get()::insertClientAccount);
+
+    standDb.get().transactionTypeStorage.values()
+      .forEach(tableTestDao.get()::insertTransactionType);
+
+    standDb.get().transactionStorage.values()
+      .forEach(tableTestDao.get()::insertClientAccountTransation);
+
     logger.info("Finish loading test data");
   }
 }
