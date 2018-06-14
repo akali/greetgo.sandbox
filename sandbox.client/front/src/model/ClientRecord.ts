@@ -1,6 +1,3 @@
-import {CharacterType} from "./CharacterType";
-import {ClientToSave} from "./ClientToSave";
-
 function getAge(birthDate: Date): number /* int */ {
   const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();

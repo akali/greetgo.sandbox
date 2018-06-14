@@ -11,6 +11,11 @@ public class ClientPhone {
     this.type = type;
   }
 
+  public ClientPhone(String number, PhoneType type) {
+    this.number = number;
+    this.type = type;
+  }
+
   public ClientPhone() {
 
   }

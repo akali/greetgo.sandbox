@@ -4,7 +4,7 @@ import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.mvc.annotations.*;
 import kz.greetgo.sandbox.controller.model.*;
-import kz.greetgo.sandbox.controller.register.TableRegister;
+import kz.greetgo.sandbox.controller.register.ClientsRegister;
 import kz.greetgo.sandbox.controller.util.Controller;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
 @Bean
 @Mapping("/clients")
 public class ClientsController implements Controller {
-    public BeanGetter<TableRegister> tableRegister;
+    public BeanGetter<ClientsRegister> tableRegister;
 
     @ToJson
     //TODO(DONE): если здесь поток приостановить на 5 сек, то форма добавления отрабатывает неверно.

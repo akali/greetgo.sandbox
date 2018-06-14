@@ -6,14 +6,14 @@
     <changeSet author="akali" id="init-create-clients-table">
         <sql endDelimiter=";;"><![CDATA[
         create table Charm (
-            id integer primary key,
+            id serial primary key,
             name varchar(64) not null,
             description varchar(64) not null,
             energy numeric not null
         );
 
         create table Client (
-            id integer primary key,
+            id serial primary key,
             surname varchar(64) not null,
             name varchar(64) not null,
             patronymic varchar(64) not null,
@@ -40,7 +40,7 @@
         );
 
         create table ClientAccount (
-            id integer primary key,
+            id serial primary key,
             client integer references Client,
             money numeric not null,
             number varchar(64) not null,
@@ -48,13 +48,13 @@
         );
 
         create table TransactionType (
-            id integer primary key,
+            id serial primary key,
             code varchar(64) not null,
             name varchar(64) not null
         );
 
         create table ClientAccountTransaction (
-            id integer primary key,
+            id serial primary key,
             account integer references ClientAccount,
             money numeric not null,
             finished_at timestamp not null,

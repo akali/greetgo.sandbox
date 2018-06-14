@@ -3,7 +3,7 @@ package kz.greetgo.sandbox.stand.stand_register_impls;
 import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.sandbox.controller.model.*;
-import kz.greetgo.sandbox.controller.register.TableRegister;
+import kz.greetgo.sandbox.controller.register.ClientsRegister;
 import kz.greetgo.sandbox.db.stand.beans.StandDb;
 
 import java.sql.Timestamp;
@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Bean
-public class TableRegisterStand implements TableRegister {
+public class ClientsRegisterStand implements ClientsRegister {
     public BeanGetter<StandDb> standDb;
 
     private Client getClient(int clientId) {

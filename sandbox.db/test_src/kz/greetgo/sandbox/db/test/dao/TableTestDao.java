@@ -1,10 +1,13 @@
 package kz.greetgo.sandbox.db.test.dao;
 
 import kz.greetgo.sandbox.controller.model.*;
-import kz.greetgo.sandbox.db.stand.model.PersonDot;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 
 public interface TableTestDao {
+  @Delete("delete from Charm")
+  void clearCharm();
+
   @Insert("insert into Charm (id, name, description, energy) " +
     "                  values (#{id}, #{name}, #{description}, #{energy})")
   void insertCharm(Charm charm);
