@@ -17,27 +17,27 @@ public class TableRegisterImpl implements TableRegister {
   }
 
   @Override
-  public TableResponse getRecordTable(int start, int offset, String direction, String active, String filter) {
+  public TableResponse getClientRecords(int start, int offset, String direction, String active, String filter) {
     return null;
   }
 
   @Override
-  public ClientDetail getClientDetail(int clientId) {
+  public ClientDetail getClientDetailsById(int clientId) {
     return null;
   }
 
   @Override
-  public ClientRecord addClient(ClientToSave clientToSave) {
+  public ClientRecord addClientToSave(ClientToSave clientToSave) {
     return null;
   }
 
   @Override
-  public ClientRecord editClient(ClientToSave client) {
+  public ClientRecord editClientToSave(ClientToSave client) {
     return null;
   }
 
   @Override
-  public void removeClient(int clientId) {
+  public void removeClientById(int clientId) {
 
   }
 }

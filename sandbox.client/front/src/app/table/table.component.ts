@@ -85,7 +85,7 @@ export class TableComponent implements OnInit, AfterViewInit {
     client.id = -1;
     client.phones = [];
     client.phones.push(new ClientPhone(-1, "", PhoneType.MOBILE));
-    this.httpService.get("/table/getCharms").toPromise().then(value => {
+    this.httpService.get("/clients/getCharms").toPromise().then(value => {
       client.setCharms(value.json());
       this.clientDialogRef = this.dialog.open(ClientDialogComponent, {
         data: {
@@ -100,7 +100,7 @@ export class TableComponent implements OnInit, AfterViewInit {
         let clientToSave = value;
         console.log(JSON.stringify(clientToSave));
 
-        this.httpService.post("/table/add", {
+        this.httpService.post("/clients/addClientToSave", {
           clientToSave: JSON.stringify(clientToSave)
         }).subscribe(result => {
           console.log(result.json());
@@ -115,7 +115,7 @@ export class TableComponent implements OnInit, AfterViewInit {
   }
 
   onClientRemove() {
-    this.httpService.post("/table/remove", {
+    this.httpService.post("/clients/removeClientById", {
       clientId: this.selectedClientId
     }).toPromise().then(value => {
       console.log(this.selectedClient);
@@ -126,7 +126,7 @@ export class TableComponent implements OnInit, AfterViewInit {
   }
 
   onClientEdit() {
-    this.httpService.post("/table/detail", {
+    this.httpService.post("/clients/getClientDetailsById", {
       clientId: this.selectedClientId
     }).subscribe(value => {
       let client = ClientDetail.copy(value.json());
@@ -145,7 +145,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 
         console.log('sending to REST', JSON.stringify(clientToSave));
 
-        this.httpService.post("/table/edit", {
+        this.httpService.post("/clients/editClientToSave", {
           clientToSave: JSON.stringify(clientToSave)
         }).subscribe(result => {
           console.log(result.json());

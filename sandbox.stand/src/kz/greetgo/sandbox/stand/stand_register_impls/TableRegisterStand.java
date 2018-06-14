@@ -36,9 +36,14 @@ public class TableRegisterStand implements TableRegister {
     }
 
     @Override
-    public TableResponse getRecordTable(int start, int offset, String direction, String action, String filter) {
+    public TableResponse getClientRecords(QueryFilter queryFilter) {
+        int start = queryFilter.start;
+        int offset = queryFilter.limit;
+        String direction = queryFilter.direction;
+        String active = queryFilter.active;
+        String filter = queryFilter.filter;
         System.out.println("start: " + start + "; " + "offset: " + offset);
-        System.out.println("direction: " + direction + "; " + "action: " + action);
+        System.out.println("direction: " + direction + "; " + "active: " + active);
         List<ClientRecord> list = new ArrayList<>();
 
         Map<String, Client> map = standDb.get().clientStorage;
@@ -53,7 +58,7 @@ public class TableRegisterStand implements TableRegister {
         System.out.println(Arrays.toString(list.stream()
           .filter(clientRecord -> filter == null || clientRecord.getCombinedString().contains(filter)).toArray()));
 
-        return new TableResponse(list, start, offset, direction, action, filter);
+        return new TableResponse(list, start, offset, direction, active, filter);
     }
 
     public static int calculateAge(long birthDateTs) {
@@ -66,7 +71,7 @@ public class TableRegisterStand implements TableRegister {
 
 
     @Override
-    public ClientDetail getClientDetail(int clientId) {
+    public ClientDetail getClientDetailsById(int clientId) {
         Client client = getClient(clientId);
 
         ClientDetail clientDetail = new ClientDetail();
@@ -116,7 +121,7 @@ public class TableRegisterStand implements TableRegister {
     }
 
     @Override
-    public ClientRecord addClient(ClientToSave clientToSave) {
+    public ClientRecord addClientToSave(ClientToSave clientToSave) {
         System.err.println(clientToSave);
         if (!verify(clientToSave))
             throw new RuntimeException("Incorrect data");
@@ -132,7 +137,7 @@ public class TableRegisterStand implements TableRegister {
     }
 
     @Override
-    public ClientRecord editClient(ClientToSave clientToSave) {
+    public ClientRecord editClientToSave(ClientToSave clientToSave) {
         System.err.println(clientToSave);
         if (!verify(clientToSave))
             throw new RuntimeException("Incorrect data");
@@ -173,7 +178,7 @@ public class TableRegisterStand implements TableRegister {
     }
 
     @Override
-    public void removeClient(int clientId) {
+    public void removeClientById(int clientId) {
         standDb.get().clientStorage.remove(String.valueOf(clientId));
     }
 }

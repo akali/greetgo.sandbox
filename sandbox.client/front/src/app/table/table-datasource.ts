@@ -5,6 +5,7 @@ import {ClientRecord} from "../../model/ClientRecord";
 import {HttpService} from "../HttpService";
 import {TableResponse} from "./TableResponse";
 import {ActionType} from "./client-dialog/actionType";
+import {QueryFilter} from "../../model/QueryFilter";
 
 export class TableDatasource extends DataSource<ClientRecord> {
   data: ClientRecord[] = [];
@@ -27,12 +28,8 @@ export class TableDatasource extends DataSource<ClientRecord> {
   }
 
   public load(pageIndex = 0, pageSize = 1, sortDirection = 'ASC', active = 'name', filter: string) {
-    this.httpService.post("/table/get", {
-      start: pageSize * pageIndex,
-      limit: pageSize,
-      sort: sortDirection,
-      active: active,
-      filter: filter
+    this.httpService.post("/clients/getClientRecords", {
+      queryFilter: JSON.stringify(new QueryFilter(pageSize * pageIndex, pageSize, sortDirection, active, filter))
     }).subscribe(clients => {
       let tableResponse = TableResponse.copy(clients.json());
       console.log(tableResponse.list);

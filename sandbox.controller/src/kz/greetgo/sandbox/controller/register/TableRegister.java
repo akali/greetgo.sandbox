@@ -7,11 +7,11 @@ import java.util.List;
 //TODO: поменяй название интерфейся и соответственно всех классов, которые имплементируют его.
 public interface TableRegister {
     List<Charm> getCharms();
-    TableResponse getRecordTable(int start, int offset, String direction, String active, String filter);
-    ClientDetail getClientDetail(int clientId);
+    TableResponse getClientRecords(QueryFilter queryFilter);
+    ClientDetail getClientDetailsById(int clientId);
 
-    ClientRecord addClient(ClientToSave clientToSave);
-    ClientRecord editClient(ClientToSave client);
+    ClientRecord addClientToSave(ClientToSave clientToSave);
+    ClientRecord editClientToSave(ClientToSave client);
 
-    void removeClient(int clientId);
+    void removeClientById(int clientId);
 }
