@@ -27,7 +27,12 @@ export class TableDatasource extends DataSource<ClientRecord> {
     this.clientsSubject.complete();
   }
 
-  public load(pageIndex = 0, pageSize = 1, sortDirection = 'ASC', active = 'name', filter: string) {
+  public load(
+    pageIndex = 0,
+    pageSize = 1,
+    sortDirection = 'ASC',
+    active = 'name',
+    filter: string) {
     this.httpService.post("/clients/getClientRecords", {
       queryFilter: JSON.stringify(new QueryFilter(pageSize * pageIndex, pageSize, sortDirection, active, filter))
     }).subscribe(clients => {

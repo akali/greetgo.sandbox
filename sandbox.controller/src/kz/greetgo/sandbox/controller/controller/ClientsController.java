@@ -16,11 +16,15 @@ import java.util.List;
 public class ClientsController implements Controller {
     public BeanGetter<TableRegister> tableRegister;
 
-
     @ToJson
-    //TODO: если здесь поток приостановить на 5 сек, то форма добавления отрабатывает неверно.
+    //TODO(DONE): если здесь поток приостановить на 5 сек, то форма добавления отрабатывает неверно.
     @Mapping("/getCharms")
     public List<Charm> getCharms() {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return tableRegister.get().getCharms();
     }
 

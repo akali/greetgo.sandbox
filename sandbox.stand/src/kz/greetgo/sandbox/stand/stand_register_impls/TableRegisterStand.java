@@ -20,9 +20,14 @@ public class TableRegisterStand implements TableRegister {
     }
 
     @Override
-    public List<Charm> getCharms() {
+    public List<Charm>  getCharms() {
         List<Charm> list = new ArrayList<>();
         Map<String, Charm> map = standDb.get().charmStorage;
+//        try {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         for (String key : map.keySet())
             list.add(map.get(key));
         return list;
@@ -53,7 +58,6 @@ public class TableRegisterStand implements TableRegister {
             ClientRecord result = getClientRecord(client.id);
             list.add(result);
         }
-
 
         System.out.println(Arrays.toString(list.stream()
           .filter(clientRecord -> filter == null || clientRecord.getCombinedString().contains(filter)).toArray()));

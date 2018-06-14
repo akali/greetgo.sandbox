@@ -4,15 +4,13 @@ import {TableDatasource} from './table-datasource';
 import {HttpService} from "../HttpService";
 import {ClientRecord} from "../../model/ClientRecord";
 import {debounceTime, distinctUntilChanged, tap} from "rxjs/operators";
-import {BehaviorSubject, fromEvent, merge, ReplaySubject} from "rxjs";
+import {BehaviorSubject, fromEvent, merge} from "rxjs";
 import {ClientDialogComponent} from "./client-dialog/clientDialog.component";
 import {ClientDetail} from "../../model/ClientDetail";
-import {ClientAddress} from "../../model/ClientAddress";
-import {AddressType} from "../../model/AddressType";
 import {PhoneType} from "../../model/PhoneType";
 import {ClientPhone} from "../../model/ClientPhone";
-import {ClientToSave} from "../../model/ClientToSave";
 import {ActionType} from "./client-dialog/actionType";
+import {Charm} from "../../model/Charm";
 
 @Component({
   selector: 'table-component',
@@ -31,6 +29,9 @@ export class TableComponent implements OnInit, AfterViewInit {
   displayedColumns = ['name', 'charm', 'age', 'total', 'max', 'min'];
   INIT_PAGE_SIZE = 5;
   PAGE_SIZE_OPTIONS = [1, 2, 5, 50];
+
+  private charmsStorage: Charm[] = undefined;
+
   private toReload = new BehaviorSubject(undefined);
 
   constructor(private httpService: HttpService, private dialog: MatDialog) {}
@@ -79,14 +80,34 @@ export class TableComponent implements OnInit, AfterViewInit {
   clientDialogRef: MatDialogRef<ClientDialogComponent>;
   selectedClientId = -1;
   selectedClient: ClientRecord;
+  loading = false;
 
   onClientAdd() {
     let client = new ClientDetail();
     client.id = -1;
     client.phones = [];
     client.phones.push(new ClientPhone(-1, "", PhoneType.MOBILE));
-    this.httpService.get("/clients/getCharms").toPromise().then(value => {
-      client.setCharms(value.json());
+
+    this.loading = true;
+
+    if (this.charmsStorage !== undefined) {
+      client.setCharms(this.charmsStorage);
+      this.openDialog(ActionType.CREATE, client);
+    } else {
+      this.httpService.get("/clients/getCharms").toPromise().then(value => {
+        this.charmsStorage = value.json();
+        client.setCharms(this.charmsStorage);
+
+        this.openDialog(ActionType.CREATE, client);
+      }, error => {
+        console.log(error);
+      });
+    }
+  }
+
+  private openDialog(type: ActionType, client: ClientDetail) {
+    this.loading = false;
+    if (type == ActionType.CREATE) {
       this.clientDialogRef = this.dialog.open(ClientDialogComponent, {
         data: {
           client: ClientDetail.copy(client),
@@ -109,27 +130,8 @@ export class TableComponent implements OnInit, AfterViewInit {
           console.log(error.json());
         });
       });
-    }, error => {
-      console.log(error);
-    });
-  }
-
-  onClientRemove() {
-    this.httpService.post("/clients/removeClientById", {
-      clientId: this.selectedClientId
-    }).toPromise().then(value => {
-      console.log(this.selectedClient);
-      this.toReload.next({action: ActionType.REMOVE, client: this.selectedClient});
-    }).catch(reason => {
-      console.log(reason);
-    });
-  }
-
-  onClientEdit() {
-    this.httpService.post("/clients/getClientDetailsById", {
-      clientId: this.selectedClientId
-    }).subscribe(value => {
-      let client = ClientDetail.copy(value.json());
+    }
+    if (type == ActionType.EDIT) {
       this.clientDialogRef = this.dialog.open(ClientDialogComponent,
         {
           data: {
@@ -155,6 +157,26 @@ export class TableComponent implements OnInit, AfterViewInit {
         });
 
       });
+    }
+  }
+
+  onClientRemove() {
+    this.httpService.post("/clients/removeClientById", {
+      clientId: this.selectedClientId
+    }).toPromise().then(value => {
+      console.log(this.selectedClient);
+      this.toReload.next({action: ActionType.REMOVE, client: this.selectedClient});
+    }).catch(reason => {
+      console.log(reason);
+    });
+  }
+
+  onClientEdit() {
+    this.loading = true;
+    this.httpService.post("/clients/getClientDetailsById", {
+      clientId: this.selectedClientId
+    }).subscribe(value => {
+      this.openDialog(ActionType.EDIT, ClientDetail.copy(value.json()));
     }, error => {
       alert(error);
     });

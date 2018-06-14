@@ -2,3 +2,13 @@
   background: #42A948; /* green */
 }
 
+.wrapper {
+  height: inherit;
+  width: 100%;
+  padding-left: 45%;
+  position: relative;
+}
+
+.center {
+  position: absolute;
+}
