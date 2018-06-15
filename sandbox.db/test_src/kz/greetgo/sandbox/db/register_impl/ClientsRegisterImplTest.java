@@ -3,16 +3,13 @@ package kz.greetgo.sandbox.db.register_impl;
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.controller.register.ClientsRegister;
-import kz.greetgo.sandbox.db.test.dao.TableTestDao;
+import kz.greetgo.sandbox.db.test.dao.ClientsTestDao;
 import kz.greetgo.sandbox.db.test.util.ParentTestNg;
 import kz.greetgo.sandbox.db.util.DBHelper;
-import liquibase.database.PreparedStatementFactory;
-import liquibase.database.jvm.JdbcConnection;
 import org.apache.ibatis.jdbc.SQL;
 import org.testng.annotations.Test;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.*;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -20,52 +17,29 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 public class ClientsRegisterImplTest extends ParentTestNg {
 
-  public BeanGetter<TableTestDao> tableTestDao;
+  public BeanGetter<ClientsTestDao> tableTestDao;
   public BeanGetter<ClientsRegister> clientsRegister;
 
   @Test
   public void testGetCharms() {
-    DBHelper.run(connection -> {
-      List<Charm> charms = new ArrayList<>();
-
-      charms.add(new Charm("HAPPY", "VERY HAPPY PERSON", (float) 0.5));
-
-      for (Charm charm : charms) {
-        PreparedStatement st = new PreparedStatementFactory(new JdbcConnection(connection)).create(new SQL()
-          .DELETE_FROM("charm")
-          .WHERE("name=?", "description=?", "energy=?").toString()
-        );
-        st.setString(1, charm.name);
-        st.setString(2, charm.description);
-        st.setFloat(3, charm.energy);
-
-        System.out.println(st.executeUpdate());
-
-        PreparedStatement stat = connection.prepareStatement(
-          new SQL()
-            .INSERT_INTO("charm")
-            .VALUES("name, description, energy", "?,?,?")
-            .toString()
-        );
-        stat.setString(1, charm.name);
-        stat.setString(2, charm.description);
-        stat.setFloat(3, charm.energy);
-        stat.execute();
-      }
-
-      //
-      //
-      List<Charm> testCharms = clientsRegister.get().getCharms();
-      //
-      //
-
-      assertThat(testCharms).isNotNull();
-      assertThat(testCharms).containsAll(charms);
-    });
+    List<Charm> charms = new ArrayList<>();
+    charms.add(new Charm("HAPPY", "VERY HAPPY PERSON", (float) 0.5));
+    tableTestDao.get().clearCharm();
+    charms.forEach(tableTestDao.get()::insertCharm);
+    List<Charm> testCharms = clientsRegister.get().getCharms();
+    assertThat(testCharms).isNotNull();
+    assertThat(testCharms).containsAll(charms);
+    System.out.println(testCharms);
   }
 
   @Test
   public void testGetClientRecords() {
+    //
+    //
+    TableResponse result = clientsRegister.get()
+      .getClientRecords(new QueryFilter(0, 100, "DESC", "name", ""));
+    //
+    //
   }
 
   @Test

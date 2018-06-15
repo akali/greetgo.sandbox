@@ -12,6 +12,17 @@ public class QueryFilter {
     this.filter = filter;
   }
 
+  @Override
+  public String toString() {
+    return "QueryFilter{" +
+      "start=" + start +
+      ", limit=" + limit +
+      ", direction='" + direction + '\'' +
+      ", active='" + active + '\'' +
+      ", filter='" + filter + '\'' +
+      '}';
+  }
+
   public QueryFilter() {
   }
 }

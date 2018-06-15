@@ -6,7 +6,7 @@ import kz.greetgo.sandbox.db.register_impl.TokenRegister;
 import kz.greetgo.sandbox.db.test.dao.AuthTestDao;
 import kz.greetgo.sandbox.db.stand.beans.StandDb;
 import kz.greetgo.sandbox.db.stand.model.PersonDot;
-import kz.greetgo.sandbox.db.test.dao.TableTestDao;
+import kz.greetgo.sandbox.db.test.dao.ClientsTestDao;
 import org.apache.log4j.Logger;
 
 import java.util.function.Function;
@@ -18,7 +18,7 @@ public class DbLoader {
   public BeanGetter<StandDb> standDb;
   public BeanGetter<AuthTestDao> authTestDao;
   public BeanGetter<TokenRegister> tokenManager;
-  public BeanGetter<TableTestDao> tableTestDao;
+  public BeanGetter<ClientsTestDao> tableTestDao;
 
   public void loadTestData() {
     logger.info("Start loading test data...");
@@ -49,7 +49,7 @@ public class DbLoader {
       .forEach(tableTestDao.get()::insertTransactionType);
 
     standDb.get().transactionStorage.values()
-      .forEach(tableTestDao.get()::insertClientAccountTransation);
+      .forEach(tableTestDao.get()::insertClientAccountTransaction);
 
     logger.info("Finish loading test data");
   }

@@ -4,7 +4,7 @@ import kz.greetgo.sandbox.controller.model.*;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 
-public interface TableTestDao {
+public interface ClientsTestDao {
   @Delete("delete from Charm")
   void clearCharm();
 
@@ -34,5 +34,5 @@ public interface TableTestDao {
 
   @Insert("insert into ClientAccountTransaction (id, account, money, finished_at, type)" +
     "values (#{id}, #{account}, #{money}, #{finished_at}, #{type})")
-  void insertClientAccountTransation(ClientAccountTransaction transaction);
+  void insertClientAccountTransaction(ClientAccountTransaction transaction);
 }

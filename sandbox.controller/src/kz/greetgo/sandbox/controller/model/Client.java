@@ -9,6 +9,9 @@ public class Client {
   public String name;
   public String patronymic;
   public GenderType gender;
+  public Date birth_date;
+  public int charm;
+
 
   public Client(int id, String surname, String name, String patronymic, GenderType gender, Date birth_date, int charm) {
     this.id = id;
@@ -19,9 +22,6 @@ public class Client {
     this.birth_date = birth_date;
     this.charm = charm;
   }
-
-  public Date birth_date;
-  public int charm;
 
   public Client(int id, String surname, String name, String patronymic, GenderType gender, Timestamp birth_date, int charm) {
     this.id = id;
@@ -56,7 +56,7 @@ public class Client {
       client.gender = GenderType.MALE;
     else
       client.gender = GenderType.FEMALE;
-    client.birth_date = new Timestamp(Long.parseLong(line[5]));
+    client.birth_date = new Date(Long.parseLong(line[5]));
     client.charm = Integer.parseInt(line[6]);
 
     return client;
