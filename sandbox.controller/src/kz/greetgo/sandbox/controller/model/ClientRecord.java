@@ -40,7 +40,18 @@ public class ClientRecord {
       .toLowerCase();
   }
 
+  @Override
   public String toString() {
-    return getCombinedString();
+    return "ClientRecord{" +
+      "id=" + id +
+      ", name='" + name + '\'' +
+      ", surname='" + surname + '\'' +
+      ", patronymic='" + patronymic + '\'' +
+      ", total=" + total +
+      ", max=" + max +
+      ", min=" + min +
+      ", charm='" + charm + '\'' +
+      ", age=" + age +
+      '}';
   }
 }

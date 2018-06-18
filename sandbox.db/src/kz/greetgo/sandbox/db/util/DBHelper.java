@@ -6,23 +6,21 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class DBHelper {
+public class DBHelper <T> {
 
-  public interface Runnable {
-    void run(Connection connection) throws SQLException, DatabaseException;
+  public interface Runnable <T> {
+    T run(Connection connection) throws SQLException, DatabaseException;
   }
 
-  public static void run(Runnable runnable) {
+  public T run(Runnable<T> runnable) throws DatabaseException, SQLException {
     try (Connection conn = DriverManager.getConnection(
       "jdbc:postgresql://localhost/aqali_sandbox",
       "aqali_sandbox",
       "111"
     )) {
-//      conn.setAutoCommit(false);
-      runnable.run(conn);
-//      conn.commit();
+      return runnable.run(conn);
     } catch (SQLException | DatabaseException e) {
-      e.printStackTrace();
+      throw e;
     }
   }
 }

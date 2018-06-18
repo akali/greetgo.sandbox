@@ -6,26 +6,28 @@ import kz.greetgo.sandbox.controller.register.ClientsRegister;
 import kz.greetgo.sandbox.db.test.dao.ClientsTestDao;
 import kz.greetgo.sandbox.db.test.util.ParentTestNg;
 import kz.greetgo.sandbox.db.util.DBHelper;
+import liquibase.exception.DatabaseException;
 import org.apache.ibatis.jdbc.SQL;
 import org.testng.annotations.Test;
 
 import java.sql.*;
 import java.util.*;
+import java.util.stream.IntStream;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
 
 public class ClientsRegisterImplTest extends ParentTestNg {
 
-  public BeanGetter<ClientsTestDao> tableTestDao;
+  public BeanGetter<ClientsTestDao> clientsTestDao;
   public BeanGetter<ClientsRegister> clientsRegister;
 
   @Test
   public void testGetCharms() {
     List<Charm> charms = new ArrayList<>();
     charms.add(new Charm("HAPPY", "VERY HAPPY PERSON", (float) 0.5));
-    tableTestDao.get().clearCharm();
-    charms.forEach(tableTestDao.get()::insertCharm);
+    clientsTestDao.get().clearCharm();
+    charms.forEach(clientsTestDao.get()::insertCharm);
     List<Charm> testCharms = clientsRegister.get().getCharms();
     assertThat(testCharms).isNotNull();
     assertThat(testCharms).containsAll(charms);
@@ -34,15 +36,21 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
   @Test
   public void testGetClientRecords() {
+
     //
     //
     TableResponse result = clientsRegister.get()
       .getClientRecords(new QueryFilter(0, 100, "DESC", "name", ""));
     //
     //
+
+    System.out.println(result.list);
+
+    assertThat(result.list).isNotNull();
+    assertThat(result.list).isNotEmpty();
   }
 
-  @Test
+   @Test
   public void testGetClientDetailsById() {
   }
 
@@ -59,59 +67,75 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     return cal.getTimeInMillis();
   }
 
-  @Test
-  public void testAddClientToSave() {
+  private void insertTestingCharms() {
+    clientsTestDao.get().clearCharm();
+    for (int i = 1; i <= 10; ++i) {
+      Charm charm = new Charm(i, generateString(10), generateString(24), (float) 0.9);
+      clientsTestDao.get().insertCharm(charm);
+    }
+  }
+
+  private ArrayList<ClientToSave> insertTestingClients() {
     ClientToSave clientToSave =
-      new ClientToSave("Yerbolat", "Ablemetov", "Askarovich", 1, GenderType.MALE,
+      new ClientToSave(1, "Yerbolat", "Ablemetov", "Askarovich", 1, GenderType.MALE,
         new ClientAddress(
-          AddressType.REG, "Seyfullina", "13a", "23"
+          1, AddressType.REG, "Seyfullina", "13a", "23"
         ),
         new ClientAddress(
-          AddressType.FACT, "Bekturova", "23", null
+          1, AddressType.FACT, "Bekturova", "23", null
         ),
         getTimestamp(12, 1, 1998),
         Arrays.asList(
-          new ClientPhone("+77473105484", PhoneType.MOBILE),
-          new ClientPhone("+77273518547", PhoneType.HOME)
+          new ClientPhone(1, "+77473105484", PhoneType.MOBILE),
+          new ClientPhone(1, "+77273518547", PhoneType.HOME)
         )
       );
-    Client clientToSaveClientCopy =
-      new Client(
-        -1,
-        clientToSave.surname,
-        clientToSave.name,
-        clientToSave.patronymic,
-        clientToSave.gender,
-        clientToSave.birthDate,
-        clientToSave.charm
-      );
+    clientsTestDao.get().clearClient();
+    clientsTestDao.get().clearClientAddress();
+    clientsTestDao.get().clearClientPhone();
+
+    clientsTestDao.get().insertClient(clientToSave.getClientCopy());
+    clientsTestDao.get().insertClientAddress(clientToSave.regAddress);
+    clientsTestDao.get().insertClientAddress(clientToSave.factAddress);
+    clientToSave.phones.forEach(clientsTestDao.get()::insertClientPhone);
+    ArrayList<ClientToSave> clients = new ArrayList<>();
+    clients.add(clientToSave);
+    return clients;
+  }
+
+  private final String sigma = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
+
+  private String generateString(int len) {
+    Random rnd = new Random();
+    StringBuilder sb = new StringBuilder();
+    IntStream.range(0, len).forEach(i -> sb.append(sigma.charAt(rnd.nextInt(sigma.length()))));
+    return sb.toString();
+  }
+
+  @Test
+  public void testAddClientToSave() {
+    insertTestingCharms();
+    ArrayList<ClientToSave> clients = insertTestingClients();
+    ArrayList<ClientRecord> recordClients = new ArrayList<>();
 
     //
     //
-    ClientRecord clientRecord = clientsRegister.get().addClientToSave(clientToSave);
+    clients.forEach(client -> recordClients.add(clientsRegister.get().addClientToSave(client)));
     //
     //
+    {
+      for (int i = 0; i < recordClients.size(); i++) {
+        ClientRecord client = recordClients.get(i);
 
-    DBHelper.run(connection -> {
-      PreparedStatement statement = connection.prepareStatement(
-        new SQL()
-          .SELECT("id", "surname", "name", "patronymic", "gender", "birth_date", "charm")
-          .FROM("client")
-          .WHERE("id=?")
-          .toString()
-      );
-      statement.setInt(1, clientRecord.id);
-
-      ResultSet rs = statement.executeQuery();
-      List<Client> clients = new ArrayList<>();
-      while (rs.next()) {
-        clients.add(new Client(rs.getInt("id"), rs.getString("surname"), rs.getString("name"),
-          rs.getString("patronymic"), GenderType.valueOf(rs.getString("gender")), rs.getLong("birth_date"), rs.getInt("charm")));
+        assertThat(client).equals(clientsTestDao.get().getRecordClientById(client.id));
       }
-      assertThat(clients).hasSize(1);
-      assertThat(clients.get(0)).isNotNull();
-      assertThat(clients.get(0)).equals(clientToSaveClientCopy);
-    });
+    }
+  }
+
+  @Test
+  public void test() {
+    System.out.println(GetClientDetails.getClientDetailsById(3));
+//    System.out.println(clientsTestDao.get().getRecordClientById(1));
   }
 
   @Test
@@ -125,7 +149,7 @@ public class ClientsRegisterImplTest extends ParentTestNg {
       toRemove = new ArrayList<>();
 
     for (Client client : clients)
-      tableTestDao.get().insertClient(client);
+      clientsTestDao.get().insertClient(client);
 
     Random rnd = new Random();
 
@@ -141,58 +165,8 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     //
 
     toRemove.forEach(client -> {
-//      assertThat(tableTestDao.get().getClient(client.id)).isNullOrEmpty();
+//      assertThat(clientsTestDao.get().getClient(client.id)).isNullOrEmpty();
     });
 
-  }
-
-  @Test
-  public void test() {
-    try (Connection conn = DriverManager.getConnection(
-      "jdbc:postgresql://localhost/aqali_sandbox",
-      "aqali_sandbox",
-      "111"
-    )) {
-
-      conn.setAutoCommit(false);
-      PreparedStatement statement =
-        conn.prepareStatement("insert into charm values (?,?,?,?);");
-
-      statement.setInt(1, 7);
-      statement.setString(2, "GOOD");
-      statement.setString(3, "SODOOG");
-      statement.setDouble(4, 2.5);
-
-      statement.execute();
-
-      ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM Charm");
-
-      while (rs.next()) {
-        System.out.println(rs.getRow() + ". " + rs.getString("id")
-          + "\t" + rs.getString("name")
-          + "\t" + rs.getString("description")
-          + "\t" + rs.getString("energy")
-        );
-      }
-
-//      statement = conn.createStatement();
-      System.out.println(statement.execute("delete from charm where id=3"));
-
-//      statement = conn.createStatement();
-      rs = statement.executeQuery("SELECT * FROM Charm");
-
-      while (rs.next()) {
-        System.out.println(rs.getRow() + ". " + rs.getString("id")
-          + "\t" + rs.getString("name")
-          + "\t" + rs.getString("description")
-          + "\t" + rs.getString("energy")
-        );
-      }
-
-      // statement.execute("delete * from Charm;");
-      conn.commit();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
   }
 }
