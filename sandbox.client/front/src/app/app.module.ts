@@ -17,6 +17,7 @@ import {
   MatRippleModule,
   MatSelectModule,
   MatNativeDateModule,
+  MatProgressSpinnerModule,
 } from '@angular/material';
 import {LoginComponent} from "./input/login.component";
 import {HttpService} from "./HttpService";
@@ -48,6 +49,7 @@ import {ClientDialogComponent} from "./table/client-dialog/clientDialog.componen
     MatInputModule,
     HttpModule,
     JsonpModule,
+    MatProgressSpinnerModule,
     FormsModule,
     ReactiveFormsModule,
     MatRippleModule,

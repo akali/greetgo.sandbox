@@ -3,7 +3,7 @@ package kz.greetgo.sandbox.stand.stand_register_impls;
 import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.sandbox.controller.model.*;
-import kz.greetgo.sandbox.controller.register.TableRegister;
+import kz.greetgo.sandbox.controller.register.ClientsRegister;
 import kz.greetgo.sandbox.db.stand.beans.StandDb;
 
 import java.sql.Timestamp;
@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Bean
-public class TableRegisterStand implements TableRegister {
+public class ClientsRegisterStand implements ClientsRegister {
     public BeanGetter<StandDb> standDb;
 
     private Client getClient(int clientId) {
@@ -20,9 +20,14 @@ public class TableRegisterStand implements TableRegister {
     }
 
     @Override
-    public List<Charm> getCharms() {
+    public List<Charm>  getCharms() {
         List<Charm> list = new ArrayList<>();
         Map<String, Charm> map = standDb.get().charmStorage;
+//        try {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         for (String key : map.keySet())
             list.add(map.get(key));
         return list;
@@ -36,9 +41,14 @@ public class TableRegisterStand implements TableRegister {
     }
 
     @Override
-    public TableResponse getRecordTable(int start, int offset, String direction, String action, String filter) {
+    public TableResponse getClientRecords(QueryFilter queryFilter) {
+        int start = queryFilter.start;
+        int offset = queryFilter.limit;
+        String direction = queryFilter.direction;
+        String active = queryFilter.active;
+        String filter = queryFilter.filter;
         System.out.println("start: " + start + "; " + "offset: " + offset);
-        System.out.println("direction: " + direction + "; " + "action: " + action);
+        System.out.println("direction: " + direction + "; " + "active: " + active);
         List<ClientRecord> list = new ArrayList<>();
 
         Map<String, Client> map = standDb.get().clientStorage;
@@ -49,11 +59,10 @@ public class TableRegisterStand implements TableRegister {
             list.add(result);
         }
 
-
         System.out.println(Arrays.toString(list.stream()
           .filter(clientRecord -> filter == null || clientRecord.getCombinedString().contains(filter)).toArray()));
 
-        return new TableResponse(list, start, offset, direction, action, filter);
+        return new TableResponse(list, start, offset, direction, active, filter);
     }
 
     public static int calculateAge(long birthDateTs) {
@@ -66,7 +75,7 @@ public class TableRegisterStand implements TableRegister {
 
 
     @Override
-    public ClientDetail getClientDetail(int clientId) {
+    public ClientDetail getClientDetailsById(int clientId) {
         Client client = getClient(clientId);
 
         ClientDetail clientDetail = new ClientDetail();
@@ -75,7 +84,7 @@ public class TableRegisterStand implements TableRegister {
         clientDetail.surname = client.surname;
         clientDetail.patronymic = client.patronymic;
         clientDetail.gender = client.gender;
-        clientDetail.birthDate = client.birthDate.getTime();
+        clientDetail.birthDate = client.birth_date.getTime();
         clientDetail.charm = standDb.get().charmStorage.get(String.valueOf(client.charm));
 
         standDb.get().addressStorage.values().stream()
@@ -101,7 +110,7 @@ public class TableRegisterStand implements TableRegister {
         client.surname = clientToSave.surname;
         client.name = clientToSave.name;
         client.patronymic = clientToSave.patronymic;
-        client.birthDate = new Timestamp(clientToSave.birthDate);
+        client.birth_date = new Timestamp(clientToSave.birthDate);
         client.gender = clientToSave.gender;
         client.charm = clientToSave.charm;
 
@@ -116,7 +125,7 @@ public class TableRegisterStand implements TableRegister {
     }
 
     @Override
-    public ClientRecord addClient(ClientToSave clientToSave) {
+    public ClientRecord addClientToSave(ClientToSave clientToSave) {
         System.err.println(clientToSave);
         if (!verify(clientToSave))
             throw new RuntimeException("Incorrect data");
@@ -132,7 +141,7 @@ public class TableRegisterStand implements TableRegister {
     }
 
     @Override
-    public ClientRecord editClient(ClientToSave clientToSave) {
+    public ClientRecord editClientToSave(ClientToSave clientToSave) {
         System.err.println(clientToSave);
         if (!verify(clientToSave))
             throw new RuntimeException("Incorrect data");
@@ -158,7 +167,7 @@ public class TableRegisterStand implements TableRegister {
         result.name = result.name + " " + result.surname;
         if (result.patronymic != null)
             result.name += " " + result.patronymic;
-        result.age = calculateAge(client.birthDate.getTime());
+        result.age = calculateAge(client.birth_date.getTime());
         return result;
     }
 
@@ -173,7 +182,7 @@ public class TableRegisterStand implements TableRegister {
     }
 
     @Override
-    public void removeClient(int clientId) {
+    public void removeClientById(int clientId) {
         standDb.get().clientStorage.remove(String.valueOf(clientId));
     }
 }

@@ -1,5 +1,6 @@
 package kz.greetgo.sandbox.controller.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,7 +20,7 @@ public class TableResponse {
               result = t1.name.compareTo(t2.name);
               break;
             case "total":
-              result = Integer.compare(t1.total, t2.total);
+              result = Float.compare(t1.total, t2.total);
               break;
             case "max":
               result = Float.compare(t1.max, t2.max);
@@ -43,5 +44,8 @@ public class TableResponse {
         }).collect(Collectors.toList());
     this.size = (int) total.size();
     this.list = total.stream().skip(start).limit(offset).collect(Collectors.toList());
+  }
+  public TableResponse() {
+    list = new ArrayList<>();
   }
 }

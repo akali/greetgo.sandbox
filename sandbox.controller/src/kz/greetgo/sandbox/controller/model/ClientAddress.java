@@ -15,6 +15,13 @@ public class ClientAddress {
     this.flat = flat;
   }
 
+  public ClientAddress(AddressType type, String street, String house, String flat) {
+    this.type = type;
+    this.street = street;
+    this.house = house;
+    this.flat = flat;
+  }
+
   public ClientAddress(){}
 
   public static ClientAddress parse(String[] line) {

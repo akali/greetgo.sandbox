@@ -3,5 +3,5 @@ export class ClientAccount {
     public client: number /* int */;
     public money: number /* float */;
     public number: string;
-    public registeredAt: number /* long */;
+    public registered_at: number /* long */;
 }

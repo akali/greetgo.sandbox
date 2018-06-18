@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet author="akali" id="init-create-clients-table">
+        <sql endDelimiter=";;"><![CDATA[
+        create table Charm (
+            id serial primary key,
+            name varchar(64) not null,
+            description varchar(64) not null,
+            energy numeric not null
+        );
+
+        create table Client (
+            id serial primary key,
+            surname varchar(64) not null,
+            name varchar(64) not null,
+            patronymic varchar(64) not null,
+            gender varchar(64) not null,
+            birth_date date not null,
+            charm integer references Charm on delete cascade
+        );
+
+        create table ClientAddress (
+            client integer references Client on delete cascade,
+            type varchar(64) not null,
+
+            street varchar(64),
+            house varchar(64),
+            flat varchar(64),
+            primary key(client, type)
+        );
+
+        create table ClientPhone (
+            client integer references Client on delete cascade,
+            number varchar(64) not null,
+            type varchar(64) not null,
+            primary key(client, number)
+        );
+
+        create table ClientAccount (
+            id serial primary key,
+            client integer references Client on delete cascade,
+            money numeric not null,
+            number varchar(64) not null,
+            registered_at timestamp not null
+        );
+
+        create table TransactionType (
+            id serial primary key,
+            code varchar(64) not null,
+            name varchar(64) not null
+        );
+
+        create table ClientAccountTransaction (
+            id serial primary key,
+            account integer references ClientAccount on delete cascade,
+            money numeric not null,
+            finished_at timestamp not null,
+            type integer references TransactionType
+        );
+    ]]></sql>
+    </changeSet>
+
+
+</databaseChangeLog>

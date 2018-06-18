@@ -4,14 +4,17 @@
     <button class="mat-flat-button" (click)="onClientEdit()" [disabled]="selectedClientId === -1">...</button>
     <button class="mat-flat-button" (click)="onClientRemove()" [disabled]="selectedClientId === -1">-</button>
   </div>
+
   <div style="width: 80%; margin: 50px auto;">
     <mat-form-field style="width: 100%">
       <input matInput placeholder="Search clients" #input>
     </mat-form-field>
   </div>
+  <div class="wrapper" *ngIf="loading">
+    <mat-spinner class="center" [value]="indeterminate"></mat-spinner>
+  </div>
   <div class="mat-elevation-z8" style="width: 80%; margin: 50px auto;">
     <mat-table #table [dataSource]="dataSource" matSort aria-label="Elements">
-
       <!-- Name Column -->
       <ng-container matColumnDef="name">
         <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>

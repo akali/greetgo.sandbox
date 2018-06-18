@@ -1,10 +1,7 @@
-import {CharacterType} from "./CharacterType";
 import {GenderType} from "./GenderType";
 import {PhoneNumber} from "./PhoneNumber";
 import {ClientAddress} from "./ClientAddress";
-import {ClientDetail} from "./ClientDetail";
 import {ClientPhone} from "./ClientPhone";
-import {Charm} from "./Charm";
 
 export class ClientToSave {
     public id: number /* int */;

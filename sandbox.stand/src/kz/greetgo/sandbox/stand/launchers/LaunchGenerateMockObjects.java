@@ -8,10 +8,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static kz.greetgo.sandbox.controller.model.PhoneType.MOBILE;
@@ -130,7 +126,7 @@ public class LaunchGenerateMockObjects {
             sb.append(clientAccountTransaction.id).append(";")
                     .append(clientAccountTransaction.account).append(";")
                     .append(clientAccountTransaction.money).append(";")
-                    .append(clientAccountTransaction.finishedAt).append(";")
+                    .append(clientAccountTransaction.finished_at.getTime()).append(";")
                     .append(clientAccountTransaction.type).append(";");
             printFile(sb.toString(), TRANSACTIONS);
         }
@@ -142,7 +138,7 @@ public class LaunchGenerateMockObjects {
                     .append(clientAccount.client).append(";")
                     .append(clientAccount.money).append(";")
                     .append(clientAccount.number).append(";")
-                    .append(clientAccount.registeredAt).append(";");
+                    .append(clientAccount.registered_at.getTime()).append(";");
             printFile(sb.toString(), ACCOUNTS);
         }
 
@@ -174,7 +170,7 @@ public class LaunchGenerateMockObjects {
             .append(client.name).append(";")
             .append(client.patronymic).append(";")
             .append(client.gender).append(";")
-            .append(client.birthDate).append(";")
+            .append(client.birth_date.getTime()).append(";")
             .append(client.charm).append(";");
             printFile(sb.toString(), CLIENTS);
         }
@@ -361,11 +357,27 @@ public class LaunchGenerateMockObjects {
                                 "45b",
                                 "78"
                         ))
+              .setClientAccount(
+                new ClientAccount(
+                  3,
+                  3,
+                  78453,
+                  "1234567465",
+                  new Date().getTime()
+                ))
+              .setClientAccount(
+                new ClientAccount(
+                  4,
+                  3,
+                  1230,
+                  "00078965",
+                  new Date().getTime()
+                ))
                 .setClientAccount(
                         new ClientAccount(
+                                5,
                                 3,
-                                3,
-                                100000,
+                                -5555,
                                 "78965",
                                 new Date().getTime()
                         ))
@@ -396,9 +408,4 @@ public class LaunchGenerateMockObjects {
         return names;
     }
 
-    private String pick(List<String> names) {
-        int len = names.size();
-        Random rnd = new Random();
-        return names.get(rnd.nextInt(len));
-    }
 }
