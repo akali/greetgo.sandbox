@@ -53,7 +53,7 @@ public class ClientsRegisterImpl implements ClientsRegister {
 
   @Override
   public ClientDetail getClientDetailsById(int clientId) {
-    throw new NotImplementedException();
+    return GetClientDetails.getClientDetailsById(clientId);
   }
 
   @Override
@@ -112,10 +112,10 @@ public class ClientsRegisterImpl implements ClientsRegister {
 
       Client client = clientsDao.get().getClient(clientToSave.id);
       clientToSave.set(clientToSave.id);
-      clientsDao.get().addClientAddress(clientToSave.regAddress);
+      clientsDao.get().editClientAddress(clientToSave.regAddress);
       clientToSave.phones.forEach(clientsDao.get()::addClientPhone);
       if (clientToSave.factAddress != null)
-        clientsDao.get().addClientAddress(clientToSave.factAddress);
+        clientsDao.get().editClientAddress(clientToSave.factAddress);
       return clientsDao.get().getClientRecordById(client.id);
     } catch (DatabaseException | SQLException e) {
       e.printStackTrace();

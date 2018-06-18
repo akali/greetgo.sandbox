@@ -190,7 +190,7 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
     ClientRecord record = clientsRegister.get().addClientToSave(clientToSave);
 
-    System.out.println(clientsTestDao.get().getClientDetailsById(record.id));
+    System.out.println(GetClientDetails.getClientDetailsById(record.id));
 
     ClientToSave clientToEdit =
       new ClientToSave(record.id, "Aisultan", "Kali", "Amanzholuly", 2, GenderType.MALE,
@@ -210,7 +210,7 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
     clientsRegister.get().editClientToSave(clientToEdit);
 
-    System.out.println(clientsTestDao.get().getClientDetailsById(record.id));
+    System.out.println(GetClientDetails.getClientDetailsById(record.id));
   }
 
   @Test

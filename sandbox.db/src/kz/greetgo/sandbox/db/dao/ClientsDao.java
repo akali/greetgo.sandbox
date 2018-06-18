@@ -1,10 +1,7 @@
 package kz.greetgo.sandbox.db.dao;
 
 import kz.greetgo.sandbox.controller.model.*;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import javax.management.Query;
 import java.util.List;
@@ -77,4 +74,9 @@ public interface ClientsDao {
     "select * from client where id=#{id}"
   )
   Client getClient(@Param("id") int id);
+
+  @Update(
+    "update ClientAddress set street=#{street}, house=#{house}, flat=#{flat} where client=#{client} and type=#{type}"
+  )
+  void editClientAddress(ClientAddress regAddress);
 }
