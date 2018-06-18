@@ -103,6 +103,32 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     return clients;
   }
 
+  @Test
+  void testest() {
+    clientsTestDao.get().clearClient();
+    clientsTestDao.get().clearClientAddress();
+    clientsTestDao.get().clearClientPhone();
+
+    insertTestingCharms();
+
+    ClientToSave clientToSave =
+      new ClientToSave(1, "Yerbolat", "Ablemetov", "Askarovich", 1, GenderType.MALE,
+        new ClientAddress(
+          1, AddressType.REG, "Seyfullina", "13a", "23"
+        ),
+        new ClientAddress(
+          1, AddressType.FACT, "Bekturova", "23", null
+        ),
+        getTimestamp(12, 1, 1998),
+        Arrays.asList(
+          new ClientPhone(1, "+77473105484", PhoneType.MOBILE),
+          new ClientPhone(1, "+77273518547", PhoneType.HOME)
+        )
+      );
+
+    System.out.println(clientsRegister.get().addClientToSave(clientToSave));
+  }
+
   private final String sigma = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
 
   private String generateString(int len) {
@@ -114,6 +140,12 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
   @Test
   public void testAddClientToSave() {
+
+    clientsTestDao.get().clearClientPhone();
+    clientsTestDao.get().clearClient();
+    clientsTestDao.get().clearClientAddress();
+    clientsTestDao.get().clearCharm();
+
     insertTestingCharms();
     ArrayList<ClientToSave> clients = insertTestingClients();
     ArrayList<ClientRecord> recordClients = new ArrayList<>();
@@ -123,6 +155,7 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     clients.forEach(client -> recordClients.add(clientsRegister.get().addClientToSave(client)));
     //
     //
+
     {
       for (int i = 0; i < recordClients.size(); i++) {
         ClientRecord client = recordClients.get(i);
@@ -134,8 +167,50 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
   @Test
   public void test() {
-    System.out.println(GetClientDetails.getClientDetailsById(3));
-//    System.out.println(clientsTestDao.get().getRecordClientById(1));
+    clientsTestDao.get().clearClient();
+    clientsTestDao.get().clearClientAddress();
+    clientsTestDao.get().clearClientPhone();
+
+    insertTestingCharms();
+
+    ClientToSave clientToSave =
+      new ClientToSave(1, "Yerbolat", "Ablemetov", "Askarovich", 1, GenderType.MALE,
+        new ClientAddress(
+          1, AddressType.REG, "Seyfullina", "13a", "23"
+        ),
+        new ClientAddress(
+          1, AddressType.FACT, "Bekturova", "23", null
+        ),
+        getTimestamp(12, 1, 1998),
+        Arrays.asList(
+          new ClientPhone(1, "+77473105484", PhoneType.MOBILE),
+          new ClientPhone(1, "+77273518547", PhoneType.HOME)
+        )
+      );
+
+    ClientRecord record = clientsRegister.get().addClientToSave(clientToSave);
+
+    System.out.println(clientsTestDao.get().getClientDetailsById(record.id));
+
+    ClientToSave clientToEdit =
+      new ClientToSave(record.id, "Aisultan", "Kali", "Amanzholuly", 2, GenderType.MALE,
+        new ClientAddress(
+          record.id, AddressType.REG, "AkhanSeri", "13a", "32"
+        ),
+        new ClientAddress(
+          record.id, AddressType.FACT, "Timeriyazeva", "44", "33"
+        ),
+        getTimestamp(12, 1, 1965),
+        Arrays.asList(
+          new ClientPhone(1, "+77772233636", PhoneType.MOBILE),
+          new ClientPhone(1, "+77051472585", PhoneType.HOME),
+          new ClientPhone(1, "+77271472585", PhoneType.WORK)
+        )
+      );
+
+    clientsRegister.get().editClientToSave(clientToEdit);
+
+    System.out.println(clientsTestDao.get().getClientDetailsById(record.id));
   }
 
   @Test

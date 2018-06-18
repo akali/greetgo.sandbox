@@ -1,8 +1,7 @@
 package kz.greetgo.sandbox.controller.model;
 
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Date;
+import java.sql.Date;
 
 public class Client {
   public int id;
@@ -30,7 +29,7 @@ public class Client {
     this.name = name;
     this.patronymic = patronymic;
     this.gender = gender;
-    this.birth_date = birth_date;
+    this.birth_date = new Date(birth_date.getTime());
     this.charm = charm;
   }
 
@@ -40,7 +39,7 @@ public class Client {
     this.name = name;
     this.patronymic = patronymic;
     this.gender = GenderType.valueOf(gender);
-    this.birth_date = new Timestamp(birth_date.getTime());
+    this.birth_date = birth_date;
     this.charm = charm;
   }
 

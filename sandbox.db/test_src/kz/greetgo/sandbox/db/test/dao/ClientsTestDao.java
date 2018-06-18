@@ -19,8 +19,8 @@ public interface ClientsTestDao {
   @Delete("delete from Client")
   void clearClient();
 
-  @Insert("insert into Client (id, surname, name, patronymic, gender, birth_date, charm)" +
-    "values (#{id}, #{surname}, #{name}, #{patronymic}, #{gender}, #{birth_date}, #{charm})")
+  @Insert("insert into Client (surname, name, patronymic, gender, birth_date, charm)" +
+    "values (#{surname}, #{name}, #{patronymic}, #{gender}, #{birth_date}, #{charm})")
   void insertClient(Client client);
 
   @Delete("delete from ClientAddress")
