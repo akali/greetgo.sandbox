@@ -29,8 +29,6 @@ public class ClientPhone {
       phone.type = PhoneType.MOBILE;
     } else if (splitLine[2].equals(PhoneType.HOME.toString())) {
         phone.type = PhoneType.HOME;
-    } else if (splitLine[2].equals(PhoneType.EMBEDDED.toString())) {
-      phone.type = PhoneType.EMBEDDED;
     } else phone.type = PhoneType.WORK;
 
     System.out.println("|"+splitLine[2]+"|" + " " + "|"+PhoneType.MOBILE.toString()+"|" + " " + splitLine[2].equals(PhoneType.MOBILE.toString()));

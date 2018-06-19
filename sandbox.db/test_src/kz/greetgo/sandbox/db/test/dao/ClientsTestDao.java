@@ -1,10 +1,7 @@
 package kz.greetgo.sandbox.db.test.dao;
 
 import kz.greetgo.sandbox.controller.model.*;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.ArrayList;
 
@@ -63,4 +60,19 @@ public interface ClientsTestDao {
 
   @Select("SELECT * from ClientDetail where id = #{id}")
   ClientDetail getClientDetailsById(@Param("id") int id);
+
+  @Update("ALTER SEQUENCE charm_id_seq RESTART WITH 1")
+  void resetCharmIncrementor();
+
+  @Update("ALTER SEQUENCE client_id_seq RESTART WITH 1")
+  void resetClientIncrementor();
+
+  @Update("ALTER SEQUENCE ClientAccount_id_seq RESTART WITH 1")
+  void resetClientAccountIncrementor();
+
+  @Update("ALTER SEQUENCE ClientAccountTransaction_id_seq RESTART WITH 1")
+  void resetClientAccountTransactionIncrementor();
+
+  @Update("ALTER SEQUENCE TransactionType_id_seq RESTART WITH 1")
+  void resetTransactionTypeIncrementor();
 }

@@ -244,4 +244,52 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     });
 
   }
+
+  @Test
+  public void generatorTest() {
+    clearEntities();
+
+    List<RandomClientGenerator.ClientBundle> clientBundles = RandomClientGenerator.generate(1);
+    clientBundles.forEach(System.out::println);
+
+    for (Charm charm : clientBundles.get(0).getCharms()) {
+      clientsTestDao.get().insertCharm(charm);
+    }
+
+    for (TransactionType type : clientBundles.get(0).getTransactionTypes()) {
+      clientsTestDao.get().insertTransactionType(type);
+    }
+
+    clientBundles.forEach(clientBundle -> {
+      clientsTestDao.get().insertClient(clientBundle.getClient());
+      clientsTestDao.get().insertClientAddress(clientBundle.getRegAddress());
+      if (clientBundle.getFactAddress() != null)
+        clientsTestDao.get().insertClientAddress(clientBundle.getFactAddress());
+
+      clientBundle.getPhones().forEach(clientsTestDao.get()::insertClientPhone);
+      clientBundle.getAccounts().forEach(clientsTestDao.get()::insertClientAccount);
+      clientBundle.getTransactions().forEach(clientsTestDao.get()::insertClientAccountTransaction);
+    });
+
+  }
+
+  private void clearEntities() {
+    clientsTestDao.get().clearCharm();
+    clientsTestDao.get().clearClientAddress();
+    clientsTestDao.get().clearClient();
+
+    clientsTestDao.get().clearClientPhone();
+    clientsTestDao.get().clearClientAccount();
+    clientsTestDao.get().clearClientAccountTransaction();
+
+    clientsTestDao.get().clearTransactionType();
+
+    clientsTestDao.get().resetCharmIncrementor();
+    clientsTestDao.get().resetClientIncrementor();
+
+    clientsTestDao.get().resetClientAccountIncrementor();
+    clientsTestDao.get().resetClientAccountTransactionIncrementor();
+
+    clientsTestDao.get().resetTransactionTypeIncrementor();
+  }
 }

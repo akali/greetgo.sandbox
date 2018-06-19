@@ -3,12 +3,16 @@ package kz.greetgo.sandbox.db.register_impl;
 import kz.greetgo.sandbox.controller.model.*;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Date;
 import java.util.*;
 
 public class RandomClientGenerator {
+  private int accountId = 1;
+  private int accountTransactionId = 1;
+
   public class ClientBundle {
     private Client client;
     private ClientAddress regAddress, factAddress;
@@ -128,10 +132,12 @@ public class RandomClientGenerator {
   }
   private String sigma;
 
+  private List<String> phoneCodes = new ArrayList<>();
   private List<String> names = new ArrayList<>();
   private List<String> surnames = new ArrayList<>();
   private List<Charm> charms = new ArrayList<>();
   private List<TransactionType> transactionTypes = new ArrayList<>();
+
   private Random random = new Random();
 
   public RandomClientGenerator() {
@@ -141,6 +147,7 @@ public class RandomClientGenerator {
       for (char c = 'A'; c <= 'Z'; ++c) sigma = sigma.concat(String.valueOf(c));
       names = load("first_names/all.txt");
       surnames = load("surnames/all.txt");
+      phoneCodes = load("phonesCodes/all.txt");
       generateCharms();
       generateTransactionTypes();
     } catch (IOException e) {
@@ -148,7 +155,19 @@ public class RandomClientGenerator {
     }
   }
 
-  public ClientBundle generate(int id) {
+  public static List<ClientBundle> generate(int count) {
+    List<ClientBundle> bundle = new ArrayList<>();
+
+    RandomClientGenerator generator = new RandomClientGenerator();
+
+    for (int i = 0; i < count; ++i) {
+      bundle.add(generator.generateClientBundle(i + 1));
+    }
+
+    return bundle;
+  }
+
+  public ClientBundle generateClientBundle(int id) {
     ClientBundle bundle = new ClientBundle();
 
     bundle.setClient(generateClient(id));
@@ -156,18 +175,67 @@ public class RandomClientGenerator {
     bundle.setRegAddress(generateAddress(id, AddressType.REG));
     bundle.setPhones(generatePhones(id));
     bundle.setAccounts(generateAccounts(id));
+    bundle.setTransactions(generateTransactions(bundle.getAccounts()));
 
+    bundle.setTransactionTypes(transactionTypes);
+    bundle.setCharms(charms);
     return bundle;
+  }
+
+  private List<ClientAccountTransaction> generateTransactions(List<ClientAccount> accounts) {
+    List<ClientAccountTransaction> transactions = new ArrayList<>();
+
+    int count = 20 + random.nextInt(100);
+
+    int year = 2007, month = 1;
+
+    for (int i = 0; i < count; ++i) {
+      int num = random.nextInt(accounts.size());
+      ClientAccount account = accounts.get(num);
+
+      num = random.nextInt(transactionTypes.size());
+
+      TransactionType type = transactionTypes.get(num);
+      float money = random.nextFloat();
+
+      if (!type.name.equals("in"))
+        money = -money;
+
+      transactions.add(new ClientAccountTransaction(
+        generateAccountTransactionId(),
+        account.id,
+        money,
+        getTimestamp(getDays(month, year), month, year),
+        type.id
+      ));
+      ++month;
+      if (month == 13) {
+        ++year;
+        month = 1;
+      }
+    }
+    return transactions;
+  }
+
+  private int generateAccountTransactionId() {
+    return ++accountTransactionId;
   }
 
 
   private void generateTransactionTypes() {
+    transactionTypes = new ArrayList<>();
+    transactionTypes.add(new TransactionType(
+      1,
+      "IN",
+      "income"
+    ));
+    transactionTypes.add(new TransactionType(2, "OUT", "outcome"));
   }
 
   private void generateCharms() {
     charms = new ArrayList<>();
     for (int i = 0; i < 50; ++i) {
-      charms.add(new Charm(generateRandomString(15), generateRandomString(64), random.nextFloat()));
+      charms.add(new Charm(i + 1, generateRandomString(15), generateRandomString(64), random.nextFloat()));
     }
   }
 
@@ -179,13 +247,54 @@ public class RandomClientGenerator {
     return String.valueOf(string);
   }
 
+  private String generateRandomString(int len, String sigma) {
+    StringBuilder string = new StringBuilder();
+    for (int i = 0; i < len; ++i) {
+      string.append(sigma.charAt(random.nextInt(sigma.length())));
+    }
+    return String.valueOf(string);
+  }
+
   private List<ClientAccount> generateAccounts(int id) {
+    int count = 1 + random.nextInt(5);
+
+    List<ClientAccount> accounts = new ArrayList<>();
+
+    for (int i = 0; i < count; ++i) {
+      accounts.add(new ClientAccount(
+        generateAccountId(),
+        id,
+        100 * random.nextFloat(),
+        generateRandomString(10),
+        pickDate().getTime()
+      ));
+    }
+
+    return accounts;
+  }
+
+  private int generateAccountId() {
+    return ++accountId;
   }
 
   private List<ClientPhone> generatePhones(int id) {
+    int count = 1 + random.nextInt(10);
+    List<ClientPhone> phones = new ArrayList<>();
+
+    for (int i = 0; i < count; ++i) {
+      phones.add(new ClientPhone(id, "+7" + pick(phoneCodes) + generateRandomString(7, "0123456789"), PhoneType.getRandomType(random)));
+    }
+    return phones;
   }
 
-  private ClientAddress generateAddress(int id, AddressType fact) {
+  private ClientAddress generateAddress(int id, AddressType type) {
+    return new ClientAddress(
+      id,
+      type,
+      pick(names) + " street",
+      String.valueOf(1 + random.nextInt(1000)),
+      String.valueOf(1 + random.nextInt(1000))
+    );
   }
 
   public long getTimestamp(int day, int month, int year) {
@@ -206,6 +315,7 @@ public class RandomClientGenerator {
     if (random.nextInt(1) > 0)
       client.gender = GenderType.MALE;
     client.birth_date = pickDate();
+    client.charm = charms.get(random.nextInt(charms.size())).id;
     return client;
   }
 
@@ -231,7 +341,8 @@ public class RandomClientGenerator {
   private List<String> load(String name) throws IOException {
     List<String> objs = new ArrayList<>();
     BufferedReader bf =
-      new BufferedReader(new FileReader("NameDatabases/NamesDatabases/" + name));
+      new BufferedReader(new FileReader(
+        "/home/aqali/work/greetgo/greetgo.sandbox/sandbox.db/test_src/kz/greetgo/sandbox/db/register_impl/NameDatabases/NamesDatabases/" + name));
     String s;
     while ((s = bf.readLine()) != null) {
       s = s.trim();
@@ -241,5 +352,4 @@ public class RandomClientGenerator {
     }
     return objs;
   }
-
 }
