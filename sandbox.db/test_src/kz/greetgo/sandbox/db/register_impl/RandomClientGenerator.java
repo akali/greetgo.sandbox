@@ -7,11 +7,52 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class RandomClientGenerator {
   private int accountId = 1;
   private int accountTransactionId = 1;
+
+  public static List<Charm> getCharms() {
+    return charms;
+  }
+
+  public static List<QueryFilter> generateFilters(int listSize, List<String> actives) {
+    List<QueryFilter> filters = new ArrayList<>();
+    List<String> directions = Arrays.asList("DESC", "ASC");
+    for (int start = 0; start < listSize; ++start)
+      for (int limit = 1; limit <= listSize; ++limit) {
+        int finalI = start, finalJ = limit;
+        directions.forEach(
+          direction -> actives.forEach(
+            active -> filters.add(
+              new QueryFilter(finalI, finalJ, direction, active, "")
+            )
+          )
+        );
+      }
+    return filters;
+  }
+
+  public static TableResponse getClientRecords(List<ClientBundle> clientBundles, QueryFilter queryFilter) {
+    int start = queryFilter.start;
+    int offset = queryFilter.limit;
+    String direction = queryFilter.direction;
+    String active = queryFilter.active;
+    String filter = queryFilter.filter;
+    List<ClientRecord> list = new ArrayList<>();
+
+    for (ClientBundle clientBundle: clientBundles) {
+      list.add(clientBundle.getClientRecord());
+    }
+
+    return new TableResponse(list, start, offset, direction, active, filter);
+  }
 
   public class ClientBundle {
     private Client client;
@@ -23,6 +64,9 @@ public class RandomClientGenerator {
 
     private List<Charm> charms;
     private List<TransactionType> transactionTypes;
+    private float total;
+    private float min;
+    private float max;
 
     public List<Charm> getCharms() {
       return charms;
@@ -50,6 +94,42 @@ public class RandomClientGenerator {
         ", accounts=" + accounts +
         ", transactions=" + transactions +
         '}';
+    }
+
+    public ClientToSave getClientToSave() {
+      return new ClientToSave(
+        this.client.id,
+        this.client.name,
+        this.client.surname,
+        this.client.patronymic,
+        this.client.charm,
+        this.client.gender,
+        getRegAddress(),
+        getFactAddress(),
+        this.client.birth_date.getTime(),
+        this.getPhones()
+      );
+    }
+
+    public ClientRecord getClientRecord() {
+      return new ClientRecord(
+        this.client.id,
+        this.client.name,
+        this.client.surname,
+        this.client.patronymic,
+        getTotal(),
+        getMax(),
+        getMin(),
+        this.charms.get(this.client.charm - 1).name,
+        calculateAge(this.client.birth_date.getTime())
+      );
+    }
+
+    public int calculateAge(long birthDateTs) {
+      LocalDate date = Instant.ofEpochMilli(new java.util.Date().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+      LocalDate date1 = new Timestamp(birthDateTs).toLocalDateTime().toLocalDate();
+
+      return date.minusYears(date1.getYear()).getYear();
     }
 
     @Override
@@ -108,6 +188,11 @@ public class RandomClientGenerator {
 
     public void setAccounts(List<ClientAccount> accounts) {
       this.accounts = accounts;
+      if (accounts != null && !accounts.isEmpty()) {
+        accounts.forEach(clientAccount -> total += clientAccount.money);
+        min = accounts.stream().min((a, b) -> Float.compare(a.money, b.money)).get().money;
+        max = accounts.stream().max((a, b) -> Float.compare(a.money, b.money)).get().money;
+      }
     }
 
     public List<ClientAccountTransaction> getTransactions() {
@@ -117,6 +202,31 @@ public class RandomClientGenerator {
     public void setTransactions(List<ClientAccountTransaction> transactions) {
       this.transactions = transactions;
     }
+
+    public float getTotal() {
+      return total;
+    }
+
+    public void setTotal(float total) {
+      this.total = total;
+    }
+
+    public float getMin() {
+      return min;
+    }
+
+    public void setMin(float min) {
+      this.min = min;
+    }
+
+    public float getMax() {
+      return max;
+    }
+
+    public void setMax(float max) {
+      this.max = max;
+    }
+
 
     public ClientBundle() {
     }
@@ -130,17 +240,18 @@ public class RandomClientGenerator {
       this.transactions = transactions;
     }
   }
-  private String sigma;
+  private static String sigma;
 
-  private List<String> phoneCodes = new ArrayList<>();
-  private List<String> names = new ArrayList<>();
-  private List<String> surnames = new ArrayList<>();
-  private List<Charm> charms = new ArrayList<>();
-  private List<TransactionType> transactionTypes = new ArrayList<>();
+  private static List<String> phoneCodes = new ArrayList<>();
+  private static List<String> names = new ArrayList<>();
+  private static List<String> surnames = new ArrayList<>();
+  private static List<Charm> charms = new ArrayList<>();
+  private static List<TransactionType> transactionTypes = new ArrayList<>();
 
-  private Random random = new Random();
+  private static final long RANDOM_SEED = 1337;
+  private static Random random = new Random(RANDOM_SEED);
 
-  public RandomClientGenerator() {
+  static {
     try {
       sigma = "";
       for (char c = 'a'; c <= 'z'; ++c) sigma = sigma.concat(String.valueOf(c));
@@ -196,7 +307,7 @@ public class RandomClientGenerator {
       num = random.nextInt(transactionTypes.size());
 
       TransactionType type = transactionTypes.get(num);
-      float money = random.nextFloat();
+      float money = nextFloat();
 
       if (!type.name.equals("in"))
         money = -money;
@@ -217,12 +328,16 @@ public class RandomClientGenerator {
     return transactions;
   }
 
+  private static float nextFloat() {
+    return Float.parseFloat(String.format(java.util.Locale.US, "%.2f", random.nextFloat()));
+  }
+
   private int generateAccountTransactionId() {
     return ++accountTransactionId;
   }
 
 
-  private void generateTransactionTypes() {
+  private static void generateTransactionTypes() {
     transactionTypes = new ArrayList<>();
     transactionTypes.add(new TransactionType(
       1,
@@ -232,14 +347,14 @@ public class RandomClientGenerator {
     transactionTypes.add(new TransactionType(2, "OUT", "outcome"));
   }
 
-  private void generateCharms() {
+  private static void generateCharms() {
     charms = new ArrayList<>();
     for (int i = 0; i < 50; ++i) {
-      charms.add(new Charm(i + 1, generateRandomString(15), generateRandomString(64), random.nextFloat()));
+      charms.add(new Charm(i + 1, generateRandomString(15), generateRandomString(64), nextFloat()));
     }
   }
 
-  private String generateRandomString(int len) {
+  private static String generateRandomString(int len) {
     StringBuilder string = new StringBuilder();
     for (int i = 0; i < len; ++i) {
       string.append(sigma.charAt(random.nextInt(sigma.length())));
@@ -264,7 +379,7 @@ public class RandomClientGenerator {
       accounts.add(new ClientAccount(
         generateAccountId(),
         id,
-        100 * random.nextFloat(),
+        100 * nextFloat(),
         generateRandomString(10),
         pickDate().getTime()
       ));
@@ -338,7 +453,7 @@ public class RandomClientGenerator {
     return l.get(random.nextInt(l.size()));
   }
 
-  private List<String> load(String name) throws IOException {
+  private static List<String> load(String name) throws IOException {
     List<String> objs = new ArrayList<>();
     BufferedReader bf =
       new BufferedReader(new FileReader(

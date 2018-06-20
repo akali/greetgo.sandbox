@@ -8,6 +8,15 @@ import java.sql.SQLException;
 
 public class DBHelper <T> {
 
+  private boolean noCommits = false;
+
+  public DBHelper() {
+  }
+
+  public DBHelper(boolean noCommits) {
+    this.noCommits = noCommits;
+  }
+
   public interface Runnable <T> {
     T run(Connection connection) throws SQLException, DatabaseException;
   }

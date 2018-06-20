@@ -48,7 +48,7 @@ public class GetClientRecords {
         .GROUP_BY("client.id", "c3.name")
         .WHERE("client.name || client.surname || client.patronymic like '%'||?||'%'")
         .ORDER_BY(active)
-        .toString().concat(queryFilter.direction.equals("asc") ? " asc " : " desc ")
+        .toString().concat(queryFilter.direction.toLowerCase().equals("asc") ? " asc " : " desc ")
         .concat(" LIMIT ? OFFSET ?")
     );
 
@@ -70,8 +70,6 @@ public class GetClientRecords {
       ));
     }
     tableResponse.size = tableResponse.list.size();
-    System.out.println(tableResponse.list);
-    System.out.println(statement.toString());
     return tableResponse;
   }
 }

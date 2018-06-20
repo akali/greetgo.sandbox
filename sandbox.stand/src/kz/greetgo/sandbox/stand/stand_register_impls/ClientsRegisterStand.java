@@ -110,7 +110,7 @@ public class ClientsRegisterStand implements ClientsRegister {
         client.surname = clientToSave.surname;
         client.name = clientToSave.name;
         client.patronymic = clientToSave.patronymic;
-        client.birth_date = new Timestamp(clientToSave.birthDate);
+        client.birth_date = new java.sql.Date(clientToSave.birthDate);
         client.gender = clientToSave.gender;
         client.charm = clientToSave.charm;
 
