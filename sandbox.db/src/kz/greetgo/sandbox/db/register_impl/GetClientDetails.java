@@ -97,7 +97,6 @@ public class GetClientDetails {
         resultSet.getString("charmname"),
         resultSet.getString("charmdescription"),
         resultSet.getFloat("charmEnergy")));
-
     }
     return result;
   }

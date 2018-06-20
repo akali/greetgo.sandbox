@@ -189,6 +189,7 @@ public class RandomClientGenerator {
     public void setAccounts(List<ClientAccount> accounts) {
       this.accounts = accounts;
       if (accounts != null && !accounts.isEmpty()) {
+        total = 0;
         accounts.forEach(clientAccount -> total += clientAccount.money);
         min = accounts.stream().min((a, b) -> Float.compare(a.money, b.money)).get().money;
         max = accounts.stream().max((a, b) -> Float.compare(a.money, b.money)).get().money;
@@ -239,6 +240,22 @@ public class RandomClientGenerator {
       this.accounts = accounts;
       this.transactions = transactions;
     }
+
+    public ClientDetail getClientDetail() {
+      return new ClientDetail(
+        this.client.id,
+        this.client.name,
+        this.client.surname,
+        this.client.patronymic,
+        this.client.gender,
+        this.client.birth_date.getTime(),
+        getRegAddress(),
+        getFactAddress(),
+        this.getPhones(),
+        this.getCharms(),
+        getCharms().get(this.client.charm - 1)
+      );
+    }
   }
   private static String sigma;
 
@@ -276,6 +293,10 @@ public class RandomClientGenerator {
     }
 
     return bundle;
+  }
+
+  public static ClientBundle generateBundleById(int id) {
+    return new RandomClientGenerator().generateClientBundle(id);
   }
 
   public ClientBundle generateClientBundle(int id) {
@@ -402,7 +423,7 @@ public class RandomClientGenerator {
     return phones;
   }
 
-  private ClientAddress generateAddress(int id, AddressType type) {
+  public static ClientAddress generateAddress(int id, AddressType type) {
     return new ClientAddress(
       id,
       type,
@@ -412,7 +433,7 @@ public class RandomClientGenerator {
     );
   }
 
-  public long getTimestamp(int day, int month, int year) {
+  public static long getTimestamp(int day, int month, int year) {
     Calendar cal = new GregorianCalendar();
     cal.set(Calendar.YEAR, year);
     cal.set(Calendar.MONTH, month - 1);
@@ -420,7 +441,7 @@ public class RandomClientGenerator {
     return cal.getTimeInMillis();
   }
 
-  private Client generateClient(int id) {
+  public static Client generateClient(int id) {
     Client client = new Client();
     client.id = id;
     client.surname = pick(surnames);
@@ -434,14 +455,14 @@ public class RandomClientGenerator {
     return client;
   }
 
-  private Date pickDate() {
+  private static Date pickDate() {
     int year = 1890 + random.nextInt(120);
     int month = 1 + random.nextInt(12);
     int day = random.nextInt(getDays(month, year));
     return new Date(getTimestamp(day, month, year));
   }
 
-  private int getDays(int month, int year) {
+  private static int getDays(int month, int year) {
     int[] m = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     if (year % 4 == 0 || (year % 100 == 0 && year % 400 == 0)) {
       ++m[2];
@@ -449,7 +470,7 @@ public class RandomClientGenerator {
     return m[month];
   }
 
-  private String pick(List<String> l) {
+  private static String pick(List<String> l) {
     return l.get(random.nextInt(l.size()));
   }
 

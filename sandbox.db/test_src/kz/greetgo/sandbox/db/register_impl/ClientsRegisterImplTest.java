@@ -64,7 +64,7 @@ public class ClientsRegisterImplTest extends ParentTestNg {
   public void testGetClientRecords() {
     clearEntities();
     List<RandomClientGenerator.ClientBundle> clientBundles = RandomClientGenerator.generate(10);
-    insertBundles(clientBundles, false, false);
+    insertBundles(clientBundles);
 
     QueryFilter filter = new QueryFilter(0, 5, "DESC", "name", "");
 
@@ -84,7 +84,7 @@ public class ClientsRegisterImplTest extends ParentTestNg {
   public void getClientRecordsCheckSorting() {
     clearEntities();
     List<RandomClientGenerator.ClientBundle> clientBundles = RandomClientGenerator.generate(10);
-    insertBundles(clientBundles, false, false);
+    insertBundles(clientBundles);
 
     List<QueryFilter> filters = RandomClientGenerator.generateFilters(10, Arrays.asList("name", "total", "age", "total", "max", "min"));
 
@@ -129,11 +129,9 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     });
   }
 
-  private void insertBundles(List<RandomClientGenerator.ClientBundle> clientBundles, boolean insertCharms, boolean insertTransactionTypes) {
-    if (insertCharms)
-      insertTestingCharms(clientBundles.get(0).getCharms());
-    if (insertTransactionTypes)
-      insertTestingTransactionTypes(clientBundles.get(0).getTransactionTypes());
+  private void insertBundles(List<RandomClientGenerator.ClientBundle> clientBundles) {
+    insertTestingCharms(RandomClientGenerator.getCharms());
+    insertTestingTransactionTypes(clientBundles.get(0).getTransactionTypes());
 
     clientBundles.forEach(clientBundle -> {
       clientsTestDao.get().insertClient(clientBundle.getClient());
@@ -148,11 +146,57 @@ public class ClientsRegisterImplTest extends ParentTestNg {
   }
 
   @Test
+  public void test() {
+    clearEntities();
+    List<RandomClientGenerator.ClientBundle> bundles = RandomClientGenerator.generate(10);
+    ClientDetail detail = bundles.get(0).getClientDetail();
+    ClientDetail copy = detail.getCopy();
+    copy.birthDate++;
+    assertThat(detail.equals(copy)).isTrue();
+  }
+
+  @Test
   public void testGetClientDetailsById() {
+
+    clearEntities();
+    List<RandomClientGenerator.ClientBundle> bundles = RandomClientGenerator.generate(3);
+    List<RandomClientGenerator.ClientBundle> fakeBundles = RandomClientGenerator.generate(3);
+    insertBundles(bundles);
+
+//    bundles.forEach(clientBundle -> {
+//      System.out.println("X " + clientsRegister.get().getClientDetailsById(clientBundle.getClient().id).getCharm());
+//      System.out.println("Y " + clientBundle.getClientDetail().getCharm());
+//    });
+
+    bundles.forEach(clientBundle -> assertThat(
+      clientsRegister.get().getClientDetailsById(clientBundle.getClient().id).equals(clientBundle.getClientDetail())
+    ).isTrue());
+
+    fakeBundles.forEach(clientBundle -> assertThat(
+      clientsRegister.get().getClientDetailsById(clientBundle.getClient().id).equals(clientBundle.getClientDetail())
+    ).isFalse());
   }
 
   @Test
   public void testEditClientToSave() {
+    clearEntities();
+    List<RandomClientGenerator.ClientBundle> bundles = RandomClientGenerator.generate(5);
+    insertBundles(bundles);
+    ClientRecord old = bundles.get(0).getClientRecord();
+
+    ClientToSave clientToSave = bundles.get(0).getClientToSave();
+
+    RandomClientGenerator.ClientBundle newBundle = RandomClientGenerator.generateBundleById(clientToSave.id);
+    newBundle.setAccounts(bundles.get(0).getAccounts());
+
+    //
+    //
+    ClientRecord newClientRecord = clientsRegister.get().editClientToSave(newBundle.getClientToSave());
+    //
+    //
+
+    assertThat(newClientRecord).isNotEqualTo(old);
+    assertThat(newClientRecord).isEqualTo(newBundle.getClientRecord());
   }
 
   @Test
@@ -162,7 +206,7 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
     for (int msk = 0; msk < (1 << size); ++msk) {
       clearEntities();
-      insertBundles(bundles, true, true);
+      insertBundles(bundles);
       List<Integer> toRemove = new ArrayList<>();
       //
       //
@@ -191,7 +235,7 @@ public class ClientsRegisterImplTest extends ParentTestNg {
   public void generatorTest() {
     clearEntities();
     List<RandomClientGenerator.ClientBundle> clientBundles = RandomClientGenerator.generate(5);
-    insertBundles(clientBundles, false, false);
+    insertBundles(clientBundles);
   }
 
   private void clearEntities() {

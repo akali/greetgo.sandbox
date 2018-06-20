@@ -70,8 +70,9 @@ public class ClientsRegisterImpl implements ClientsRegister {
         statement.setString(2, client.name);
         statement.setString(3, client.patronymic);
         statement.setString(4, client.gender.toString());
-        statement.setDate(5, (Date) client.birth_date);
+        statement.setDate(5, client.birth_date);
         statement.setInt(6, client.charm);
+
         ResultSet rs = statement.executeQuery();
         int result = -1;
         while (rs.next()){

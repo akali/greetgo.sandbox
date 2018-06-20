@@ -1,5 +1,7 @@
 package kz.greetgo.sandbox.controller.model;
 
+import java.util.Objects;
+
 public class ClientAddress {
   public int client;
   public AddressType type;
@@ -35,6 +37,23 @@ public class ClientAddress {
     clientAddress.house = line[3];
     clientAddress.flat = line[4];
     return clientAddress;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    ClientAddress that = (ClientAddress) o;
+    return client == that.client &&
+      type == that.type &&
+      Objects.equals(street, that.street) &&
+      Objects.equals(house, that.house) &&
+      Objects.equals(flat, that.flat);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(client, type, street, house, flat);
   }
 
   @Override
