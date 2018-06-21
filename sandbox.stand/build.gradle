@@ -1,30 +1,30 @@
 dependencies {
-  compile project(':sandbox.controller')
-  compile project('db')
+    compile project(':sandbox.controller')
+    compile project('db')
 
-  compile "kz.greetgo.depinject:greetgo.depinject.gen:$depinjectVersion"
-  compile "kz.greetgo.mvc:greetgo.mvc:$greetgoMvcVersion"
-  compile "kz.greetgo.mvc:greetgo.mvc.jetty:$greetgoMvcVersion"
-  compile "kz.greetgo.mvc:greetgo.mvc.war:$greetgoMvcVersion"
-  compile "kz.greetgo.type_script:greetgo.ts_java_convert:0.0.2"
+    compile "kz.greetgo.depinject:greetgo.depinject.gen:$depinjectVersion"
+    compile "kz.greetgo.mvc:greetgo.mvc:$greetgoMvcVersion"
+    compile "kz.greetgo.mvc:greetgo.mvc.jetty:$greetgoMvcVersion"
+    compile "kz.greetgo.mvc:greetgo.mvc.war:$greetgoMvcVersion"
+    compile "kz.greetgo.type_script:greetgo.ts_java_convert:0.0.2"
 
-  compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
-  compile "com.google.code.gson:gson:2.8.4"
+    compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    compile "com.google.code.gson:gson:2.8.4"
 
-  compile "org.eclipse.jetty:jetty-server:$jettyVersion"
-  compile "org.eclipse.jetty:jetty-servlet:$jettyVersion"
-  compile "org.eclipse.jetty:jetty-webapp:$jettyVersion"
-  compile "org.eclipse.jetty:jetty-plus:$jettyVersion"
-  compile "org.eclipse.jetty:jetty-annotations:$jettyVersion"
-  compile "org.eclipse.jetty:apache-jsp:$jettyVersion"
+    compile "org.eclipse.jetty:jetty-server:$jettyVersion"
+    compile "org.eclipse.jetty:jetty-servlet:$jettyVersion"
+    compile "org.eclipse.jetty:jetty-webapp:$jettyVersion"
+    compile "org.eclipse.jetty:jetty-plus:$jettyVersion"
+    compile "org.eclipse.jetty:jetty-annotations:$jettyVersion"
+    compile "org.eclipse.jetty:apache-jsp:$jettyVersion"
 
-  compile "com.google.guava:guava:$guavaVersion"
+    compile "com.google.guava:guava:$guavaVersion"
 
-  compile "cglib:cglib:3.2.2"
+    compile "cglib:cglib:3.2.2"
 
-  compile 'jstl:jstl:1.2'
+    compile 'jstl:jstl:1.2'
 
 
-  testCompile "kz.greetgo.depinject:greetgo.depinject.testng:$depinjectVersion"
+    testCompile "kz.greetgo.depinject:greetgo.depinject.testng:$depinjectVersion"
 
 }

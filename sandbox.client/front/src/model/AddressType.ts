@@ -1,4 +1,4 @@
 export enum AddressType {
-    FACT = "FACT",
-    REG = 'REG',
+  FACT = "FACT",
+  REG = 'REG',
 }

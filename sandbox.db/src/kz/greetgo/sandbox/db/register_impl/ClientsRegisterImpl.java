@@ -2,21 +2,23 @@ package kz.greetgo.sandbox.db.register_impl;
 
 import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.depinject.core.BeanGetter;
+import kz.greetgo.mvc.interfaces.BinResponse;
 import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.controller.register.ClientsRegister;
 import kz.greetgo.sandbox.db.dao.ClientsDao;
 import kz.greetgo.sandbox.db.util.DBHelper;
 import liquibase.exception.DatabaseException;
-import org.apache.ibatis.jdbc.SQL;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Bean
 public class ClientsRegisterImpl implements ClientsRegister {
@@ -127,5 +129,13 @@ public class ClientsRegisterImpl implements ClientsRegister {
   @Override
   public void removeClientById(int clientId) {
     clientsDao.get().removeClientById(clientId);
+  }
+
+  @Override
+  public void generateReport(FileType fileType, int authorId, QueryFilter filter, BinResponse binResponse) throws IOException {
+    binResponse.setFilename(("Report from: " + new SimpleDateFormat("dd-MM-yyyy")).concat(String.valueOf(fileType)));
+    binResponse.setContentType("application/txt");
+    binResponse.out().write(123);
+    binResponse.out().flush();
   }
 }

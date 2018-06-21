@@ -176,6 +176,7 @@ export class TableComponent implements OnInit, AfterViewInit {
     this.httpService.post("/clients/getClientDetailsById", {
       clientId: this.selectedClientId
     }).subscribe(value => {
+      console.log(value.json());
       this.openDialog(ActionType.EDIT, ClientDetail.copy(value.json()));
     }, error => {
       alert(error);

@@ -1,4 +1,4 @@
-export class QueryFilter{
+export class QueryFilter {
   public start: number /* int */;
   public limit: number /* int */;
   public direction: string;

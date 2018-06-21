@@ -24,11 +24,12 @@ class OptionsBuilder {
 @Injectable()
 export class HttpService {
 
-  public pageSize:number = 10;
+  public pageSize: number = 10;
 
   private urlPrefix = "http://localhost:1414/access/api";
 
-  constructor(private http: Http) {}
+  constructor(private http: Http) {
+  }
 
   private prefix(): string {
     return this.urlPrefix;

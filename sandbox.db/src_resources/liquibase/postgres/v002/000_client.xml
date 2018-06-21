@@ -5,6 +5,7 @@
 
     <changeSet author="akali" id="init-create-clients-table">
         <sql endDelimiter=";;"><![CDATA[
+
         create table Charm (
             id serial primary key,
             name varchar(64) not null,

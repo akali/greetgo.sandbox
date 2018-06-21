@@ -43,7 +43,7 @@ export class ClientDetail {
     this.charms = [];
     for (let key in json) {
       if (json.hasOwnProperty(key))
-       this.charms.push(Charm.copy(json[key]));
+        this.charms.push(Charm.copy(json[key]));
     }
   }
 }

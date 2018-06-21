@@ -1,5 +1,7 @@
 package kz.greetgo.sandbox.controller.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.List;
@@ -31,6 +33,8 @@ public class ClientDetail implements Serializable, Cloneable {
         this.charms = charms;
         this.charm = charm;
     }
+
+
 
     public int getId() {
         return id;
@@ -173,6 +177,7 @@ public class ClientDetail implements Serializable, Cloneable {
         return Objects.hash(id, name, surname, patronymic, gender, birthDate, regAddress, factAddress, phones, charms, charm);
     }
 
+    @JsonIgnore
     public ClientDetail getCopy() {
         try {
             return (ClientDetail) super.clone();

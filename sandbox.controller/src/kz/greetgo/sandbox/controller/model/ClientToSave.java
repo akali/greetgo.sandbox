@@ -50,6 +50,9 @@ public class ClientToSave {
     this.phones = phones;
   }
 
+  public ClientToSave() {
+  }
+
   public ClientToSave(int id,
                       String name,
                       String surname,

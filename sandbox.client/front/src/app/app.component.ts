@@ -12,7 +12,8 @@ export class AppComponent implements OnInit {
   title = 'app';
   mode: string = "login";
 
-  constructor(private httpService: HttpService) {}
+  constructor(private httpService: HttpService) {
+  }
 
   ngOnInit(): void {
     this.mode = 'init';

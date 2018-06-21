@@ -4,50 +4,50 @@ webAppDirName = 'webapps'
 configurations { providedCompile }
 
 dependencies {
-  compile project(':sandbox.server')
+    compile project(':sandbox.server')
 
-  compile 'jstl:jstl:1.2'
+    compile 'jstl:jstl:1.2'
 
-  testCompile "kz.greetgo.depinject:greetgo.depinject.gen:$depinjectVersion"
+    testCompile "kz.greetgo.depinject:greetgo.depinject.gen:$depinjectVersion"
 }
 
 //war.dependsOn project(':sandbox.client').build
 //war.dependsOn beanContainerJar
 
 task generateBeanContainerJavas(type: JavaExec) {
-  ext.genDir = "${project.buildDir}/generated/bean_container_impl"
+    ext.genDir = "${project.buildDir}/generated/bean_container_impl"
 //  dependsOn autoimplJar
 
-  main = 'kz.greetgo.sandbox.server.war.GenerateAndCompileBeanContainers'
-  args = ["${genDir}"]
+    main = 'kz.greetgo.sandbox.server.war.GenerateAndCompileBeanContainers'
+    args = ["${genDir}"]
 
-  classpath { [sourceSets.test.runtimeClasspath,] }
+    classpath { [sourceSets.test.runtimeClasspath,] }
 }
 
 task beanContainerJar(type: Jar) {
-  dependsOn generateBeanContainerJavas
-  baseName "sandbox-bean-container"
-  from generateBeanContainerJavas.genDir
+    dependsOn generateBeanContainerJavas
+    baseName "sandbox-bean-container"
+    from generateBeanContainerJavas.genDir
 }
 
 war {
-  dependsOn project(':sandbox.client:front').build
-  dependsOn beanContainerJar
+    dependsOn project(':sandbox.client:front').build
+    dependsOn beanContainerJar
 
-  doFirst {
+    doFirst {
 //    println(project(':sandbox.client').buildDir.toPath().resolve('product').toFile())
-  }
+    }
 
-  baseName 'sandbox'
+    baseName 'sandbox'
 
-  addExcludes rootSpec
+    addExcludes rootSpec
 
-  classpath beanContainerJar
+    classpath beanContainerJar
 
-  from project(':sandbox.client:front').projectDir.toPath().resolve('dist').toFile()
+    from project(':sandbox.client:front').projectDir.toPath().resolve('dist').toFile()
 }
 
 static def addExcludes(rootSpec) {
-  rootSpec.exclude 'ant-*.jar'
-  rootSpec.exclude 'ant-launcher-*.jar'
+    rootSpec.exclude 'ant-*.jar'
+    rootSpec.exclude 'ant-launcher-*.jar'
 }
