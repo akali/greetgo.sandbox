@@ -11,6 +11,9 @@ import {PhoneType} from "../../model/PhoneType";
 import {ClientPhone} from "../../model/ClientPhone";
 import {ActionType} from "./client-dialog/actionType";
 import {Charm} from "../../model/Charm";
+import {ReportType} from "../../model/ReportType";
+import {QueryFilter} from "../../model/QueryFilter";
+import { saveAs } from 'file-saver/FileSaver';
 
 @Component({
   selector: 'table-component',
@@ -33,6 +36,7 @@ export class TableComponent implements OnInit, AfterViewInit {
   private charmsStorage: Charm[] = undefined;
 
   private toReload = new BehaviorSubject(undefined);
+  private queryFilter: QueryFilter;
 
   constructor(private httpService: HttpService, private dialog: MatDialog) {}
 
@@ -116,14 +120,14 @@ export class TableComponent implements OnInit, AfterViewInit {
       });
       this.clientDialogRef.disableClose = true;
 
-      this.clientDialogRef.afterClosed().subscribe(value => {
+      this.clientDialogRef.afterClosed().toPromise().then(value => {
         if (value === undefined || value === null) return;
         let clientToSave = value;
         console.log(JSON.stringify(clientToSave));
 
         this.httpService.post("/clients/addClientToSave", {
           clientToSave: JSON.stringify(clientToSave)
-        }).subscribe(result => {
+        }).toPromise().then(result => {
           console.log(result.json());
           this.toReload.next({action: ActionType.CREATE, client: result.json()});
         }, error => {
@@ -140,7 +144,7 @@ export class TableComponent implements OnInit, AfterViewInit {
           }
         });
       this.clientDialogRef.disableClose = true;
-      this.clientDialogRef.afterClosed().subscribe(value => {
+      this.clientDialogRef.afterClosed().toPromise().then(value => {
         if (!value) return;
 
         let clientToSave = value;
@@ -149,7 +153,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 
         this.httpService.post("/clients/editClientToSave", {
           clientToSave: JSON.stringify(clientToSave)
-        }).subscribe(result => {
+        }).toPromise().then(result => {
           console.log(result.json());
           this.toReload.next({action: ActionType.EDIT, client: result.json()});
         }, error => {
@@ -175,7 +179,7 @@ export class TableComponent implements OnInit, AfterViewInit {
     this.loading = true;
     this.httpService.post("/clients/getClientDetailsById", {
       clientId: this.selectedClientId
-    }).subscribe(value => {
+    }).toPromise().then(value => {
       console.log(value.json());
       this.openDialog(ActionType.EDIT, ClientDetail.copy(value.json()));
     }, error => {
@@ -187,7 +191,7 @@ export class TableComponent implements OnInit, AfterViewInit {
     if (this.paginator.pageSize === undefined)
       this.paginator.pageSize = this.INIT_PAGE_SIZE;
       console.log("Loading");
-      this.dataSource.load(
+      this.queryFilter = this.dataSource.load(
         this.paginator.pageIndex,
         this.paginator.pageSize,
         this.sort.direction,
@@ -206,5 +210,30 @@ export class TableComponent implements OnInit, AfterViewInit {
 
   private fakeLoad(action: ActionType, client: ClientRecord) {
     this.dataSource.fakeLoad(action, client);
+  }
+
+  exportReport(type: ReportType) {
+    this.httpService.get("/clients/generateReport", {
+      reportType: JSON.stringify(type),
+      queryFilter: JSON.stringify(this.queryFilter)
+    }).toPromise().then(value => {
+      let id = value.text();
+      console.log(id);
+
+      // this.httpService.get("/clients/downloadReport", {
+      //   id: id
+      // }).toPromise().then(value1 => {
+      //   saveAs(new Blob([value1.text()]), "Report." + type.toString());
+      // }).catch(reason => {
+      //   console.log(reason);
+      // });
+
+      window.open(this.httpService.getLink("/clients/downloadReport", {
+        id: id
+      }));
+
+    }).catch(reason => {
+      console.error(reason);
+    });
   }
 }

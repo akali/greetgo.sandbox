@@ -18,8 +18,38 @@ public class GetClientRecords {
     return new GetClientRecords();
   }
 
+  public interface Iterable {
+    void iterate(ResultSet resultSet) throws SQLException;
+    void done();
+  }
+
   public TableResponse run(Connection connection, QueryFilter queryFilter) throws SQLException {
     TableResponse tableResponse = new TableResponse();
+    test(connection, queryFilter, new Iterable() {
+      @Override
+      public void iterate(ResultSet result) throws SQLException {
+        tableResponse.list.add(new ClientRecord(result.getInt("id"),
+          result.getString("name"),
+          result.getString("surname"),
+          result.getString("patronymic"),
+          result.getFloat("total"),
+          result.getFloat("max"),
+          result.getFloat("min"),
+          result.getString("charm"),
+          result.getInt("age")
+        ));
+
+      }
+
+      @Override
+      public void done() {
+        tableResponse.size = tableResponse.list.size();
+      }
+    });
+    return tableResponse;
+  }
+
+  public void test(Connection connection, QueryFilter queryFilter, Iterable iterator) throws SQLException {
     String active;
     switch(queryFilter.active) {
       case "age": active = "age"; break;
@@ -58,18 +88,8 @@ public class GetClientRecords {
 
     ResultSet result = statement.executeQuery();
     while (result.next()) {
-      tableResponse.list.add(new ClientRecord(result.getInt("id"),
-        result.getString("name"),
-        result.getString("surname"),
-        result.getString("patronymic"),
-        result.getFloat("total"),
-        result.getFloat("max"),
-        result.getFloat("min"),
-        result.getString("charm"),
-        result.getInt("age")
-      ));
+      iterator.iterate(result);
     }
-    tableResponse.size = tableResponse.list.size();
-    return tableResponse;
+    iterator.done();
   }
 }

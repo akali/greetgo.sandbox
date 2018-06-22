@@ -1,17 +1,22 @@
 package kz.greetgo.sandbox.db.register_impl;
 
+import com.itextpdf.text.DocumentException;
 import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.mvc.interfaces.BinResponse;
 import kz.greetgo.sandbox.controller.model.*;
+import kz.greetgo.sandbox.controller.register.AuthRegister;
 import kz.greetgo.sandbox.controller.register.ClientsRegister;
+import kz.greetgo.sandbox.controller.reports.ReportClientRecordPdfGenerator;
+import kz.greetgo.sandbox.controller.reports.ReportClientRecordXlsxGenerator;
+import kz.greetgo.sandbox.controller.reports.ReportClientsRecord;
 import kz.greetgo.sandbox.db.dao.ClientsDao;
+import kz.greetgo.sandbox.db.dao.ReportsDao;
 import kz.greetgo.sandbox.db.util.DBHelper;
 import liquibase.exception.DatabaseException;
 
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,11 +24,14 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Bean
 public class ClientsRegisterImpl implements ClientsRegister {
 
   public BeanGetter<ClientsDao> clientsDao;
+  public BeanGetter<ReportsDao> reportsDao;
+  public BeanGetter<AuthRegister> authRegister;
 
   @Override
   public List<Charm> getCharms() {
@@ -132,10 +140,47 @@ public class ClientsRegisterImpl implements ClientsRegister {
   }
 
   @Override
-  public void generateReport(FileType fileType, int authorId, QueryFilter filter, BinResponse binResponse) throws IOException {
-    binResponse.setFilename(("Report from: " + new SimpleDateFormat("dd-MM-yyyy")).concat(String.valueOf(fileType)));
-    binResponse.setContentType("application/txt");
-    binResponse.out().write(123);
-    binResponse.out().flush();
+  public String generateReport(ReportType reportType, QueryFilter filter, String token) throws IOException, DocumentException {
+    filter.start = 0;
+    filter.limit = 1000000000;
+
+    TableResponse response = getClientRecords(filter);
+    ReportClientsRecord reportClientsRecord  = null;
+
+    String root = "/home/aqali/tmp/" + "Report_" + new Random().nextInt(100000);
+
+    FileOutputStream fos = null; // = new FileOutputStream(root);
+
+    switch (reportType) {
+      case XLSX:
+        root += ".xlsx";
+        fos = new FileOutputStream(root);
+        reportClientsRecord = new ReportClientRecordXlsxGenerator(fos);
+        break;
+      case PDF:
+        root += ".pdf";
+        fos = new FileOutputStream(root);
+        reportClientsRecord = new ReportClientRecordPdfGenerator(fos);
+        break;
+    }
+
+    reportClientsRecord.start(authRegister.get().getUserInfo(token).accountName, new java.util.Date());
+
+    int count = 1;
+
+    String id = "" + new Random().nextInt(100000);
+
+    reportsDao.get().putFile(root, id);
+
+    GenerateReport.execute(reportClientsRecord);
+
+    reportClientsRecord.finish();
+
+    return id;
+  }
+
+  @Override
+  public void downloadReport(String id, BinResponse binResponse) throws IOException {
+
   }
 }

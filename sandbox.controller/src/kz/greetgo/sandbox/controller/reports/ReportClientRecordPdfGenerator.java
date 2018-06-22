@@ -32,6 +32,8 @@ public class ReportClientRecordPdfGenerator implements ReportClientsRecord {
     document = new Document();
     PdfWriter.getInstance(document, out);
 
+    if (!document.isOpen()) document.open();
+
     document.add(new Paragraph("Client Records Report from: " + date));
 
     PdfPTable table = new PdfPTable(7);
@@ -57,6 +59,7 @@ public class ReportClientRecordPdfGenerator implements ReportClientsRecord {
     table.addCell("" + row.total);
     table.addCell("" + row.max);
     table.addCell("" + row.min);
+    document.add(table);
   }
 
   @Override

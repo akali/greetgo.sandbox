@@ -3,13 +3,16 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
-    <!-- v001 -->
-    <include file="liquibase/postgres/v001/000_common.xml"/>
-    <include file="liquibase/postgres/v001/001_person.xml"/>
+    <changeSet author="akali" id="init-create-reports-table">
+        <sql endDelimiter=";;"><![CDATA[
 
-    <!--v002-->
+        create table Report (
+            id serial primary key,
+            id_code varchar(64) not null,
+            url varchar(64) not null
+        );
+    ]]></sql>
+    </changeSet>
 
-    <include file="liquibase/postgres/v002/000_client.xml"/>
-    <include file="liquibase/postgres/v002/001_reports.xml"/>
 
 </databaseChangeLog>

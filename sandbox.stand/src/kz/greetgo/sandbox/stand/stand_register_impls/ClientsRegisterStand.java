@@ -5,15 +5,16 @@ import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.mvc.interfaces.BinResponse;
 import kz.greetgo.sandbox.controller.model.*;
+import kz.greetgo.sandbox.controller.register.AuthRegister;
 import kz.greetgo.sandbox.controller.register.ClientsRegister;
 import kz.greetgo.sandbox.controller.reports.ReportClientRecordPdfGenerator;
 import kz.greetgo.sandbox.controller.reports.ReportClientRecordXlsxGenerator;
 import kz.greetgo.sandbox.controller.reports.ReportClientsRecord;
 import kz.greetgo.sandbox.db.stand.beans.StandDb;
+import org.apache.poi.util.IOUtils;
 
 import java.io.*;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 @Bean
 public class ClientsRegisterStand implements ClientsRegister {
   public BeanGetter<StandDb> standDb;
+  public BeanGetter<AuthRegister> authRegister;
 
   private Client getClient(int clientId) {
     return standDb.get().clientStorage.get(String.valueOf(clientId));
@@ -189,37 +191,58 @@ public class ClientsRegisterStand implements ClientsRegister {
   }
 
   @Override
-  public void generateReport(FileType fileType, int authorId, QueryFilter filter, BinResponse binResponse) throws IOException, DocumentException {
+  public String generateReport(ReportType reportType, QueryFilter filter, String token) throws IOException, DocumentException {
     filter.start = 0;
     filter.limit = 1000000000;
 
     TableResponse response = getClientRecords(filter);
-
-    binResponse.setFilename(("Report from: " + new SimpleDateFormat("dd-MM-yyyy")).concat(fileType.name().toLowerCase()));
-    binResponse.setContentType("application/".concat(fileType.name().toLowerCase()));
-
     ReportClientsRecord reportClientsRecord  = null;
 
-    switch (fileType) {
+    String root = "/home/aqali/tmp/" + "Report_" + new Random().nextInt(100000);
+
+    FileOutputStream fos = null; // = new FileOutputStream(root);
+
+    switch (reportType) {
       case XLSX:
-        reportClientsRecord = new ReportClientRecordXlsxGenerator(binResponse.out());
+        root += ".xlsx";
+        fos = new FileOutputStream(root);
+        reportClientsRecord = new ReportClientRecordXlsxGenerator(fos);
         break;
       case PDF:
-        reportClientsRecord = new ReportClientRecordPdfGenerator(binResponse.out());
+        root += ".pdf";
+        fos = new FileOutputStream(root);
+        reportClientsRecord = new ReportClientRecordPdfGenerator(fos);
         break;
     }
 
-    int count = 1;
+    reportClientsRecord.start(authRegister.get().getUserInfo(token).accountName, new Date());
 
-    reportClientsRecord.start("TMP", new Date());
+    int count = 1;
 
     for (ClientRecord record: response.list) {
       reportClientsRecord.append(new ClientRecordRow(count++, record));
     }
 
     reportClientsRecord.finish();
+    return standDb.get().putUrl(root);
+  }
+
+  @Override
+  public void downloadReport(String id, BinResponse binResponse) throws IOException {
+    System.out.println(id);
+    standDb.get().downloadUrl.forEach((s, s2) -> System.out.println(s + ": " + s2));
+
+    String filename = standDb.get().getUrl(id);
+
+    binResponse.setFilename(filename);
+    binResponse.setContentType("application/octet-stream");
+
+    System.out.println(filename);
+
+    try (FileInputStream fin = new FileInputStream(new File(filename))) {
+      IOUtils.copy(fin, binResponse.out());
+    }
 
     binResponse.out().flush();
   }
-
 }

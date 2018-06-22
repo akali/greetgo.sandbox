@@ -1,5 +1,6 @@
 package kz.greetgo.sandbox.controller.controller;
 
+import com.itextpdf.text.DocumentException;
 import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.mvc.annotations.*;
@@ -10,8 +11,6 @@ import kz.greetgo.sandbox.controller.security.NoSecurity;
 import kz.greetgo.sandbox.controller.util.Controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 //TODO(DONE): переименую контроллер. Непонятно за что контроллер отвечает
@@ -76,23 +75,30 @@ public class ClientsController implements Controller {
     return tableRegister.get().editClientToSave(clientToSave);
   }
 
+  @AsIs
   @Mapping("/generateReport")
-  public void generateReport(
-    @Par("filetype") @Json FileType fileType,
-    @Par("id") int authorId,
-    @Par("queryFilter") QueryFilter filter, BinResponse binResponse) throws IOException {
-    tableRegister.get().generateReport(fileType, authorId, filter, binResponse);
+  public String generateReport(
+    @ParSession("personId") String token,
+    @Par("reportType") @Json ReportType reportType,
+    @Par("queryFilter") @Json QueryFilter filter) throws IOException, DocumentException {
+    System.out.println("Token: " + token);
+    return tableRegister.get().generateReport(reportType, filter, token);
   }
 
   @NoSecurity
-  @Mapping("/test")
-  public void test(BinResponse binResponse) throws IOException, InterruptedException {
-    binResponse.setFilename("hello.txt");
-    binResponse.setContentType("application/txt");
-    PrintWriter pr = new PrintWriter(binResponse.out());
-    pr.println("Hello, world!");
-    pr.flush();
-    binResponse.flushBuffers();
-    binResponse.out().flush();
+  @Mapping("/downloadReport")
+  public void downloadReport(@Par("id") String id, BinResponse binResponse) throws IOException, DocumentException {
+    tableRegister.get().downloadReport(id, binResponse);
+//    tableRegister.get().generateReport(ReportType.XLSX, 1,
+//      new QueryFilter(0, 0, "ASC", "name", ""),
+//      binResponse);
+
+//    binResponse.setFilename(filename + ".txt");
+//    binResponse.setContentType("application/txt");
+//    PrintWriter pr = new PrintWriter(binResponse.out());
+//    pr.println("Hello, world!");
+//    pr.flush();
+//    binResponse.flushBuffers();
+//    binResponse.out().flush();
   }
 }
