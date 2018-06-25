@@ -5,7 +5,7 @@
       <ServerVersion>9.5.12</ServerVersion>
     </root>
     <database id="2" parent="1" name="aqali_sandbox">
-      <ObjectId>18068</ObjectId>
+      <ObjectId>29661</ObjectId>
       <IntrospectionStateNumber>24</IntrospectionStateNumber>
       <Current>1</Current>
       <Visible>1</Visible>
@@ -15,7 +15,7 @@
       <Comment>default administrative connection database</Comment>
     </database>
     <role id="4" parent="1" name="aqali_sandbox">
-      <ObjectId>18067</ObjectId>
+      <ObjectId>29660</ObjectId>
       <Inherit>1</Inherit>
       <CanLogin>1</CanLogin>
       <ConnectionLimit>-1</ConnectionLimit>
@@ -51,8 +51,8 @@
     <schema id="11" parent="2" name="public">
       <ObjectId>2200</ObjectId>
       <Comment>standard public schema</Comment>
-      <IntrospectionTimestamp>2018-06-15.10:35:17.562</IntrospectionTimestamp>
-      <IntrospectionStateNumber>1203</IntrospectionStateNumber>
+      <IntrospectionTimestamp>2018-06-22.17:28:10.852</IntrospectionTimestamp>
+      <IntrospectionStateNumber>118371</IntrospectionStateNumber>
       <Current>1</Current>
       <Visible>1</Visible>
     </schema>
@@ -81,673 +81,772 @@
       <Comment>block range index (BRIN) access method</Comment>
     </access-method>
     <sequence id="18" parent="11" name="charm_id_seq">
-      <ObjectId>18095</ObjectId>
-      <StateNumber>1203</StateNumber>
+      <ObjectId>29688</ObjectId>
+      <StateNumber>118369</StateNumber>
       <SequenceIdentity>1</SequenceIdentity>
       <BelongsToColumn>1</BelongsToColumn>
       <CacheSize>1</CacheSize>
     </sequence>
     <sequence id="19" parent="11" name="client_id_seq">
-      <ObjectId>18106</ObjectId>
-      <StateNumber>1203</StateNumber>
+      <ObjectId>29699</ObjectId>
+      <StateNumber>118369</StateNumber>
       <SequenceIdentity>1</SequenceIdentity>
       <BelongsToColumn>1</BelongsToColumn>
       <CacheSize>1</CacheSize>
     </sequence>
     <sequence id="20" parent="11" name="clientaccount_id_seq">
-      <ObjectId>18139</ObjectId>
-      <StateNumber>1203</StateNumber>
+      <ObjectId>29732</ObjectId>
+      <StateNumber>118369</StateNumber>
       <SequenceIdentity>1</SequenceIdentity>
       <BelongsToColumn>1</BelongsToColumn>
       <CacheSize>1</CacheSize>
     </sequence>
     <sequence id="21" parent="11" name="clientaccounttransaction_id_seq">
-      <ObjectId>18163</ObjectId>
-      <StateNumber>1203</StateNumber>
+      <ObjectId>29756</ObjectId>
+      <StateNumber>118369</StateNumber>
       <SequenceIdentity>1</SequenceIdentity>
       <BelongsToColumn>1</BelongsToColumn>
       <CacheSize>1</CacheSize>
     </sequence>
-    <sequence id="22" parent="11" name="transactiontype_id_seq">
-      <ObjectId>18155</ObjectId>
-      <StateNumber>1203</StateNumber>
+    <sequence id="22" parent="11" name="report_id_seq">
+      <ObjectId>29781</ObjectId>
+      <StateNumber>118371</StateNumber>
       <SequenceIdentity>1</SequenceIdentity>
       <BelongsToColumn>1</BelongsToColumn>
       <CacheSize>1</CacheSize>
     </sequence>
-    <table id="23" parent="11" name="charm">
-      <ObjectId>18097</ObjectId>
-      <StateNumber>1203</StateNumber>
+    <sequence id="23" parent="11" name="transactiontype_id_seq">
+      <ObjectId>29748</ObjectId>
+      <StateNumber>118369</StateNumber>
+      <SequenceIdentity>1</SequenceIdentity>
+      <BelongsToColumn>1</BelongsToColumn>
+      <CacheSize>1</CacheSize>
+    </sequence>
+    <table id="24" parent="11" name="charm">
+      <ObjectId>29690</ObjectId>
+      <StateNumber>118369</StateNumber>
     </table>
-    <table id="24" parent="11" name="client">
-      <ObjectId>18108</ObjectId>
-      <StateNumber>1203</StateNumber>
+    <table id="25" parent="11" name="client">
+      <ObjectId>29701</ObjectId>
+      <StateNumber>118369</StateNumber>
     </table>
-    <table id="25" parent="11" name="clientaccount">
-      <ObjectId>18141</ObjectId>
-      <StateNumber>1203</StateNumber>
+    <table id="26" parent="11" name="clientaccount">
+      <ObjectId>29734</ObjectId>
+      <StateNumber>118369</StateNumber>
     </table>
-    <table id="26" parent="11" name="clientaccounttransaction">
-      <ObjectId>18165</ObjectId>
-      <StateNumber>1203</StateNumber>
+    <table id="27" parent="11" name="clientaccounttransaction">
+      <ObjectId>29758</ObjectId>
+      <StateNumber>118369</StateNumber>
     </table>
-    <table id="27" parent="11" name="clientaddress">
-      <ObjectId>18119</ObjectId>
-      <StateNumber>1203</StateNumber>
+    <table id="28" parent="11" name="clientaddress">
+      <ObjectId>29712</ObjectId>
+      <StateNumber>118369</StateNumber>
     </table>
-    <table id="28" parent="11" name="clientphone">
-      <ObjectId>18129</ObjectId>
-      <StateNumber>1203</StateNumber>
+    <table id="29" parent="11" name="clientphone">
+      <ObjectId>29722</ObjectId>
+      <StateNumber>118369</StateNumber>
     </table>
-    <table id="29" parent="11" name="databasechangelog">
-      <ObjectId>18074</ObjectId>
-      <StateNumber>1196</StateNumber>
+    <table id="30" parent="11" name="databasechangelog">
+      <ObjectId>29667</ObjectId>
+      <StateNumber>118362</StateNumber>
     </table>
-    <table id="30" parent="11" name="databasechangeloglock">
-      <ObjectId>18069</ObjectId>
-      <StateNumber>1193</StateNumber>
+    <table id="31" parent="11" name="databasechangeloglock">
+      <ObjectId>29662</ObjectId>
+      <StateNumber>118359</StateNumber>
     </table>
-    <table id="31" parent="11" name="person">
-      <ObjectId>18086</ObjectId>
-      <StateNumber>1201</StateNumber>
+    <table id="32" parent="11" name="person">
+      <ObjectId>29679</ObjectId>
+      <StateNumber>118367</StateNumber>
     </table>
-    <table id="32" parent="11" name="transactiontype">
-      <ObjectId>18157</ObjectId>
-      <StateNumber>1203</StateNumber>
+    <table id="33" parent="11" name="report">
+      <ObjectId>29783</ObjectId>
+      <StateNumber>118371</StateNumber>
     </table>
-    <table id="33" parent="11" name="userparams">
-      <ObjectId>18081</ObjectId>
-      <StateNumber>1199</StateNumber>
+    <table id="34" parent="11" name="transactiontype">
+      <ObjectId>29750</ObjectId>
+      <StateNumber>118369</StateNumber>
     </table>
-    <routine id="34" parent="11" name="moment">
-      <ObjectId>18080</ObjectId>
-      <StateNumber>1197</StateNumber>
+    <table id="35" parent="11" name="userparams">
+      <ObjectId>29674</ObjectId>
+      <StateNumber>118365</StateNumber>
+    </table>
+    <view id="36" parent="11" name="clientrecord">
+      <ObjectId>29777</ObjectId>
+      <StateNumber>118369</StateNumber>
+    </view>
+    <routine id="37" parent="11" name="moment">
+      <ObjectId>29673</ObjectId>
+      <StateNumber>118363</StateNumber>
       <VolatilityKind>volatile</VolatilityKind>
       <ResultsDefinition>timestamp without time zone</ResultsDefinition>
       <LanguageName>plpgsql</LanguageName>
       <RoutineKind>function</RoutineKind>
       <Cost>100.0</Cost>
     </routine>
-    <column id="35" parent="23" name="id">
+    <column id="38" parent="24" name="id">
       <Position>1</Position>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <DefaultExpression>nextval(&apos;charm_id_seq&apos;::regclass)</DefaultExpression>
       <TypeId>23</TypeId>
       <SequenceName>charm_id_seq</SequenceName>
     </column>
-    <column id="36" parent="23" name="name">
+    <column id="39" parent="24" name="name">
       <Position>2</Position>
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="37" parent="23" name="description">
+    <column id="40" parent="24" name="description">
       <Position>3</Position>
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="38" parent="23" name="energy">
+    <column id="41" parent="24" name="energy">
       <Position>4</Position>
       <DataType>numeric|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <index id="39" parent="23" name="charm_pkey">
-      <ObjectId>18104</ObjectId>
+    <index id="42" parent="24" name="charm_pkey">
+      <ObjectId>29697</ObjectId>
       <ColNames>id</ColNames>
       <Unique>1</Unique>
     </index>
-    <key id="40" parent="23" name="charm_pkey">
-      <ObjectId>18105</ObjectId>
+    <key id="43" parent="24" name="charm_pkey">
+      <ObjectId>29698</ObjectId>
       <ColNames>id</ColNames>
       <UnderlyingIndexName>charm_pkey</UnderlyingIndexName>
       <Primary>1</Primary>
     </key>
-    <column id="41" parent="24" name="id">
+    <column id="44" parent="25" name="id">
       <Position>1</Position>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <DefaultExpression>nextval(&apos;client_id_seq&apos;::regclass)</DefaultExpression>
       <TypeId>23</TypeId>
       <SequenceName>client_id_seq</SequenceName>
     </column>
-    <column id="42" parent="24" name="surname">
+    <column id="45" parent="25" name="surname">
       <Position>2</Position>
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="43" parent="24" name="name">
+    <column id="46" parent="25" name="name">
       <Position>3</Position>
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="44" parent="24" name="patronymic">
+    <column id="47" parent="25" name="patronymic">
       <Position>4</Position>
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="45" parent="24" name="gender">
+    <column id="48" parent="25" name="gender">
       <Position>5</Position>
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="46" parent="24" name="birth_date">
+    <column id="49" parent="25" name="birth_date">
       <Position>6</Position>
       <DataType>date|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1082</TypeId>
     </column>
-    <column id="47" parent="24" name="charm">
+    <column id="50" parent="25" name="charm">
       <Position>7</Position>
       <DataType>integer|0s</DataType>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <index id="48" parent="24" name="client_pkey">
-      <ObjectId>18112</ObjectId>
+    <index id="51" parent="25" name="client_pkey">
+      <ObjectId>29705</ObjectId>
       <ColNames>id</ColNames>
       <Unique>1</Unique>
     </index>
-    <key id="49" parent="24" name="client_pkey">
-      <ObjectId>18113</ObjectId>
+    <key id="52" parent="25" name="client_pkey">
+      <ObjectId>29706</ObjectId>
       <ColNames>id</ColNames>
       <UnderlyingIndexName>client_pkey</UnderlyingIndexName>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="50" parent="24" name="client_charm_fkey">
-      <ObjectId>18114</ObjectId>
+    <foreign-key id="53" parent="25" name="client_charm_fkey">
+      <ObjectId>29707</ObjectId>
       <ColNames>charm</ColNames>
-      <RefTableId>18097</RefTableId>
+      <RefTableId>29690</RefTableId>
       <RefColPositions>1</RefColPositions>
       <RefTableName>charm</RefTableName>
       <RefKeyName>charm_pkey</RefKeyName>
       <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
     </foreign-key>
-    <column id="51" parent="25" name="id">
+    <column id="54" parent="26" name="id">
       <Position>1</Position>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <DefaultExpression>nextval(&apos;clientaccount_id_seq&apos;::regclass)</DefaultExpression>
       <TypeId>23</TypeId>
       <SequenceName>clientaccount_id_seq</SequenceName>
     </column>
-    <column id="52" parent="25" name="client">
+    <column id="55" parent="26" name="client">
       <Position>2</Position>
       <DataType>integer|0s</DataType>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="53" parent="25" name="money">
+    <column id="56" parent="26" name="money">
       <Position>3</Position>
       <DataType>numeric|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="54" parent="25" name="number">
+    <column id="57" parent="26" name="number">
       <Position>4</Position>
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="55" parent="25" name="registered_at">
+    <column id="58" parent="26" name="registered_at">
       <Position>5</Position>
       <DataType>timestamp|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1114</TypeId>
     </column>
-    <index id="56" parent="25" name="clientaccount_pkey">
-      <ObjectId>18148</ObjectId>
+    <index id="59" parent="26" name="clientaccount_pkey">
+      <ObjectId>29741</ObjectId>
       <ColNames>id</ColNames>
       <Unique>1</Unique>
     </index>
-    <key id="57" parent="25" name="clientaccount_pkey">
-      <ObjectId>18149</ObjectId>
+    <key id="60" parent="26" name="clientaccount_pkey">
+      <ObjectId>29742</ObjectId>
       <ColNames>id</ColNames>
       <UnderlyingIndexName>clientaccount_pkey</UnderlyingIndexName>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="58" parent="25" name="clientaccount_client_fkey">
-      <ObjectId>18150</ObjectId>
+    <foreign-key id="61" parent="26" name="clientaccount_client_fkey">
+      <ObjectId>29743</ObjectId>
       <ColNames>client</ColNames>
-      <RefTableId>18108</RefTableId>
+      <RefTableId>29701</RefTableId>
       <RefColPositions>1</RefColPositions>
       <RefTableName>client</RefTableName>
       <RefKeyName>client_pkey</RefKeyName>
       <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
     </foreign-key>
-    <column id="59" parent="26" name="id">
+    <column id="62" parent="27" name="id">
       <Position>1</Position>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <DefaultExpression>nextval(&apos;clientaccounttransaction_id_seq&apos;::regclass)</DefaultExpression>
       <TypeId>23</TypeId>
       <SequenceName>clientaccounttransaction_id_seq</SequenceName>
     </column>
-    <column id="60" parent="26" name="account">
+    <column id="63" parent="27" name="account">
       <Position>2</Position>
       <DataType>integer|0s</DataType>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="61" parent="26" name="money">
+    <column id="64" parent="27" name="money">
       <Position>3</Position>
       <DataType>numeric|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="62" parent="26" name="finished_at">
+    <column id="65" parent="27" name="finished_at">
       <Position>4</Position>
       <DataType>timestamp|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1114</TypeId>
     </column>
-    <column id="63" parent="26" name="type">
+    <column id="66" parent="27" name="type">
       <Position>5</Position>
       <DataType>integer|0s</DataType>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <index id="64" parent="26" name="clientaccounttransaction_pkey">
-      <ObjectId>18172</ObjectId>
+    <index id="67" parent="27" name="clientaccounttransaction_pkey">
+      <ObjectId>29765</ObjectId>
       <ColNames>id</ColNames>
       <Unique>1</Unique>
     </index>
-    <key id="65" parent="26" name="clientaccounttransaction_pkey">
-      <ObjectId>18173</ObjectId>
+    <key id="68" parent="27" name="clientaccounttransaction_pkey">
+      <ObjectId>29766</ObjectId>
       <ColNames>id</ColNames>
       <UnderlyingIndexName>clientaccounttransaction_pkey</UnderlyingIndexName>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="66" parent="26" name="clientaccounttransaction_account_fkey">
-      <ObjectId>18174</ObjectId>
+    <foreign-key id="69" parent="27" name="clientaccounttransaction_account_fkey">
+      <ObjectId>29767</ObjectId>
       <ColNames>account</ColNames>
-      <RefTableId>18141</RefTableId>
+      <RefTableId>29734</RefTableId>
       <RefColPositions>1</RefColPositions>
       <RefTableName>clientaccount</RefTableName>
       <RefKeyName>clientaccount_pkey</RefKeyName>
       <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
     </foreign-key>
-    <foreign-key id="67" parent="26" name="clientaccounttransaction_type_fkey">
-      <ObjectId>18179</ObjectId>
+    <foreign-key id="70" parent="27" name="clientaccounttransaction_type_fkey">
+      <ObjectId>29772</ObjectId>
       <ColNames>type</ColNames>
-      <RefTableId>18157</RefTableId>
+      <RefTableId>29750</RefTableId>
       <RefColPositions>1</RefColPositions>
       <RefTableName>transactiontype</RefTableName>
       <RefKeyName>transactiontype_pkey</RefKeyName>
       <RefColNames>id</RefColNames>
     </foreign-key>
-    <column id="68" parent="27" name="client">
+    <column id="71" parent="28" name="client">
       <Position>1</Position>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="69" parent="27" name="type">
+    <column id="72" parent="28" name="type">
       <Position>2</Position>
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="70" parent="27" name="street">
+    <column id="73" parent="28" name="street">
       <Position>3</Position>
       <DataType>varchar(64)|0s</DataType>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="71" parent="27" name="house">
+    <column id="74" parent="28" name="house">
       <Position>4</Position>
       <DataType>varchar(64)|0s</DataType>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="72" parent="27" name="flat">
+    <column id="75" parent="28" name="flat">
       <Position>5</Position>
       <DataType>varchar(64)|0s</DataType>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="73" parent="27" name="clientaddress_pkey">
-      <ObjectId>18122</ObjectId>
+    <index id="76" parent="28" name="clientaddress_pkey">
+      <ObjectId>29715</ObjectId>
       <ColNames>client
 type</ColNames>
       <Unique>1</Unique>
     </index>
-    <key id="74" parent="27" name="clientaddress_pkey">
-      <ObjectId>18123</ObjectId>
+    <key id="77" parent="28" name="clientaddress_pkey">
+      <ObjectId>29716</ObjectId>
       <ColNames>client
 type</ColNames>
       <UnderlyingIndexName>clientaddress_pkey</UnderlyingIndexName>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="75" parent="27" name="clientaddress_client_fkey">
-      <ObjectId>18124</ObjectId>
+    <foreign-key id="78" parent="28" name="clientaddress_client_fkey">
+      <ObjectId>29717</ObjectId>
       <ColNames>client</ColNames>
-      <RefTableId>18108</RefTableId>
+      <RefTableId>29701</RefTableId>
       <RefColPositions>1</RefColPositions>
       <RefTableName>client</RefTableName>
       <RefKeyName>client_pkey</RefKeyName>
       <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
     </foreign-key>
-    <column id="76" parent="28" name="client">
+    <column id="79" parent="29" name="client">
       <Position>1</Position>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="77" parent="28" name="number">
+    <column id="80" parent="29" name="number">
       <Position>2</Position>
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="78" parent="28" name="type">
+    <column id="81" parent="29" name="type">
       <Position>3</Position>
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="79" parent="28" name="clientphone_pkey">
-      <ObjectId>18132</ObjectId>
+    <index id="82" parent="29" name="clientphone_pkey">
+      <ObjectId>29725</ObjectId>
       <ColNames>client
 number</ColNames>
       <Unique>1</Unique>
     </index>
-    <key id="80" parent="28" name="clientphone_pkey">
-      <ObjectId>18133</ObjectId>
+    <key id="83" parent="29" name="clientphone_pkey">
+      <ObjectId>29726</ObjectId>
       <ColNames>client
 number</ColNames>
       <UnderlyingIndexName>clientphone_pkey</UnderlyingIndexName>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="81" parent="28" name="clientphone_client_fkey">
-      <ObjectId>18134</ObjectId>
+    <foreign-key id="84" parent="29" name="clientphone_client_fkey">
+      <ObjectId>29727</ObjectId>
       <ColNames>client</ColNames>
-      <RefTableId>18108</RefTableId>
+      <RefTableId>29701</RefTableId>
       <RefColPositions>1</RefColPositions>
       <RefTableName>client</RefTableName>
       <RefKeyName>client_pkey</RefKeyName>
       <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
     </foreign-key>
-    <column id="82" parent="29" name="id">
+    <column id="85" parent="30" name="id">
       <Position>1</Position>
       <DataType>varchar(255)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1196</StateNumber>
+      <StateNumber>118362</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="83" parent="29" name="author">
+    <column id="86" parent="30" name="author">
       <Position>2</Position>
       <DataType>varchar(255)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1196</StateNumber>
+      <StateNumber>118362</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="84" parent="29" name="filename">
+    <column id="87" parent="30" name="filename">
       <Position>3</Position>
       <DataType>varchar(255)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1196</StateNumber>
+      <StateNumber>118362</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="85" parent="29" name="dateexecuted">
+    <column id="88" parent="30" name="dateexecuted">
       <Position>4</Position>
       <DataType>timestamp|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1196</StateNumber>
+      <StateNumber>118362</StateNumber>
       <TypeId>1114</TypeId>
     </column>
-    <column id="86" parent="29" name="orderexecuted">
+    <column id="89" parent="30" name="orderexecuted">
       <Position>5</Position>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1196</StateNumber>
+      <StateNumber>118362</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="87" parent="29" name="exectype">
+    <column id="90" parent="30" name="exectype">
       <Position>6</Position>
       <DataType>varchar(10)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1196</StateNumber>
+      <StateNumber>118362</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="88" parent="29" name="md5sum">
+    <column id="91" parent="30" name="md5sum">
       <Position>7</Position>
       <DataType>varchar(35)|0s</DataType>
-      <StateNumber>1196</StateNumber>
+      <StateNumber>118362</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="89" parent="29" name="description">
+    <column id="92" parent="30" name="description">
       <Position>8</Position>
       <DataType>varchar(255)|0s</DataType>
-      <StateNumber>1196</StateNumber>
+      <StateNumber>118362</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="90" parent="29" name="comments">
+    <column id="93" parent="30" name="comments">
       <Position>9</Position>
       <DataType>varchar(255)|0s</DataType>
-      <StateNumber>1196</StateNumber>
+      <StateNumber>118362</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="91" parent="29" name="tag">
+    <column id="94" parent="30" name="tag">
       <Position>10</Position>
       <DataType>varchar(255)|0s</DataType>
-      <StateNumber>1196</StateNumber>
+      <StateNumber>118362</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="92" parent="29" name="liquibase">
+    <column id="95" parent="30" name="liquibase">
       <Position>11</Position>
       <DataType>varchar(20)|0s</DataType>
-      <StateNumber>1196</StateNumber>
+      <StateNumber>118362</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="93" parent="29" name="contexts">
+    <column id="96" parent="30" name="contexts">
       <Position>12</Position>
       <DataType>varchar(255)|0s</DataType>
-      <StateNumber>1196</StateNumber>
+      <StateNumber>118362</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="94" parent="29" name="labels">
+    <column id="97" parent="30" name="labels">
       <Position>13</Position>
       <DataType>varchar(255)|0s</DataType>
-      <StateNumber>1196</StateNumber>
+      <StateNumber>118362</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="95" parent="29" name="deployment_id">
+    <column id="98" parent="30" name="deployment_id">
       <Position>14</Position>
       <DataType>varchar(10)|0s</DataType>
-      <StateNumber>1196</StateNumber>
+      <StateNumber>118362</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="96" parent="30" name="id">
+    <column id="99" parent="31" name="id">
       <Position>1</Position>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1193</StateNumber>
+      <StateNumber>118359</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="97" parent="30" name="locked">
+    <column id="100" parent="31" name="locked">
       <Position>2</Position>
       <DataType>boolean|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1193</StateNumber>
+      <StateNumber>118359</StateNumber>
       <TypeId>16</TypeId>
     </column>
-    <column id="98" parent="30" name="lockgranted">
+    <column id="101" parent="31" name="lockgranted">
       <Position>3</Position>
       <DataType>timestamp|0s</DataType>
-      <StateNumber>1193</StateNumber>
+      <StateNumber>118359</StateNumber>
       <TypeId>1114</TypeId>
     </column>
-    <column id="99" parent="30" name="lockedby">
+    <column id="102" parent="31" name="lockedby">
       <Position>4</Position>
       <DataType>varchar(255)|0s</DataType>
-      <StateNumber>1193</StateNumber>
+      <StateNumber>118359</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="100" parent="30" name="pk_databasechangeloglock">
-      <ObjectId>18072</ObjectId>
+    <index id="103" parent="31" name="pk_databasechangeloglock">
+      <ObjectId>29665</ObjectId>
       <ColNames>id</ColNames>
       <Unique>1</Unique>
     </index>
-    <key id="101" parent="30" name="pk_databasechangeloglock">
-      <ObjectId>18073</ObjectId>
+    <key id="104" parent="31" name="pk_databasechangeloglock">
+      <ObjectId>29666</ObjectId>
       <ColNames>id</ColNames>
       <UnderlyingIndexName>pk_databasechangeloglock</UnderlyingIndexName>
       <Primary>1</Primary>
     </key>
-    <column id="102" parent="31" name="id">
+    <column id="105" parent="32" name="id">
       <Position>1</Position>
       <DataType>varchar(30)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1201</StateNumber>
+      <StateNumber>118367</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="103" parent="31" name="accountname">
+    <column id="106" parent="32" name="accountname">
       <Position>2</Position>
       <DataType>varchar(100)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1201</StateNumber>
+      <StateNumber>118367</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="104" parent="31" name="surname">
+    <column id="107" parent="32" name="surname">
       <Position>3</Position>
       <DataType>varchar(255)|0s</DataType>
-      <StateNumber>1201</StateNumber>
+      <StateNumber>118367</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="105" parent="31" name="name">
+    <column id="108" parent="32" name="name">
       <Position>4</Position>
       <DataType>varchar(255)|0s</DataType>
-      <StateNumber>1201</StateNumber>
+      <StateNumber>118367</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="106" parent="31" name="patronymic">
+    <column id="109" parent="32" name="patronymic">
       <Position>5</Position>
       <DataType>varchar(255)|0s</DataType>
-      <StateNumber>1201</StateNumber>
+      <StateNumber>118367</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="107" parent="31" name="encryptedpassword">
+    <column id="110" parent="32" name="encryptedpassword">
       <Position>6</Position>
       <DataType>varchar(255)|0s</DataType>
-      <StateNumber>1201</StateNumber>
+      <StateNumber>118367</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="108" parent="31" name="blocked">
+    <column id="111" parent="32" name="blocked">
       <Position>7</Position>
       <DataType>smallint|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1201</StateNumber>
+      <StateNumber>118367</StateNumber>
       <DefaultExpression>1</DefaultExpression>
       <TypeId>21</TypeId>
     </column>
-    <index id="109" parent="31" name="person_pkey">
-      <ObjectId>18093</ObjectId>
+    <index id="112" parent="32" name="person_pkey">
+      <ObjectId>29686</ObjectId>
       <ColNames>id</ColNames>
       <Unique>1</Unique>
     </index>
-    <key id="110" parent="31" name="person_pkey">
-      <ObjectId>18094</ObjectId>
+    <key id="113" parent="32" name="person_pkey">
+      <ObjectId>29687</ObjectId>
       <ColNames>id</ColNames>
       <UnderlyingIndexName>person_pkey</UnderlyingIndexName>
       <Primary>1</Primary>
     </key>
-    <column id="111" parent="32" name="id">
+    <column id="114" parent="33" name="id">
       <Position>1</Position>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118371</StateNumber>
+      <DefaultExpression>nextval(&apos;report_id_seq&apos;::regclass)</DefaultExpression>
+      <TypeId>23</TypeId>
+      <SequenceName>report_id_seq</SequenceName>
+    </column>
+    <column id="115" parent="33" name="id_code">
+      <Position>2</Position>
+      <DataType>varchar(64)|0s</DataType>
+      <NotNull>1</NotNull>
+      <StateNumber>118371</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="116" parent="33" name="url">
+      <Position>3</Position>
+      <DataType>varchar(64)|0s</DataType>
+      <NotNull>1</NotNull>
+      <StateNumber>118371</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <index id="117" parent="33" name="report_pkey">
+      <ObjectId>29787</ObjectId>
+      <ColNames>id</ColNames>
+      <Unique>1</Unique>
+    </index>
+    <key id="118" parent="33" name="report_pkey">
+      <ObjectId>29788</ObjectId>
+      <ColNames>id</ColNames>
+      <UnderlyingIndexName>report_pkey</UnderlyingIndexName>
+      <Primary>1</Primary>
+    </key>
+    <column id="119" parent="34" name="id">
+      <Position>1</Position>
+      <DataType>integer|0s</DataType>
+      <NotNull>1</NotNull>
+      <StateNumber>118369</StateNumber>
       <DefaultExpression>nextval(&apos;transactiontype_id_seq&apos;::regclass)</DefaultExpression>
       <TypeId>23</TypeId>
       <SequenceName>transactiontype_id_seq</SequenceName>
     </column>
-    <column id="112" parent="32" name="code">
+    <column id="120" parent="34" name="code">
       <Position>2</Position>
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="113" parent="32" name="name">
+    <column id="121" parent="34" name="name">
       <Position>3</Position>
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1203</StateNumber>
+      <StateNumber>118369</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="114" parent="32" name="transactiontype_pkey">
-      <ObjectId>18161</ObjectId>
+    <index id="122" parent="34" name="transactiontype_pkey">
+      <ObjectId>29754</ObjectId>
       <ColNames>id</ColNames>
       <Unique>1</Unique>
     </index>
-    <key id="115" parent="32" name="transactiontype_pkey">
-      <ObjectId>18162</ObjectId>
+    <key id="123" parent="34" name="transactiontype_pkey">
+      <ObjectId>29755</ObjectId>
       <ColNames>id</ColNames>
       <UnderlyingIndexName>transactiontype_pkey</UnderlyingIndexName>
       <Primary>1</Primary>
     </key>
-    <column id="116" parent="33" name="personid">
+    <column id="124" parent="35" name="personid">
       <Position>1</Position>
       <DataType>varchar(30)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1199</StateNumber>
+      <StateNumber>118365</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="117" parent="33" name="name">
+    <column id="125" parent="35" name="name">
       <Position>2</Position>
       <DataType>varchar(50)|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>1199</StateNumber>
+      <StateNumber>118365</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="118" parent="33" name="value">
+    <column id="126" parent="35" name="value">
       <Position>3</Position>
       <DataType>varchar(255)|0s</DataType>
-      <StateNumber>1199</StateNumber>
+      <StateNumber>118365</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="119" parent="33" name="userparams_pkey">
-      <ObjectId>18084</ObjectId>
+    <index id="127" parent="35" name="userparams_pkey">
+      <ObjectId>29677</ObjectId>
       <ColNames>personid
 name</ColNames>
       <Unique>1</Unique>
     </index>
-    <key id="120" parent="33" name="userparams_pkey">
-      <ObjectId>18085</ObjectId>
+    <key id="128" parent="35" name="userparams_pkey">
+      <ObjectId>29678</ObjectId>
       <ColNames>personid
 name</ColNames>
       <UnderlyingIndexName>userparams_pkey</UnderlyingIndexName>
       <Primary>1</Primary>
     </key>
-    <argument id="121" parent="34">
+    <column id="129" parent="36" name="id">
+      <Position>1</Position>
+      <DataType>integer|0s</DataType>
+      <StateNumber>118369</StateNumber>
+    </column>
+    <column id="130" parent="36" name="name">
+      <Position>2</Position>
+      <DataType>varchar(64)|0s</DataType>
+      <StateNumber>118369</StateNumber>
+    </column>
+    <column id="131" parent="36" name="surname">
+      <Position>3</Position>
+      <DataType>varchar(64)|0s</DataType>
+      <StateNumber>118369</StateNumber>
+    </column>
+    <column id="132" parent="36" name="patronymic">
+      <Position>4</Position>
+      <DataType>varchar(64)|0s</DataType>
+      <StateNumber>118369</StateNumber>
+    </column>
+    <column id="133" parent="36" name="age">
+      <Position>5</Position>
+      <DataType>double precision|0s</DataType>
+      <StateNumber>118369</StateNumber>
+    </column>
+    <column id="134" parent="36" name="max">
+      <Position>6</Position>
+      <DataType>numeric|0s</DataType>
+      <StateNumber>118369</StateNumber>
+    </column>
+    <column id="135" parent="36" name="min">
+      <Position>7</Position>
+      <DataType>numeric|0s</DataType>
+      <StateNumber>118369</StateNumber>
+    </column>
+    <column id="136" parent="36" name="total">
+      <Position>8</Position>
+      <DataType>numeric|0s</DataType>
+      <StateNumber>118369</StateNumber>
+    </column>
+    <column id="137" parent="36" name="charm">
+      <Position>9</Position>
+      <DataType>varchar(64)|0s</DataType>
+      <StateNumber>118369</StateNumber>
+    </column>
+    <argument id="138" parent="37">
       <ArgumentDirection>R</ArgumentDirection>
       <DataType>timestamp|0s</DataType>
     </argument>

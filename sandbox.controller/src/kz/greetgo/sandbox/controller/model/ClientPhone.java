@@ -1,5 +1,7 @@
 package kz.greetgo.sandbox.controller.model;
 
+import java.util.Objects;
+
 public class ClientPhone {
   public int client;
   public String number;
@@ -29,8 +31,6 @@ public class ClientPhone {
       phone.type = PhoneType.MOBILE;
     } else if (splitLine[2].equals(PhoneType.HOME.toString())) {
         phone.type = PhoneType.HOME;
-    } else if (splitLine[2].equals(PhoneType.EMBEDDED.toString())) {
-      phone.type = PhoneType.EMBEDDED;
     } else phone.type = PhoneType.WORK;
 
     System.out.println("|"+splitLine[2]+"|" + " " + "|"+PhoneType.MOBILE.toString()+"|" + " " + splitLine[2].equals(PhoneType.MOBILE.toString()));
@@ -40,6 +40,21 @@ public class ClientPhone {
 
   public String getId() {
     return client + "_" + number;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    ClientPhone that = (ClientPhone) o;
+    return client == that.client &&
+      Objects.equals(number, that.number) &&
+      type == that.type;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(client, number, type);
   }
 
   @Override

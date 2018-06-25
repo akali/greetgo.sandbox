@@ -50,6 +50,9 @@ public class ClientToSave {
     this.phones = phones;
   }
 
+  public ClientToSave() {
+  }
+
   public ClientToSave(int id,
                       String name,
                       String surname,
@@ -79,5 +82,17 @@ public class ClientToSave {
     }
     factAddress.client = id;
     regAddress.client = id;
+  }
+
+  public Client getClientCopy() {
+    return new Client(
+      this.id,
+      this.surname,
+      this.name,
+      this.patronymic,
+      this.gender,
+      this.birthDate,
+      this.charm
+    );
   }
 }

@@ -1,15 +1,17 @@
 package kz.greetgo.sandbox.db.register_impl;
 
+import com.itextpdf.text.DocumentException;
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.controller.register.ClientsRegister;
+import kz.greetgo.sandbox.db.dao.ReportsDao;
 import kz.greetgo.sandbox.db.test.dao.ClientsTestDao;
 import kz.greetgo.sandbox.db.test.util.ParentTestNg;
-import kz.greetgo.sandbox.db.util.DBHelper;
-import org.apache.ibatis.jdbc.SQL;
 import org.testng.annotations.Test;
 
-import java.sql.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -17,182 +19,276 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 public class ClientsRegisterImplTest extends ParentTestNg {
 
-  public BeanGetter<ClientsTestDao> tableTestDao;
+  public BeanGetter<ClientsTestDao> clientsTestDao;
   public BeanGetter<ClientsRegister> clientsRegister;
+  public BeanGetter<ReportsDao> reportsDao;
+
+  @Test
+  public void inserting100RandomClients() {
+
+    clearEntities();
+
+    List<RandomClientGenerator.ClientBundle> clientBundles =
+      RandomClientGenerator.generate(10);
+
+    insertTestingCharms(clientBundles.get(0).getCharms());
+    insertTestingTransactionTypes(clientBundles.get(0).getTransactionTypes());
+
+    List<ClientRecord> testClientRecords = new ArrayList<>(), actualClientRecords = new ArrayList<>();
+
+    //
+    //
+    for (RandomClientGenerator.ClientBundle clientBundle : clientBundles) {
+      testClientRecords.add(clientsRegister.get().addClientToSave(clientBundle.getClientToSave()));
+      ClientRecord actualClientRecord = clientBundle.getClientRecord();
+      actualClientRecord.total = actualClientRecord.max = actualClientRecord.min = 0;
+      actualClientRecords.add(actualClientRecord);
+    }
+    //
+    //
+
+    assertThat(testClientRecords).containsAll(actualClientRecords);
+  }
 
   @Test
   public void testGetCharms() {
-    List<Charm> charms = new ArrayList<>();
-    charms.add(new Charm("HAPPY", "VERY HAPPY PERSON", (float) 0.5));
-    tableTestDao.get().clearCharm();
-    charms.forEach(tableTestDao.get()::insertCharm);
+    List<Charm> charms = RandomClientGenerator.getCharms();
+    clearEntities();
+
+    charms.forEach(clientsTestDao.get()::insertCharm);
+
+    //
+    //
     List<Charm> testCharms = clientsRegister.get().getCharms();
-    assertThat(testCharms).isNotNull();
+    //
+    //
+
     assertThat(testCharms).containsAll(charms);
-    System.out.println(testCharms);
   }
 
   @Test
   public void testGetClientRecords() {
+    clearEntities();
+    List<RandomClientGenerator.ClientBundle> clientBundles = RandomClientGenerator.generate(10);
+    insertBundles(clientBundles);
+
+    QueryFilter filter = new QueryFilter(0, 5, "DESC", "name", "");
+
+    TableResponse actual = RandomClientGenerator.getClientRecords(clientBundles, filter);
+
     //
     //
-    TableResponse result = clientsRegister.get()
-      .getClientRecords(new QueryFilter(0, 100, "DESC", "name", ""));
+    TableResponse test = clientsRegister.get()
+      .getClientRecords(filter);
     //
     //
+
+    assertThat(test.list).isEqualTo(actual.list);
   }
 
   @Test
-  public void testGetClientDetailsById() {
-  }
+  public void getClientRecordsCheckSorting() {
+    clearEntities();
+    List<RandomClientGenerator.ClientBundle> clientBundles = RandomClientGenerator.generate(10);
+    insertBundles(clientBundles);
 
-  private Calendar getCalendar(int day, int month, int year) {
-    Calendar cal = new GregorianCalendar();
-    cal.set(Calendar.YEAR, year);
-    cal.set(Calendar.MONTH, month - 1);
-    cal.set(Calendar.DATE, day);
-    return cal;
-  }
+    List<QueryFilter> filters = RandomClientGenerator.generateFilters(10, Arrays.asList("name", "total", "age", "total", "max", "min"));
 
-  public long getTimestamp(int day, int month, int year) {
-    Calendar cal = getCalendar(day, month, year);
-    return cal.getTimeInMillis();
-  }
+    filters.forEach(filter -> {
+      //
+      //
+      TableResponse test = clientsRegister.get()
+        .getClientRecords(filter);
+      //
+      //
 
-  @Test
-  public void testAddClientToSave() {
-    ClientToSave clientToSave =
-      new ClientToSave("Yerbolat", "Ablemetov", "Askarovich", 1, GenderType.MALE,
-        new ClientAddress(
-          AddressType.REG, "Seyfullina", "13a", "23"
-        ),
-        new ClientAddress(
-          AddressType.FACT, "Bekturova", "23", null
-        ),
-        getTimestamp(12, 1, 1998),
-        Arrays.asList(
-          new ClientPhone("+77473105484", PhoneType.MOBILE),
-          new ClientPhone("+77273518547", PhoneType.HOME)
-        )
-      );
-    Client clientToSaveClientCopy =
-      new Client(
-        -1,
-        clientToSave.surname,
-        clientToSave.name,
-        clientToSave.patronymic,
-        clientToSave.gender,
-        clientToSave.birthDate,
-        clientToSave.charm
-      );
-
-    //
-    //
-    ClientRecord clientRecord = clientsRegister.get().addClientToSave(clientToSave);
-    //
-    //
-
-    DBHelper.run(connection -> {
-      PreparedStatement statement = connection.prepareStatement(
-        new SQL()
-          .SELECT("id", "surname", "name", "patronymic", "gender", "birth_date", "charm")
-          .FROM("client")
-          .WHERE("id=?")
-          .toString()
-      );
-      statement.setInt(1, clientRecord.id);
-
-      ResultSet rs = statement.executeQuery();
-      List<Client> clients = new ArrayList<>();
-      while (rs.next()) {
-        clients.add(new Client(rs.getInt("id"), rs.getString("surname"), rs.getString("name"),
-          rs.getString("patronymic"), GenderType.valueOf(rs.getString("gender")), rs.getLong("birth_date"), rs.getInt("charm")));
-      }
-      assertThat(clients).hasSize(1);
-      assertThat(clients.get(0)).isNotNull();
-      assertThat(clients.get(0)).equals(clientToSaveClientCopy);
+      assertThat(test.list).isSortedAccordingTo(
+        (t1, t2) -> {
+          int result = 0;
+          switch(filter.active.toLowerCase()) {
+            case "name":
+              result = t1.name.compareTo(t2.name);
+              break;
+            case "total":
+              result = Float.compare(t1.total, t2.total);
+              break;
+            case "max":
+              result = Float.compare(t1.max, t2.max);
+              break;
+            case "min":
+              result = Float.compare(t1.min, t2.min);
+              break;
+            case "charm":
+              result = t1.charm.compareTo(t2.charm);
+              break;
+            case "age":
+              result = Integer.compare(t1.age, t2.age);
+              break;
+            default:
+              result = Integer.compare(t1.id, t2.id);
+          }
+          if (filter.direction != null && filter.direction.toLowerCase().equals("desc")) {
+            result = -result;
+          }
+          return result;
+      });
     });
   }
 
-  @Test
-  public void testEditClientToSave() {
-  }
+  private void insertBundles(List<RandomClientGenerator.ClientBundle> clientBundles) {
+    insertTestingCharms(RandomClientGenerator.getCharms());
+    insertTestingTransactionTypes(clientBundles.get(0).getTransactionTypes());
 
-  @Test
-  public void testRemoveClientById() {
+    clientBundles.forEach(clientBundle -> {
+      clientsTestDao.get().insertClient(clientBundle.getClient());
+      clientsTestDao.get().insertClientAddress(clientBundle.getRegAddress());
+      if (clientBundle.getFactAddress() != null)
+        clientsTestDao.get().insertClientAddress(clientBundle.getFactAddress());
 
-    List<Client> clients = new ArrayList<>(),
-      toRemove = new ArrayList<>();
-
-    for (Client client : clients)
-      tableTestDao.get().insertClient(client);
-
-    Random rnd = new Random();
-
-    clients.forEach(client -> {
-      if (rnd.nextInt(1) == 0)
-        toRemove.add(client);
+      clientBundle.getPhones().forEach(clientsTestDao.get()::insertClientPhone);
+      clientBundle.getAccounts().forEach(clientsTestDao.get()::insertClientAccount);
+      clientBundle.getTransactions().forEach(clientsTestDao.get()::insertClientAccountTransaction);
     });
-
-    //
-    //
-    toRemove.forEach(client -> clientsRegister.get().removeClientById(client.id));
-    //
-    //
-
-    toRemove.forEach(client -> {
-//      assertThat(tableTestDao.get().getClient(client.id)).isNullOrEmpty();
-    });
-
   }
 
   @Test
   public void test() {
-    try (Connection conn = DriverManager.getConnection(
-      "jdbc:postgresql://localhost/aqali_sandbox",
-      "aqali_sandbox",
-      "111"
-    )) {
+    clearEntities();
+    List<RandomClientGenerator.ClientBundle> bundles = RandomClientGenerator.generate(10);
+    ClientDetail detail = bundles.get(0).getClientDetail();
+    ClientDetail copy = detail.getCopy();
+    copy.birthDate++;
+    assertThat(detail.equals(copy)).isTrue();
+  }
 
-      conn.setAutoCommit(false);
-      PreparedStatement statement =
-        conn.prepareStatement("insert into charm values (?,?,?,?);");
+  @Test
+  public void testGetClientDetailsById() {
 
-      statement.setInt(1, 7);
-      statement.setString(2, "GOOD");
-      statement.setString(3, "SODOOG");
-      statement.setDouble(4, 2.5);
+    clearEntities();
+    List<RandomClientGenerator.ClientBundle> bundles = RandomClientGenerator.generate(3);
+    List<RandomClientGenerator.ClientBundle> fakeBundles = RandomClientGenerator.generate(3);
+    insertBundles(bundles);
 
-      statement.execute();
+//    bundles.forEach(clientBundle -> {
+//      System.out.println("X " + clientsRegister.get().getClientDetailsById(clientBundle.getClient().id).getCharm());
+//      System.out.println("Y " + clientBundle.getClientDetail().getCharm());
+//    });
 
-      ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM Charm");
+    bundles.forEach(clientBundle -> assertThat(
+      clientsRegister.get().getClientDetailsById(clientBundle.getClient().id).equals(clientBundle.getClientDetail())
+    ).isTrue());
 
-      while (rs.next()) {
-        System.out.println(rs.getRow() + ". " + rs.getString("id")
-          + "\t" + rs.getString("name")
-          + "\t" + rs.getString("description")
-          + "\t" + rs.getString("energy")
-        );
+    fakeBundles.forEach(clientBundle -> assertThat(
+      clientsRegister.get().getClientDetailsById(clientBundle.getClient().id).equals(clientBundle.getClientDetail())
+    ).isFalse());
+  }
+
+  @Test
+  public void testEditClientToSave() {
+    clearEntities();
+    List<RandomClientGenerator.ClientBundle> bundles = RandomClientGenerator.generate(5);
+    insertBundles(bundles);
+    ClientRecord old = bundles.get(0).getClientRecord();
+
+    ClientToSave clientToSave = bundles.get(0).getClientToSave();
+
+    RandomClientGenerator.ClientBundle newBundle = RandomClientGenerator.generateBundleById(clientToSave.id);
+    newBundle.setAccounts(bundles.get(0).getAccounts());
+
+    //
+    //
+    ClientRecord newClientRecord = clientsRegister.get().editClientToSave(newBundle.getClientToSave());
+    //
+    //
+
+    assertThat(newClientRecord).isNotEqualTo(old);
+    assertThat(newClientRecord).isEqualTo(newBundle.getClientRecord());
+  }
+
+  @Test
+  public void testRemoveClientById() {
+    int size = 3;
+    List<RandomClientGenerator.ClientBundle> bundles = RandomClientGenerator.generate(size);
+
+    for (int msk = 0; msk < (1 << size); ++msk) {
+      clearEntities();
+      insertBundles(bundles);
+      List<Integer> toRemove = new ArrayList<>();
+      //
+      //
+      for (int i = 0; i < size; ++i) {
+        if (((1 << i) & msk) > 0) {
+          int id = bundles.get(i).getClient().id;
+          toRemove.add(i);
+          clientsRegister.get().removeClientById(id);
+        }
       }
+      //
+      //
+      toRemove.forEach(
+        f -> assertThat(clientsRegister.get()
+          .getClientDetailsById(bundles.get(f).getClient().id))
+          .isNull()
+      );
+      //
+      //
 
-//      statement = conn.createStatement();
-      System.out.println(statement.execute("delete from charm where id=3"));
+      toRemove.forEach(f -> clientsTestDao.get().insertClient(bundles.get(f).getClient()));
+    }
+  }
 
-//      statement = conn.createStatement();
-      rs = statement.executeQuery("SELECT * FROM Charm");
+  @Test
+  public void generatorTest() {
+    clearEntities();
+    List<RandomClientGenerator.ClientBundle> clientBundles = RandomClientGenerator.generate(5);
+    insertBundles(clientBundles);
+  }
 
-      while (rs.next()) {
-        System.out.println(rs.getRow() + ". " + rs.getString("id")
-          + "\t" + rs.getString("name")
-          + "\t" + rs.getString("description")
-          + "\t" + rs.getString("energy")
-        );
-      }
+  private void clearEntities() {
+    clientsTestDao.get().clearCharm();
+    clientsTestDao.get().clearClientAddress();
+    clientsTestDao.get().clearClient();
 
-      // statement.execute("delete * from Charm;");
-      conn.commit();
-    } catch (SQLException e) {
+    clientsTestDao.get().clearClientPhone();
+    clientsTestDao.get().clearClientAccount();
+    clientsTestDao.get().clearClientAccountTransaction();
+
+    clientsTestDao.get().clearTransactionType();
+
+    clientsTestDao.get().resetCharmIncrementor();
+    clientsTestDao.get().resetClientIncrementor();
+
+    clientsTestDao.get().resetClientAccountIncrementor();
+    clientsTestDao.get().resetClientAccountTransactionIncrementor();
+
+    clientsTestDao.get().resetTransactionTypeIncrementor();
+  }
+
+  private void insertTestingTransactionTypes(List<TransactionType> transactionTypes) {
+    transactionTypes.forEach(clientsTestDao.get()::insertTransactionType);
+  }
+
+  private void insertTestingCharms(List<Charm> charms) {
+    charms.forEach(clientsTestDao.get()::insertCharm);
+  }
+
+
+  @Test()
+  private void generateReportTest() {
+    clearEntities();
+    List<RandomClientGenerator.ClientBundle> bundles = RandomClientGenerator.generate(20);
+    insertBundles(bundles);
+    String id = null;
+    try {
+      id = clientsRegister.get().generateReport(
+        ReportType.XLSX,
+        new QueryFilter(0, 10, "ASC", "name", ""),
+        "p1"
+      );
+    } catch (IOException | DocumentException e) {
       e.printStackTrace();
     }
+    String path = reportsDao.get().getFile(id);
+    assertThat(new File(path).exists()).isTrue();
   }
 }

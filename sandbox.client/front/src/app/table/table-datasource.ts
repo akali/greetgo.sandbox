@@ -32,7 +32,7 @@ export class TableDatasource extends DataSource<ClientRecord> {
     pageSize = 1,
     sortDirection = 'ASC',
     active = 'name',
-    filter: string) {
+    filter: string): QueryFilter {
     this.httpService.post("/clients/getClientRecords", {
       queryFilter: JSON.stringify(new QueryFilter(pageSize * pageIndex, pageSize, sortDirection, active, filter))
     }).subscribe(clients => {
@@ -42,6 +42,7 @@ export class TableDatasource extends DataSource<ClientRecord> {
       this.localTable = tableResponse.list;
       this.clientsSubject.next(tableResponse.list);
     });
+    return new QueryFilter(pageSize * pageIndex, pageSize, sortDirection, active, filter);
   }
 
   public fakeLoad(action: ActionType, client: ClientRecord) {

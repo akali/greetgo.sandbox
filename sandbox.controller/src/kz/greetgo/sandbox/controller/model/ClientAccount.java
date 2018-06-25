@@ -29,4 +29,15 @@ public class ClientAccount {
     account.registered_at = new Timestamp(Long.parseLong(line[4]));
     return account;
   }
+
+  @Override
+  public String toString() {
+    return "ClientAccount{" +
+      "id=" + id +
+      ", client=" + client +
+      ", money=" + money +
+      ", number='" + number + '\'' +
+      ", registered_at=" + registered_at +
+      '}';
+  }
 }

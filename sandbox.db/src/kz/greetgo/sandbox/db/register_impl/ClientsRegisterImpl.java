@@ -1,113 +1,189 @@
 package kz.greetgo.sandbox.db.register_impl;
 
+import com.itextpdf.text.DocumentException;
 import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.depinject.core.BeanGetter;
+import kz.greetgo.mvc.interfaces.BinResponse;
 import kz.greetgo.sandbox.controller.model.*;
+import kz.greetgo.sandbox.controller.register.AuthRegister;
 import kz.greetgo.sandbox.controller.register.ClientsRegister;
+import kz.greetgo.sandbox.controller.reports.ReportClientRecordPdfGenerator;
+import kz.greetgo.sandbox.controller.reports.ReportClientRecordXlsxGenerator;
+import kz.greetgo.sandbox.controller.reports.ReportClientsRecord;
 import kz.greetgo.sandbox.db.dao.ClientsDao;
+import kz.greetgo.sandbox.db.dao.ReportsDao;
 import kz.greetgo.sandbox.db.util.DBHelper;
-import org.apache.ibatis.jdbc.SQL;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import liquibase.exception.DatabaseException;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Random;
 
 @Bean
 public class ClientsRegisterImpl implements ClientsRegister {
 
   public BeanGetter<ClientsDao> clientsDao;
+  public BeanGetter<ReportsDao> reportsDao;
+  public BeanGetter<AuthRegister> authRegister;
 
   @Override
   public List<Charm> getCharms() {
-    List<Charm> charms = new ArrayList<>();
-    DBHelper.run(connection -> {
-      ResultSet rs = connection.prepareStatement("select * from charm").executeQuery();
-      while (rs.next()) {
-        charms.add(new Charm(rs.getInt("id"), rs.getString("name"),
-          rs.getString("description"), rs.getFloat("energy")));
-      }
-    });
-    return charms;
+    try {
+      return new DBHelper<List<Charm>>().run(connection -> {
+        ResultSet rs = connection.prepareStatement("select * from charm").executeQuery();
+        List<Charm> charms = new ArrayList<>();
+        while (rs.next()) {
+          charms.add(new Charm(rs.getInt("id"), rs.getString("name"),
+            rs.getString("description"), rs.getFloat("energy")));
+        }
+        return charms;
+      });
+    } catch (DatabaseException | SQLException e) {
+      e.printStackTrace();
+      return null;
+    }
   }
 
   @Override
   public TableResponse getClientRecords(QueryFilter queryFilter) {
-    AtomicReference<TableResponse> tableResponse = new AtomicReference<>();
-    DBHelper.run(connection -> {
-      PreparedStatement statement = connection.prepareStatement(
-        new SQL()
-          .SELECT(
-            "count(*) over (partition by 1) total_rows",
-            "client.id as id",
-            "client.name as name",
-            "client.surname as surname",
-            "client.patronymic as patronymic",
-            "(extract(year from age(birth_date))) as age",
-            "max(c2.money) as max",
-            "min(c2.money) as min",
-            "sum(c2.money) as total",
-            "c3.name as charm "
-            )
-          .FROM("client")
-          .JOIN("ClientAccount c2 on client.id = c2.client", "charm c3 on client.charm = c3.id")
-          .GROUP_BY("client.id", "c3.name")
-          .WHERE("client.name like ?", "client.surname like ?", "client.patronymic like ?")
-          .ORDER_BY("?", "?")
-        .toString()
-          .concat(" LIMIT ? OFFSET ?")
-      );
-
-      System.out.println(statement.toString());
-
-      statement.setString(1, "%" + queryFilter.filter + "%");
-      statement.setString(2, "%" + queryFilter.filter + "%");
-      statement.setString(3, "%" + queryFilter.filter + "%");
-      statement.setString(4, queryFilter.active);
-      statement.setString(5, queryFilter.direction);
-      statement.setInt(6, queryFilter.limit);
-      statement.setInt(7, queryFilter.start);
-
-      ResultSet result = statement.executeQuery();
-      tableResponse.set(new TableResponse());
-      while (result.next()) {
-        tableResponse.get().list.add(new ClientRecord(result.getInt("id"),
-          result.getString("name"),
-          result.getString("surname"),
-          result.getString("patronymic"),
-          result.getFloat("total"),
-          result.getFloat("max"),
-          result.getFloat("min"),
-          result.getString("charm"),
-          result.getInt("age")
-          ));
-      }
-      tableResponse.get().size = tableResponse.get().list.size();
-    });
-
-    System.out.println(queryFilter);
-
-    return tableResponse.get();
+    try {
+      return new DBHelper<TableResponse>().run(connection -> GetClientRecords.instance().run(connection, queryFilter));
+    } catch (DatabaseException | SQLException e) {
+      e.printStackTrace();
+      return null;
+    }
   }
 
   @Override
   public ClientDetail getClientDetailsById(int clientId) {
-    throw new NotImplementedException();
+    return GetClientDetails.getClientDetailsById(clientId);
   }
 
   @Override
   public ClientRecord addClientToSave(ClientToSave clientToSave) {
-    throw new NotImplementedException();
+    try {
+      Client client = clientToSave.getClientCopy();
+      client.id = new DBHelper<Integer>().run(connection -> {
+        PreparedStatement statement = connection.prepareStatement(
+          "INSERT INTO client (surname, name, patronymic, gender, birth_date, charm) " +
+            "VALUES (?, ?, ?, ?, ?, ?) " +
+            "RETURNING (id)"
+        );
+        statement.setString(1, client.surname);
+        statement.setString(2, client.name);
+        statement.setString(3, client.patronymic);
+        statement.setString(4, client.gender.toString());
+        statement.setDate(5, client.birth_date);
+        statement.setInt(6, client.charm);
+
+        ResultSet rs = statement.executeQuery();
+        int result = -1;
+        while (rs.next()){
+          result = (rs.getInt(1));
+        }
+        return result;
+      });
+      clientToSave.set(client.id);
+      clientsDao.get().addClientAddress(clientToSave.regAddress);
+      clientToSave.phones.forEach(clientsDao.get()::addClientPhone);
+      if (clientToSave.factAddress != null)
+        clientsDao.get().addClientAddress(clientToSave.factAddress);
+      return clientsDao.get().getClientRecordById(client.id);
+    } catch (DatabaseException | SQLException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   @Override
-  public ClientRecord editClientToSave(ClientToSave client) {
-    throw new NotImplementedException();
+  public ClientRecord editClientToSave(ClientToSave clientToSave) {
+    try {
+      new DBHelper<Void>().run(connection -> {
+        PreparedStatement statement = connection.prepareStatement(
+          "Update client set surname=?, name=?, patronymic=?, gender=?, birth_date=?, charm=? " +
+            "where id=?"
+        );
+        statement.setString(1, clientToSave.surname);
+        statement.setString(2, clientToSave.name);
+        statement.setString(3, clientToSave.patronymic);
+        statement.setString(4, clientToSave.gender.toString());
+        statement.setDate(5, new Date(clientToSave.birthDate));
+        statement.setInt(6, clientToSave.charm);
+        statement.setInt(7, clientToSave.id);
+        System.out.println(statement.executeUpdate());
+        return null;
+      });
+
+      Client client = clientsDao.get().getClient(clientToSave.id);
+      clientToSave.set(clientToSave.id);
+      clientsDao.get().editClientAddress(clientToSave.regAddress);
+      clientToSave.phones.forEach(clientsDao.get()::addClientPhone);
+      if (clientToSave.factAddress != null)
+        clientsDao.get().editClientAddress(clientToSave.factAddress);
+      return clientsDao.get().getClientRecordById(client.id);
+    } catch (DatabaseException | SQLException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   @Override
   public void removeClientById(int clientId) {
+    clientsDao.get().removeClientById(clientId);
+  }
+
+  @Override
+  public String generateReport(ReportType reportType, QueryFilter filter, String token) throws IOException, DocumentException {
+    filter.start = 0;
+    filter.limit = 1000000000;
+
+    TableResponse response = getClientRecords(filter);
+    ReportClientsRecord reportClientsRecord  = null;
+
+    String root = "/home/aqali/tmp/" + "Report_" + new Random().nextInt(100000);
+
+    FileOutputStream fos = null; // = new FileOutputStream(root);
+
+    switch (reportType) {
+      case XLSX:
+        root += ".xlsx";
+        fos = new FileOutputStream(root);
+        reportClientsRecord = new ReportClientRecordXlsxGenerator(fos);
+        break;
+      case PDF:
+        root += ".pdf";
+        fos = new FileOutputStream(root);
+        reportClientsRecord = new ReportClientRecordPdfGenerator(fos);
+        break;
+    }
+
+    int count = 1;
+
+    String id = "" + new Random().nextInt(100000);
+
+    reportsDao.get().putFile(root, id);
+
+    GenerateReport report =
+      new GenerateReport(
+        reportClientsRecord,
+        filter,
+        authRegister.get().getUserInfo(token).accountName
+      );
+
+    report.execute();
+
+    return id;
+  }
+
+  @Override
+  public void downloadReport(String id, BinResponse binResponse) throws IOException {
+
   }
 }

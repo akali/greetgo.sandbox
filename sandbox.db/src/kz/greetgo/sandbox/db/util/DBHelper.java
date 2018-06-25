@@ -1,28 +1,38 @@
 package kz.greetgo.sandbox.db.util;
 
+import com.itextpdf.text.DocumentException;
 import liquibase.exception.DatabaseException;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class DBHelper {
+public class DBHelper <T> {
 
-  public interface Runnable {
-    void run(Connection connection) throws SQLException, DatabaseException;
+  private boolean noCommits = false;
+
+  public DBHelper() {
   }
 
-  public static void run(Runnable runnable) {
+  public DBHelper(boolean noCommits) {
+    this.noCommits = noCommits;
+  }
+
+  public interface Runnable <T> {
+    T run(Connection connection) throws SQLException, DatabaseException, DocumentException, IOException;
+  }
+
+  public T run(Runnable<T> runnable) throws DatabaseException, SQLException {
     try (Connection conn = DriverManager.getConnection(
       "jdbc:postgresql://localhost/aqali_sandbox",
       "aqali_sandbox",
       "111"
     )) {
-//      conn.setAutoCommit(false);
-      runnable.run(conn);
-//      conn.commit();
-    } catch (SQLException | DatabaseException e) {
+      return runnable.run(conn);
+    } catch (Exception e) {
       e.printStackTrace();
     }
+    return null;
   }
 }

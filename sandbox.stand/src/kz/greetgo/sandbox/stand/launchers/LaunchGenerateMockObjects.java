@@ -357,6 +357,19 @@ public class LaunchGenerateMockObjects {
                                 "45b",
                                 "78"
                         ))
+                .setClientAddress(
+                  new ClientAddress(
+                    3, AddressType.FACT,
+                    "Timeriytazeva",
+                    "45",
+                    "123"
+                  )
+                )
+          .setClientPhone(
+            new ClientPhone(
+              3, "+77273548789", PhoneType.HOME
+            )
+          )
               .setClientAccount(
                 new ClientAccount(
                   3,

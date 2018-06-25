@@ -1,23 +1,23 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import {BrowserModule} from '@angular/platform-browser';
+import {NgModule} from '@angular/core';
 
-import { AppComponent } from './app.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { TableComponent } from './table/table.component';
+import {AppComponent} from './app.component';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {TableComponent} from './table/table.component';
 import {
-  MatTableModule,
-  MatPaginatorModule,
-  MatSortModule,
-  MatDialogModule,
-  MatDatepickerModule,
-  MatFormFieldModule,
-  MatInputModule,
   MatButtonModule,
   MatCardModule,
+  MatDatepickerModule,
+  MatDialogModule,
+  MatFormFieldModule,
+  MatInputModule,
+  MatNativeDateModule,
+  MatPaginatorModule,
+  MatProgressSpinnerModule,
   MatRippleModule,
   MatSelectModule,
-  MatNativeDateModule,
-  MatProgressSpinnerModule,
+  MatSortModule,
+  MatTableModule,
 } from '@angular/material';
 import {LoginComponent} from "./input/login.component";
 import {HttpService} from "./HttpService";
@@ -59,4 +59,5 @@ import {ClientDialogComponent} from "./table/client-dialog/clientDialog.componen
   bootstrap: [AppComponent],
   entryComponents: [ClientDialogComponent]
 })
-export class AppModule { }
+export class AppModule {
+}

@@ -5,6 +5,7 @@
 
     <changeSet author="akali" id="init-create-clients-table">
         <sql endDelimiter=";;"><![CDATA[
+
         create table Charm (
             id serial primary key,
             name varchar(64) not null,
@@ -60,6 +61,15 @@
             finished_at timestamp not null,
             type integer references TransactionType
         );
+
+        create view ClientRecord
+        AS SELECT c1.id as id, c1.name as name, c1.surname as surname,
+        c1.patronymic as patronymic, (extract(year from age(c1.birth_date))) as age,
+        max(c2.money) as max, min(c2.money) as min, sum(c2.money) as total, c3.name as charm
+        FROM client c1, ClientAccount c2, Charm c3
+        WHERE c1.id = c2.client AND c1.charm = c3.id
+        GROUP BY c1.id, c3.name;
+
     ]]></sql>
     </changeSet>
 

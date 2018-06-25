@@ -3,6 +3,7 @@ package kz.greetgo.sandbox.controller.model;
 
 
 public class Charm {
+  private static final float EPS = (float) 1e-3;
   public int id;
   public String name;
   public String description;
@@ -47,6 +48,6 @@ public class Charm {
     Charm c = (Charm) o;
     if (!c.name.equals(name)) return false;
     if (!c.description.equals(description)) return false;
-    return Float.compare(energy, c.energy) == 0;
+    return Math.abs(energy - c.energy) < EPS;
   }
 }

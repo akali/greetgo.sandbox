@@ -8,8 +8,10 @@ import kz.greetgo.sandbox.db.stand.model.PersonDot;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 @Bean
 public class StandDb implements HasAfterInject {
@@ -21,6 +23,8 @@ public class StandDb implements HasAfterInject {
   public final Map<String, ClientAccountTransaction> transactionStorage = new HashMap<>();
   public final Map<String, TransactionType> transactionTypeStorage = new HashMap<>();
   public final Map<String, Charm> charmStorage = new HashMap<>();
+  public final Map<String, String> downloadUrl = new HashMap<>();
+  private final static Random random = new Random();
 
   public int clientId;
   public int addressId;
@@ -32,6 +36,16 @@ public class StandDb implements HasAfterInject {
   public final static String TRANSACTIONS = "StandDbTransactions.txt";
   public final static String TRANSACTION_TYPES = "StandDbTransactionTypes.txt";
   public final static String CHARMS = "StandDbCharms.txt";
+
+  public String getUrl(String id) {
+    return downloadUrl.get(id);
+  }
+
+  public String putUrl(String url) {
+    String id = "Report_" + new Date() + random.nextInt(100000);
+    downloadUrl.put(id, url);
+    return id;
+  }
 
   @Override
   public void afterInject() throws Exception {

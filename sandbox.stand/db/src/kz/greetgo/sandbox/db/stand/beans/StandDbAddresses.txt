@@ -1,3 +1,4 @@
 1;REG;Seyfullina;15;33;
 2;REG;Tole-bi;55;33;
 3;REG;Dostyk;45b;78;
+3;FACT;Timeriytazeva;45;123;

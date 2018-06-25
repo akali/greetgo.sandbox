@@ -4,75 +4,78 @@ def vendorName = "greetgo!"
 def ggRepo = System.getenv('GG_REPO')
 
 allprojects {
-  apply plugin: 'java'
-  apply plugin: 'eclipse'
-  apply plugin: 'maven'
-  apply plugin: 'idea'
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+    apply plugin: 'maven'
+    apply plugin: 'idea'
 
-  version = '0.0.1'
+    version = '0.0.1'
 
-  sourceCompatibility = 1.8
-  targetCompatibility = 1.8
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 
-  group = "kz.greetgo.sandbox"
+    group = "kz.greetgo.sandbox"
 
-  eclipse.project.natures 'org.springsource.ide.eclipse.gradle.core.nature'
-  compileJava.options.debugOptions.debugLevel = "source,lines,vars"
-  compileJava.options.encoding = "UTF-8"
-  compileTestJava.options.debugOptions.debugLevel = "source,lines,vars"
-  compileTestJava.options.encoding = "UTF-8"
+    eclipse.project.natures 'org.springsource.ide.eclipse.gradle.core.nature'
+    compileJava.options.debugOptions.debugLevel = "source,lines,vars"
+    compileJava.options.encoding = "UTF-8"
+    compileTestJava.options.debugOptions.debugLevel = "source,lines,vars"
+    compileTestJava.options.encoding = "UTF-8"
 
 }
 
 subprojects {
 
-  project.eclipse.classpath.file.whenMerged { cp ->
-    if (project.hasProperty("sourceCompatibility")) {
-      cp.entries.findAll { it.path.contains('JRE_CONTAINER') }.each {
-        it.path += "/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/" +
-          "JavaSE-$project.sourceCompatibility"
-      }
+    project.eclipse.classpath.file.whenMerged { cp ->
+        if (project.hasProperty("sourceCompatibility")) {
+            cp.entries.findAll { it.path.contains('JRE_CONTAINER') }.each {
+                it.path += "/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/" +
+                        "JavaSE-$project.sourceCompatibility"
+            }
+        }
     }
-  }
 
-  repositories {
-    mavenLocal()
-    if (ggRepo?.trim()) maven { url ggRepo.trim() }
-    jcenter()
-  }
-
-  dependencies {
-    ext.jacksonVersion = "2.7.3"
-    ext.depinjectVersion = '2.0.0'
-    ext.greetgoDbVersion = '2.0.0'
-    ext.greetgoConfVersion = '0.1.5'
-    ext.greetgoMvcVersion = "2.0.7"
-    ext.jettyVersion = '9.4.0.v20161208'
-    ext.guavaVersion = '23.0'
-
-    testCompile 'org.testng:testng:6.5.1'
-    compile 'org.easytesting:fest-assert-core:2.0M10'
-
-    //compile 'com.google.code.findbugs:annotations:2.0.1'
-  }
-
-  jar {
-    manifest {
-      attributes 'Implementation-Title': project.name
-      attributes 'Implementation-Version': version
-      attributes 'Implementation-Vendor': vendorName
-      attributes 'Created-By': System.getProperty("user.name")
-      attributes 'Created-At': nowFormattedDate
+    repositories {
+        mavenLocal()
+        if (ggRepo?.trim()) maven { url ggRepo.trim() }
+        jcenter()
     }
-  }
 
-  sourceSets.main.java.srcDirs = ["src"]
-  sourceSets.main.resources.srcDirs = ["src", "src_resources"]
-  //sourceSets.main.output.resourcesDir = "build/classes/main"
-  sourceSets.test.java.srcDirs = ["test_src"]
-  sourceSets.test.resources.srcDirs = ["test_src", "test_resources"]
-  //sourceSets.test.output.resourcesDir = "build/classes/test"
+    dependencies {
+        ext.jacksonVersion = "2.7.3"
+        ext.depinjectVersion = '2.0.0'
+        ext.greetgoDbVersion = '2.0.0'
+        ext.greetgoConfVersion = '0.1.5'
+        ext.greetgoMvcVersion = "2.0.7"
+        ext.jettyVersion = '9.4.0.v20161208'
+        ext.guavaVersion = '23.0'
 
-  //noinspection GroovyMissingReturnStatement
-  test { useTestNG() }
+        testCompile 'org.testng:testng:6.5.1'
+        compile 'org.easytesting:fest-assert-core:2.0M10'
+
+        compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.9'
+        compile group: 'com.itextpdf', name: 'itextpdf', version: '5.0.6'
+
+        //compile 'com.google.code.findbugs:annotations:2.0.1'
+    }
+
+    jar {
+        manifest {
+            attributes 'Implementation-Title': project.name
+            attributes 'Implementation-Version': version
+            attributes 'Implementation-Vendor': vendorName
+            attributes 'Created-By': System.getProperty("user.name")
+            attributes 'Created-At': nowFormattedDate
+        }
+    }
+
+    sourceSets.main.java.srcDirs = ["src"]
+    sourceSets.main.resources.srcDirs = ["src", "src_resources"]
+    //sourceSets.main.output.resourcesDir = "build/classes/main"
+    sourceSets.test.java.srcDirs = ["test_src"]
+    sourceSets.test.resources.srcDirs = ["test_src", "test_resources"]
+    //sourceSets.test.output.resourcesDir = "build/classes/test"
+
+    //noinspection GroovyMissingReturnStatement
+    test { useTestNG() }
 }
