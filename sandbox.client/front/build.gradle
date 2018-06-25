@@ -19,10 +19,10 @@ node {
   download = true
 
   // Set the work directory for unpacking node
-  workDir = file("${project.buildDir}/nodejs")
+  workDir = file(System.getProperty("user.home") + "/.local/lib/nodejs")
 
   // Set the work directory for NPM
-  npmWorkDir = file("${project.buildDir}/npm")
+  npmWorkDir = file(System.getProperty("user.home") + "/.local/lib/npm")
 
   // Set the work directory where node_modules should be located
   nodeModulesDir = file("${project.projectDir}")
@@ -30,7 +30,9 @@ node {
 
 build.dependsOn npm_run_build
 
-//build.dependsOn npm_install
-//build.dependsOn npm_build
-//
-//npm_build.shouldRunAfter npm_install
+task deleteDist(type: Delete) {
+  group "build"
+  delete["dist"]
+}
+
+clean.dependsOn deleteDist
