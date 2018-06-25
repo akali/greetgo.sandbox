@@ -164,17 +164,20 @@ public class ClientsRegisterImpl implements ClientsRegister {
         break;
     }
 
-    reportClientsRecord.start(authRegister.get().getUserInfo(token).accountName, new java.util.Date());
-
     int count = 1;
 
     String id = "" + new Random().nextInt(100000);
 
     reportsDao.get().putFile(root, id);
 
-    GenerateReport.execute(reportClientsRecord);
+    GenerateReport report =
+      new GenerateReport(
+        reportClientsRecord,
+        filter,
+        authRegister.get().getUserInfo(token).accountName
+      );
 
-    reportClientsRecord.finish();
+    report.execute();
 
     return id;
   }

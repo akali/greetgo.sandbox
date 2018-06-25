@@ -39,6 +39,13 @@ public class ReportClientRecordXlsxGenerator implements ReportClientsRecord {
     sheet = workbook.createSheet("Client Record");
     Row row = sheet.createRow(currentRow++);
     row.createCell(0).setCellValue("от " + date);
+    row = sheet.createRow(currentRow++);
+    row.createCell(0).setCellValue("#");
+    row.createCell(1).setCellValue("Name Surname Patronymic");
+    row.createCell(2).setCellValue("Age");
+    row.createCell(3).setCellValue("Total");
+    row.createCell(4).setCellValue("Min");
+    row.createCell(5).setCellValue("Max");
   }
 
   @Override

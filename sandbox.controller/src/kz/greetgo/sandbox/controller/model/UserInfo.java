@@ -10,4 +10,17 @@ public class UserInfo {
   public String patronymic;
   public boolean yellow;
   public PhoneType phoneType;
+
+  @Override
+  public String toString() {
+    return "UserInfo{" +
+      "id='" + id + '\'' +
+      ", accountName='" + accountName + '\'' +
+      ", surname='" + surname + '\'' +
+      ", name='" + name + '\'' +
+      ", patronymic='" + patronymic + '\'' +
+      ", yellow=" + yellow +
+      ", phoneType=" + phoneType +
+      '}';
+  }
 }

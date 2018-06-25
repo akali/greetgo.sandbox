@@ -1,12 +1,17 @@
 package kz.greetgo.sandbox.db.register_impl;
 
+import com.itextpdf.text.DocumentException;
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.controller.register.ClientsRegister;
+import kz.greetgo.sandbox.db.dao.ReportsDao;
 import kz.greetgo.sandbox.db.test.dao.ClientsTestDao;
 import kz.greetgo.sandbox.db.test.util.ParentTestNg;
 import org.testng.annotations.Test;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -16,6 +21,7 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
   public BeanGetter<ClientsTestDao> clientsTestDao;
   public BeanGetter<ClientsRegister> clientsRegister;
+  public BeanGetter<ReportsDao> reportsDao;
 
   @Test
   public void inserting100RandomClients() {
@@ -264,5 +270,25 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
   private void insertTestingCharms(List<Charm> charms) {
     charms.forEach(clientsTestDao.get()::insertCharm);
+  }
+
+
+  @Test()
+  private void generateReportTest() {
+    clearEntities();
+    List<RandomClientGenerator.ClientBundle> bundles = RandomClientGenerator.generate(20);
+    insertBundles(bundles);
+    String id = null;
+    try {
+      id = clientsRegister.get().generateReport(
+        ReportType.XLSX,
+        new QueryFilter(0, 10, "ASC", "name", ""),
+        "p1"
+      );
+    } catch (IOException | DocumentException e) {
+      e.printStackTrace();
+    }
+    String path = reportsDao.get().getFile(id);
+    assertThat(new File(path).exists()).isTrue();
   }
 }

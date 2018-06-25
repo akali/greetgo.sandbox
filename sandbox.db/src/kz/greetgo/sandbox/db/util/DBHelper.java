@@ -1,7 +1,9 @@
 package kz.greetgo.sandbox.db.util;
 
+import com.itextpdf.text.DocumentException;
 import liquibase.exception.DatabaseException;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -18,7 +20,7 @@ public class DBHelper <T> {
   }
 
   public interface Runnable <T> {
-    T run(Connection connection) throws SQLException, DatabaseException;
+    T run(Connection connection) throws SQLException, DatabaseException, DocumentException, IOException;
   }
 
   public T run(Runnable<T> runnable) throws DatabaseException, SQLException {
@@ -28,8 +30,9 @@ public class DBHelper <T> {
       "111"
     )) {
       return runnable.run(conn);
-    } catch (SQLException | DatabaseException e) {
-      throw e;
+    } catch (Exception e) {
+      e.printStackTrace();
     }
+    return null;
   }
 }
