@@ -7,7 +7,6 @@ import kz.greetgo.sandbox.controller.model.*;
 import java.io.IOException;
 import java.util.List;
 
-//TODO(DONE): поменяй название интерфейся и соответственно всех классов, которые имплементируют его.
 public interface ClientsRegister {
   List<Charm> getCharms();
 
