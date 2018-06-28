@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static kz.greetgo.learn.migration.util.TimeUtils.recordsPerSecond;
@@ -26,6 +27,7 @@ public class Migration implements Closeable {
 
   private final ConnectionConfig ciaConfig;
   private Connection operConnection = null, ciaConnection = null;
+  private HashMap<String, String> tmpSqlVars;
 
   public Migration(ConnectionConfig operConfig, ConnectionConfig ciaConfig) {
     this.operConfig = operConfig;
@@ -86,7 +88,7 @@ public class Migration implements Closeable {
     }
   }
 
-  public int portionSize = 1_000_000;
+  public int chunkSize = 1_000_000;
   public int downloadMaxBatchSize = 50_000;
   public int uploadMaxBatchSize = 50_000;
   public int showStatusPingMillis = 5000;
@@ -99,13 +101,43 @@ public class Migration implements Closeable {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
     Date nowDate = new Date();
     tmpClientTable = "cia_migration_client_" + sdf.format(nowDate);
-    info("TMP_CLIENT = " + tmpClientTable);
+    tmpSqlVars = new HashMap<String, String>() {
+      {
+        put("TMP_CLIENT", "cia_migration_client_" + sdf.format(nowDate));
+        put("TMP_CHARM", "cia_migration_charm_" + sdf.format(nowDate));
+        put("TMP_ADDRESS", "cia_migration_address_" + sdf.format(nowDate));
+        put("TMP_PHONE", "cia_migration_phone_" + sdf.format(nowDate));
+      }
+    };
+    tmpSqlVars.forEach((key, value) -> {
+      info(key + " = " + value);
+    });
 
     createOperConnection();
 
+    createTables();
+
+    createCiaConnection();
+
+    int chunkSize = download();
+
+    info("Downloaded chunk " + chunkSize + " finished for " + TimeUtils.showTime(System.nanoTime(), startedAt));
+
+    if (chunkSize == 0) return 0;
+
+    closeCiaConnection();
+
+    migrateFromTmp();
+
+    info("Migration chunk " + chunkSize + " finished for " + TimeUtils.showTime(System.nanoTime(), startedAt));
+
+    return chunkSize;
+  }
+
+  private void createTables() throws SQLException {
     //language=PostgreSQL
     exec("create table TMP_CLIENT (\n" +
-      "  client_id int8,\n" +
+      "  client_id serial primary key ,\n" +
       "  status int not null default 0,\n" +
       "  error varchar(300),\n" +
       "  \n" +
@@ -114,30 +146,33 @@ public class Migration implements Closeable {
       "  surname varchar(300),\n" +
       "  name varchar(300),\n" +
       "  patronymic varchar(300),\n" +
-      "  birth_date date\n" +
+      "  birth_date date,\n" +
+      "  charm int" +
       ")");
-
-    createCiaConnection();
-
-    int portionSize = download();
-
-    {
-      long now = System.nanoTime();
-      info("Downloaded of portion " + portionSize + " finished for " + TimeUtils.showTime(now, startedAt));
-    }
-
-    if (portionSize == 0) return 0;
-
-    closeCiaConnection();
-
-    migrateFromTmp();
-
-    {
-      long now = System.nanoTime();
-      info("Migration of portion " + portionSize + " finished for " + TimeUtils.showTime(now, startedAt));
-    }
-
-    return portionSize;
+    //language=PostgreSQL
+    exec("create table TMP_CHARM (" +
+      " charm_id serial primary key," +
+      " name varchar(300) not null unique," +
+      " desciption varchar(300)," +
+      " energy numeric, " +
+      " number bigint not null primary key" +
+      ");");
+    //language=PostgreSQL
+    exec("create table TMP_ADDRESS (\n" +
+      "  client_id integer references TMP_CLIENT,\n" +
+      "  type varchar(10) not null primary key,\n" +
+      "  street varchar(300),\n" +
+      "  house varchar(300),\n" +
+      "  flat varchar(300),\n" +
+      "  cia_id varchar(300) primary key\n" +
+      ");");
+    //language=PostgreSQL
+    exec("create table TMP_PHONE (\n" +
+      "  client_id integer references TMP_CLIENT primary key ,\n" +
+      "  number varchar(20) not null primary key ,\n" +
+      "  type varchar(20) not null,\n" +
+      "  cia_id varchar(300) primary key\n" +
+      ");\n");
   }
 
   private void createOperConnection() throws Exception {
@@ -175,7 +210,11 @@ public class Migration implements Closeable {
 
       info("Prepared statement for : select * from transition_client");
 
-      ciaPS.setInt(1, portionSize);
+      ciaPS.setInt(1, chunkSize);
+
+      Insert insertCharm = new Insert("TMP_CHARM");
+      insertCharm.field(1, "number", "?");
+      insertCharm.field(2, "name", "?");
 
       Insert insert = new Insert("TMP_CLIENT");
       insert.field(1, "number", "?");
@@ -184,6 +223,7 @@ public class Migration implements Closeable {
       insert.field(4, "name", "?");
       insert.field(5, "patronymic", "?");
       insert.field(6, "birth_date", "?");
+      insert.field(7, "charm", "?");
 
       operConnection.setAutoCommit(false);
       try (PreparedStatement operPS = operConnection.prepareStatement(r(insert.toString()))) {
@@ -207,6 +247,7 @@ public class Migration implements Closeable {
             operPS.setString(4, r.name);
             operPS.setString(5, r.patronymic);
             operPS.setDate(6, r.birthDate);
+            operPS.setString(7, r.charm_name);
 
             operPS.addBatch();
             batchSize++;
@@ -248,7 +289,6 @@ public class Migration implements Closeable {
       }
     }
   }
-
 
   private void uploadAndDropErrors() throws Exception {
     info("uploadAndDropErrors goes : maxBatchSize = " + uploadMaxBatchSize);

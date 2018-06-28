@@ -5,10 +5,10 @@ import java.util.Date;
 
 public class Logger {
   public static void log(String tag, String message) {
-    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/YYYY:HH:MM:SS");
-    String time = sdf.format(new Date(System.nanoTime()));
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    String time = sdf.format(new Date());
 
-    message = "[" + time + "] " + tag + ": " + message;
+    message = time + " [" + tag + "] " + message;
 
     System.out.println(message);
   }

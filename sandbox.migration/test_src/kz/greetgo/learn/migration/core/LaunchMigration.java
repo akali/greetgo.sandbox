@@ -23,7 +23,7 @@ public class LaunchMigration {
 
     try (Migration migration = new Migration(operCC, ciaCC)) {
 
-      migration.portionSize = 250_000;
+      migration.chunkSize = 250_000;
       migration.uploadMaxBatchSize = 50_000;
       migration.downloadMaxBatchSize = 50_000;
 
