@@ -14,11 +14,11 @@ import java.io.IOException;
 public class LaunchMigration {
 
   public static void main(String[] args) throws Exception {
-    Logger.log("LaunchMigration", "creating cia db");
-    clearCiaDb();
-    Logger.log("LaunchMigration", "creating oper db");
-    createOperDb();
-    readArchives();
+//    Logger.log("LaunchMigration", "creating cia db");
+//    clearCiaDb();
+//    Logger.log("LaunchMigration", "creating oper db");
+//    createOperDb();
+//    readArchives();
 
     final File file = new File("build/__migration__");
     file.getParentFile().mkdirs();
@@ -65,8 +65,8 @@ public class LaunchMigration {
   }
 
   private static void readArchives() throws IOException {
-    File file = new File("migration_data/from_cia_2018-02-21-154929-1-300.xml.tar.bz2");
-//    File file = new File("migration_data/from_cia_2018-02-21-154955-5-1000000.xml.tar.bz2");
+//    File file = new File("migration_data/from_cia_2018-02-21-154929-1-300.xml.tar.bz2");
+    File file = new File("migration_data/from_cia_2018-02-21-154955-5-1000000.xml.tar.bz2");
 //    File file = new File("migration_data/from_frs_2018-02-21-155112-1-30002.json_row.txt.tar.bz2");
     StreamHandler handler = new JsonHandler(), xmlHandler = new XmlHandler();
     ((JsonHandler) handler).setParser(new JsonParser());

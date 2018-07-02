@@ -167,7 +167,7 @@ public class Migration implements Closeable {
 //      ");");
     //language=PostgreSQL
     exec("create table TMP_ADDRESS (\n" +
-      "  number bigint references TMP_CLIENT,\n" +
+      "  number bigint references TMP_CLIENT on delete cascade,\n" +
       "  client_id bigint,\n" +
       "  type varchar(10) not null,\n" +
       "  street varchar(300),\n" +
@@ -176,13 +176,22 @@ public class Migration implements Closeable {
       "  status int not null default 0,\n" +
       "  primary key(number, type)\n" +
       ");");
-//    //language=PostgreSQL
-//    exec("create table TMP_PHONE (\n" +
-//      "  client_id integer references TMP_CLIENT primary key ,\n" +
-//      "  number varchar(20) not null primary key ,\n" +
-//      "  type varchar(20) not null,\n" +
-//      "  cia_id varchar(300) primary key\n" +
-//      ");\n");
+
+    //language=PostgreSQL
+    exec("create table TMP_PHONE (\n" +
+      "  client_id bigint,\n" +
+      "  phone_number varchar(64) not null,\n" +
+      "  type varchar(64) not null,\n" +
+      "  number bigint references TMP_CLIENT on delete cascade,\n" +
+      "  status int not null default 0,\n" +
+      "  primary key(number, phone_number)\n" +
+      ");\n");
+    /*
+    client bigint references Client on delete cascade,
+    number varchar(64) not null,
+    type varchar(64) not null,
+    primary key(client, number)
+    * */
   }
 
   private void createOperConnection() throws Exception {
@@ -235,7 +244,7 @@ public class Migration implements Closeable {
       insert.field(6, "birth_date", "?");
       insert.field(7, "charm_name", "?");
 
-      Insert insertAddress = new Insert("TMP_ADDRESS"); // TODO: write all inserts
+      Insert insertAddress = new Insert("TMP_ADDRESS"); // TODO(DONE): write all inserts
       insertAddress.field(1, "number", "?");
       insertAddress.field(2, "type", "?");
       insertAddress.field(3, "street", "?");
@@ -243,6 +252,9 @@ public class Migration implements Closeable {
       insertAddress.field(5, "flat", "?");
 
       Insert insertPhone = new Insert("TMP_PHONE"); // TODO: write all inserts
+      insertPhone.field(1, "number", "?");
+      insertPhone.field(2, "type", "?");
+      insertPhone.field(3, "phone_number", "?");
 
       operConnection.setAutoCommit(false);
       try (PreparedStatement clientStatement = operConnection.prepareStatement(r(insert.toString()));
@@ -296,6 +308,27 @@ public class Migration implements Closeable {
               addressStatement.addBatch();
             }
 
+            {
+              for (String homePhone: r.homePhones) {
+                phoneStatement.setLong(1, r.number);
+                phoneStatement.setString(2, "HOME");
+                phoneStatement.setString(3, homePhone);
+                phoneStatement.addBatch();
+              }
+              for (String homePhone: r.workPhones) {
+                phoneStatement.setLong(1, r.number);
+                phoneStatement.setString(2, "WORK");
+                phoneStatement.setString(3, homePhone);
+                phoneStatement.addBatch();
+              }
+              for (String homePhone: r.mobilePhones) {
+                phoneStatement.setLong(1, r.number);
+                phoneStatement.setString(2, "MOBILE");
+                phoneStatement.setString(3, homePhone);
+                phoneStatement.addBatch();
+              }
+            }
+
             batchSize++;
             recordsCount++;
 
@@ -303,6 +336,7 @@ public class Migration implements Closeable {
 //              charmStatement.executeBatch();
               clientStatement.executeBatch();
               addressStatement.executeBatch();
+              phoneStatement.executeBatch();
 
               operConnection.commit();
               batchSize = 0;
@@ -320,6 +354,8 @@ public class Migration implements Closeable {
 
           if (batchSize > 0) {
             clientStatement.executeBatch();
+            addressStatement.executeBatch();
+            phoneStatement.executeBatch();
             operConnection.commit();
           }
 
@@ -553,20 +589,18 @@ public class Migration implements Closeable {
     exec("update TMP_CLIENT set client_id = nextval('s_client') where status = 0");
 
     //language=PostgreSQL
-    exec("update TMP_CLIENT set charm_id = (select id from charm where name = charm_name) where status = 0");
+    exec("update TMP_CLIENT set charm_id = f.id from charm f where f.name = charm_name and status = 0");
 
     //language=PostgreSQL
     exec("update TMP_CLIENT set charm_id = nextval('s_charm') where status = 0 and charm_id is null");
 
     //language=PostgreSQL
     exec("" +
-      "update TMP_ADDRESS " +
-      "set client_id = (select client_id from TMP_CLIENT where number = TMP_ADDRESS.number)" +
-      "");
+      "update TMP_ADDRESS a set status = f.status, client_id = f.client_id from TMP_CLIENT f where a.number = f.number");
 
     //language=PostgreSQL
-    exec("insert into ClientAddress(client, type, street, house, flat)\n" +
-      "select client_id, type, street, house, flat from TMP_ADDRESS;");
+    exec("" +
+      "update TMP_PHONE a set status = f.status, client_id = f.client_id from TMP_CLIENT f where a.number = f.number");
 
     //language=PostgreSQL
     exec("insert into charm(id, name)\n" +
@@ -588,6 +622,13 @@ public class Migration implements Closeable {
       "from TMP_CLIENT s\n" +
       "where c.id = s.client_id\n" +
       "and s.status = 3");
+
+    //language=PostgreSQL
+    exec("insert into ClientAddress(client, type, street, house, flat)\n" +
+      "select client_id, type, street, house, flat from TMP_ADDRESS where status = 0;");
+
+    //language=PostgreSQL
+    exec("insert into ClientPhone(client, type, number) select client_id, type, phone_number from TMP_PHONE where status=0");
 
     //language=PostgreSQL
     exec("update client set actual = 1 where id in (\n" +

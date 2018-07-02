@@ -25,6 +25,12 @@ create table ClientAddress (
     flat varchar(64),
     primary key(client, type)
 );;
+create table ClientPhone (
+    client bigint references Client on delete cascade,
+    number varchar(64) not null,
+    type varchar(64) not null,
+    primary key(client, number)
+);;
 create sequence s_client start with 1000000;;
 create sequence s_charm start with 1000000;;
 create sequence s_address start with 1000000;;
