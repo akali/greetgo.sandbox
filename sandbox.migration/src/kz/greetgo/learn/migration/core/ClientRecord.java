@@ -43,7 +43,19 @@ public class ClientRecord extends SaxHandler {
       case "/client/name": name = attributes.getValue("value"); break;
       case "/client/patronymic": patronymic = attributes.getValue("value"); break;
       case "/client/charm": charm_name = attributes.getValue("value"); break;
-      case "/client/birth": birthDate = new java.sql.Date(new SimpleDateFormat("yyyy-MM-dd").parse(attributes.getValue("value")).getTime()); break;
+      case "/client/birth": {
+        try {
+          birthDate =
+            new java.sql.Date(
+              new SimpleDateFormat("yyyy-MM-dd")
+                .parse(
+                  attributes.getValue("value")
+                ).getTime()
+            );
+        } catch (Exception ignored) {
+          birthDate = null;
+        }
+      } break;
       case "/client/address/fact": factAddress = new ClientAddress(attributes.getValue("street"), attributes.getValue("house"), attributes.getValue("flat")); break;
       case "/client/address/register": regAddress = new ClientAddress(attributes.getValue("street"), attributes.getValue("house"), attributes.getValue("flat")); break;
     }
@@ -70,5 +82,53 @@ public class ClientRecord extends SaxHandler {
 
   private void addHomePhone(String text) {
     homePhones.add(text);
+  }
+
+  @Override
+  public String toString() {
+    return "ClientRecord{" +
+      "number=" + number +
+      ", id='" + id + '\'' +
+      ", surname='" + surname + '\'' +
+      ", name='" + name + '\'' +
+      ", patronymic='" + patronymic + '\'' +
+      ", birthDate=" + birthDate +
+      ", cia_id='" + cia_id + '\'' +
+      ", charm_name='" + charm_name + '\'' +
+      ", factAddress=" + factAddress +
+      ", regAddress=" + regAddress +
+      ", workPhones=" + workPhones +
+      ", homePhones=" + homePhones +
+      ", mobilePhones=" + mobilePhones +
+      '}';
+  }
+
+  public static void main(String[] args) {
+    String xml = "  <client id=\"4-DU8-32-H7\"> <!-- Идентификаторы строковые, не длиннее 50 символов -->\n" +
+      "    <surname value=\"Иванов\" />\n" +
+      "    <name value=\"Иван\" />\n" +
+      "    <patronymic value=\"Иваныч\" />\n" +
+      "    <gender value=\"MALE\" />\n" +
+      "    <charm value=\"Уситчивый\" />\n" +
+      "    <birth value=\"1980-11-12\" />\n" +
+      "    <address>\n" +
+      "      <fact street=\"Панфилова\" house=\"23A\" flat=\"22\" />\n" +
+      "      <register street=\"Панфилова\" house=\"23A\" flat=\"22\" />\n" +
+      "    </address>\n" +
+      "    \n" +
+      "      <homePhone>+7-123-111-22-33</homePhone>\n" +
+      "    <mobilePhone>+7-123-111-33-33</mobilePhone>\n" +
+      "    <mobilePhone>+7-123-111-44-33</mobilePhone>\n" +
+      "    <mobilePhone>+7-123-111-55-33</mobilePhone>\n" +
+      "      <workPhone>+7-123-111-00-33 вн. 3344</workPhone>\n" +
+      "      <workPhone>+7-123-111-00-33 вн. 3343</workPhone>\n" +
+      "  </client>";
+    ClientRecord c = new ClientRecord();
+    try {
+      c.parseRecordData(xml);
+      System.out.println(c);
+    } catch (SAXException | IOException e) {
+      e.printStackTrace();
+    }
   }
 }

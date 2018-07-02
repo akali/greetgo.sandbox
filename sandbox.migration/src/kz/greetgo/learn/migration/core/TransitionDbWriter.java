@@ -74,7 +74,7 @@ public class TransitionDbWriter {
     if (!open)
       throw new Exception("Writer is not opened");
     try {
-      Logger.log("TransitionDbWriter", "Writing xml " + xml);
+//      Logger.log("TransitionDbWriter", "Writing xml " + xml);
       preparedStatement.setString(1, xml);
       preparedStatement.addBatch();
 

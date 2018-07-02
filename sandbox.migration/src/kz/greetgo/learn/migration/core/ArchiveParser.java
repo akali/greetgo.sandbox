@@ -1,14 +1,14 @@
 package kz.greetgo.learn.migration.core;
 
-import kz.greetgo.learn.migration.interfaces.StreamHandler;
-import kz.greetgo.learn.migration.util.ConfigFiles;
-import kz.greetgo.learn.migration.util.ConnectionUtils;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -37,22 +37,6 @@ public class ArchiveParser {
       this.streamReader = streamReader;
       this.filename = filename;
     }
-  }
-
-  public static void main(String[] args) throws Exception {
-//    File file = new File("migration_data/from_cia_2018-02-21-154955-5-1000000.xml.tar.bz2");
-    File file = new File("migration_data/from_frs_2018-02-21-155112-1-30002.json_row.txt.tar.bz2");
-    StreamHandler handler = new JsonHandler(), xmlHandler = new XmlHandler();
-    ((JsonHandler) handler).setParser(new JsonParser());
-    handler.setParentHandler(xmlHandler);
-    ((XmlHandler) xmlHandler).setRowParser(new XmlParser());
-
-    ArchiveParser parser = new ArchiveParser(file);
-    parser.run(new MyObservable().withObserver((observable1, o) -> {
-      if (o == null) return;
-      StreamBundle sb = (StreamBundle) o;
-      handler.handle(sb.streamReader, sb.filename);
-    }));
   }
 
   public void run(MyObservable observable) {

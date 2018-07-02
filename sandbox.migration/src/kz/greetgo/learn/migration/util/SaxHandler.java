@@ -34,7 +34,6 @@ public abstract class SaxHandler extends DefaultHandler {
   @Override
   public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
     pathList.add(localName);
-
     try {
       startingTag(attributes);
     } catch (Exception e) {
