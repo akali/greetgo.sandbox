@@ -69,12 +69,33 @@ subprojects {
         }
     }
 
+/*
     sourceSets.main.java.srcDirs = ["src"]
     sourceSets.main.resources.srcDirs = ["src", "src_resources"]
     //sourceSets.main.output.resourcesDir = "build/classes/main"
     sourceSets.test.java.srcDirs = ["test_src"]
     sourceSets.test.resources.srcDirs = ["test_src", "test_resources"]
     //sourceSets.test.output.resourcesDir = "build/classes/test"
+*/
+
+    idea.module.inheritOutputDirs = false
+    idea.module.outputDir = file("$buildDir/classes/main/")
+    idea.module.testOutputDir = file("$buildDir/classes/test/")
+
+
+    sourceSets.main.java.srcDirs = ["src"]
+    sourceSets.test.java.srcDirs = ["test_src"]
+    sourceSets.main.resources.srcDirs = ["src_resources"]
+    sourceSets.test.resources.srcDirs = ["test_resources"]
+
+    sourceSets.main.resources {
+        srcDirs += sourceSets.main.java.srcDirs
+        exclude '**/*.java'
+    }
+    sourceSets.test.resources {
+        srcDirs += sourceSets.test.java.srcDirs
+        exclude '**/*.java'
+    }
 
     //noinspection GroovyMissingReturnStatement
     test { useTestNG() }
