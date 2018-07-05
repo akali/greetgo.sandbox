@@ -13,7 +13,8 @@ public class JsonHandler implements StreamHandler {
 
   private StreamHandler parentStreamHandler;
   private RowParser parser;
-  private TransitionDbWriter frsWriter = new FrsTransitionWriter(ConnectionUtils.fileToConnectionConfig(ConfigFiles.migrationDb()));
+  private TransitionDbWriter frsWriter =
+    new FrsTransitionWriter(ConnectionUtils.fileToConnectionConfig(ConfigFiles.migrationDb()));
 
   public JsonHandler() throws IOException { }
 

@@ -1,4 +1,4 @@
-create table transition_client (
+create table transition_cia (
   number bigserial primary key,
   inserted_at timestamp not null default current_timestamp,
   status varchar(30) not null default 'JUST_INSERTED',

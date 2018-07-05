@@ -14,10 +14,10 @@ import java.io.IOException;
 public class LaunchMigration {
 
   public static void main(String[] args) throws Exception {
-//    Logger.log("LaunchMigration", "creating cia db");
+//    Logger.log("LaunchMigration", "creating migrsrc db");
 //    clearCiaDb();
-//    Logger.log("LaunchMigration", "creating oper db");
-//    createOperDb();
+    Logger.log("LaunchMigration", "creating oper db");
+    createOperDb();
 //    readArchives();
 
     final File file = new File("build/__migration__");
@@ -31,7 +31,7 @@ public class LaunchMigration {
     ConnectionConfig operCC = ConnectionUtils.fileToConnectionConfig(ConfigFiles.homeDb());
     ConnectionConfig ciaCC = ConnectionUtils.fileToConnectionConfig(ConfigFiles.migrationDb());
 
-    try (Migration migration = new Migration(operCC, ciaCC)) {
+    try (Migration migration = new FrsMigration(operCC, ciaCC)) {
 
       migration.chunkSize =  250_000;
       migration.uploadMaxBatchSize = 50_000;
@@ -40,8 +40,7 @@ public class LaunchMigration {
       while (true) {
         int count = migration.migrate();
         System.err.println("MIGRATION COUNT = " + count);
-        if (count == 0) break;
-//        if (count > 0) break;
+        if (count > 0) break;
         if (!file.exists()) break;
         System.out.println("Migrated " + count + " records");
         System.out.println("------------------------------------------------------------------");
@@ -66,8 +65,8 @@ public class LaunchMigration {
 
   private static void readArchives() throws IOException {
 //    File file = new File("migration_data/from_cia_2018-02-21-154929-1-300.xml.tar.bz2");
-    File file = new File("migration_data/from_cia_2018-02-21-154955-5-1000000.xml.tar.bz2");
-//    File file = new File("migration_data/from_frs_2018-02-21-155112-1-30002.json_row.txt.tar.bz2");
+//    File file = new File("migration_data/from_cia_2018-02-21-154955-5-1000000.xml.tar.bz2");
+    File file = new File("migration_data/from_frs_2018-02-21-155112-1-30002.json_row.txt.tar.bz2");
     StreamHandler handler = new JsonHandler(), xmlHandler = new XmlHandler();
     ((JsonHandler) handler).setParser(new JsonParser());
     handler.setParentHandler(xmlHandler);
