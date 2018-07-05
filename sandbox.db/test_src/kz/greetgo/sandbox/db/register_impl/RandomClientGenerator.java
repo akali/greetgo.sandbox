@@ -476,6 +476,13 @@ public class RandomClientGenerator {
 
   private static List<String> load(String name) throws IOException {
     List<String> objs = new ArrayList<>();
+
+    // TODO: Укажи относительный путь.
+    // В командной разработке не указывай абсолютные пути,
+    // потому что у всех в команде на своих машинах свои пути.
+    // Пути должны строится относительно проекта
+
+    // TODO: также закоммить эти файлы.
     BufferedReader bf =
       new BufferedReader(new FileReader(
         "/home/aqali/work/greetgo/greetgo.sandbox/sandbox.db/test_src/kz/greetgo/sandbox/db/register_impl/NameDatabases/NamesDatabases/" + name));
