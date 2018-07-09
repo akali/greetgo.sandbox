@@ -1,6 +1,6 @@
 package kz.greetgo.sandbox.db.register_impl;
 
-import com.itextpdf.text.DocumentException;
+import kz.greetgo.db.Jdbc;
 import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.mvc.interfaces.BinResponse;
@@ -31,6 +31,7 @@ public class ClientsRegisterImpl implements ClientsRegister {
   public BeanGetter<ClientsDao> clientsDao;
   public BeanGetter<ReportsDao> reportsDao;
   public BeanGetter<AuthRegister> authRegister;
+  public BeanGetter<Jdbc> jdbcBeanGetter;
 
   @Override
   public List<Charm> getCharms() {
@@ -51,21 +52,14 @@ public class ClientsRegisterImpl implements ClientsRegister {
   }
 
   @Override
-  public TableResponse getClientRecords(QueryFilter queryFilter) {
-    try {
+  public FilteredTable getClientRecords(QueryFilter queryFilter) {
 
-      // TODO: есть уже реализация для jdbc
-      // public BeanGetter<JdbcSandbox> jdbc;
-      // jdbc.get().execute(connection -> ...)
-      // jdbc.get().execute(new ClassForMigrationForExample)
+    // TODO(DONE): есть уже реализация для jdbc
+    // public BeanGetter<JdbcSandbox> jdbc;
+    // jdbc.get().execute(connection -> ...)
+    // jdbc.get().execute(new ClassForMigrationForExample)
 
-      return new DBHelper<TableResponse>().run(connection -> GetClientRecords.instance().run(connection, queryFilter));
-    } catch (DatabaseException | SQLException e) {
-
-      // TODO: не проглатывай ошибку
-      e.printStackTrace();
-      return null;
-    }
+    return jdbcBeanGetter.get().execute(connection -> GetClientRecords.instance().run(connection, queryFilter));
   }
 
   @Override
@@ -81,7 +75,7 @@ public class ClientsRegisterImpl implements ClientsRegister {
         PreparedStatement statement = connection.prepareStatement(
           "INSERT INTO client (surname, name, patronymic, gender, birth_date, charm) " +
             "VALUES (?, ?, ?, ?, ?, ?) " +
-            "RETURNING (id)"
+            "RETURNING id"
         );
         statement.setString(1, client.surname);
         statement.setString(2, client.name);
@@ -147,11 +141,11 @@ public class ClientsRegisterImpl implements ClientsRegister {
   }
 
   @Override
-  public String generateReport(ReportType reportType, QueryFilter filter, String token) throws IOException, DocumentException {
+  public String generateReport(ReportType reportType, QueryFilter filter, String token) throws IOException {
     filter.start = 0;
     filter.limit = 1000000000;
 
-    TableResponse response = getClientRecords(filter);
+    FilteredTable response = getClientRecords(filter);
     ReportClientsRecord reportClientsRecord = null;
 
     String root = "/home/aqali/tmp/" + "Report_" + new Random().nextInt(100000);
@@ -190,7 +184,7 @@ public class ClientsRegisterImpl implements ClientsRegister {
   }
 
   @Override
-  public void downloadReport(String id, BinResponse binResponse) throws IOException {
+  public void downloadReport(String id, BinResponse binResponse) {
 
   }
 }

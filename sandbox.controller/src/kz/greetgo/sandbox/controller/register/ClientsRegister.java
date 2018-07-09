@@ -5,12 +5,13 @@ import kz.greetgo.mvc.interfaces.BinResponse;
 import kz.greetgo.sandbox.controller.model.*;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 public interface ClientsRegister {
   List<Charm> getCharms();
 
-  TableResponse getClientRecords(QueryFilter queryFilter);
+  FilteredTable getClientRecords(QueryFilter queryFilter) throws SQLException;
 
   ClientDetail getClientDetailsById(int clientId);
 

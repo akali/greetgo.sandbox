@@ -3,11 +3,9 @@ package kz.greetgo.sandbox.db.test.dao;
 import kz.greetgo.sandbox.controller.model.*;
 import org.apache.ibatis.annotations.*;
 
-import java.util.ArrayList;
-
 public interface ClientsTestDao {
 
-  //TODO: Delete очень ресурсо-ёмкая операция, желательно использовать параметр actual,
+  //TODO(DONE): Delete очень ресурсо-ёмкая операция, желательно использовать параметр actual,
   // указывающий на действительность записи.
   // в тестах уже не меняй. Просто знай. На real надо будет именно так делать, через actual
   @Delete("delete from Charm")

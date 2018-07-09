@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,14 +38,16 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
     List<ClientRecord> testClientRecords = new ArrayList<>(), actualClientRecords = new ArrayList<>();
 
-    // TODO: простовляй такие пометки непосредственно в месте вызова проверяемого методы
+    // TODO(DONE): простовляй такие пометки непосредственно в месте вызова проверяемого методы
     //
     //
     for (RandomClientGenerator.ClientBundle clientBundle : clientBundles) {
-      // TODO: Не пиши всё в одну строку в одно выражение.
+      // TODO(DONE): Не пиши всё в одну строку в одно выражение.
       // Если после тебя на проект придёт другой программист, ему будет тяжелее понять такой код.
       // Старайся писать легче, чтобы другие разрабы с твоей команды понимали код.
-      testClientRecords.add(clientsRegister.get().addClientToSave(clientBundle.getClientToSave()));
+      ClientToSave clientToSave = clientBundle.getClientToSave();
+      ClientRecord e = clientsRegister.get().addClientToSave(clientToSave);
+      testClientRecords.add(e);
       ClientRecord actualClientRecord = clientBundle.getClientRecord();
       actualClientRecord.total = actualClientRecord.max = actualClientRecord.min = 0;
       actualClientRecords.add(actualClientRecord);
@@ -54,7 +57,14 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
     assertThat(testClientRecords).containsAll(actualClientRecords);
 
-    // TODO: пероверь ещё на сохранение в базу.
+    for (RandomClientGenerator.ClientBundle clientBundle : clientBundles) {
+      assertThat(clientsTestDao.get().getRecordClientById(clientBundle.getClient().id)).isEqualTo(
+        clientBundle.getClientRecord()
+      );
+    }
+
+
+    // TODO(DONE): пероверь ещё на сохранение в базу.
     // то что метод вернул рекорд, это ещё не гарантирует сохранение в базу.
   }
 
@@ -75,19 +85,19 @@ public class ClientsRegisterImplTest extends ParentTestNg {
   }
 
   @Test
-  public void testGetClientRecords() {
+  public void testGetClientRecords() throws SQLException {
     clearEntities();
     List<RandomClientGenerator.ClientBundle> clientBundles = RandomClientGenerator.generate(10);
     insertBundles(clientBundles);
 
     QueryFilter filter = new QueryFilter(0, 5, "DESC", "name", "");
 
-    //TODO: TableResponse - поменяй название класса на более понятный
-    TableResponse actual = RandomClientGenerator.getClientRecords(clientBundles, filter);
+    //TODO(DONE): TableResponse - поменяй название класса на более понятный
+    FilteredTable actual = RandomClientGenerator.getClientRecords(clientBundles, filter);
 
     //
     //
-    TableResponse test = clientsRegister.get()
+    FilteredTable test = clientsRegister.get()
       .getClientRecords(filter);
     //
     //
@@ -106,8 +116,13 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     filters.forEach(filter -> {
       //
       //
-      TableResponse test = clientsRegister.get()
-        .getClientRecords(filter);
+      FilteredTable test = null;
+      try {
+        test = clientsRegister.get()
+          .getClientRecords(filter);
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
       //
       //
 
@@ -163,9 +178,9 @@ public class ClientsRegisterImplTest extends ParentTestNg {
   }
 
   @Test
-  // TODO: назови тест правильно, чтобы было понятно.
+  // TODO(DONE): назови тест правильно, чтобы было понятно.
   // даже если он просто для проверки "левого" метода
-  public void test() {
+  public void testClientDetailIsEqualByAge() {
     clearEntities();
     List<RandomClientGenerator.ClientBundle> bundles = RandomClientGenerator.generate(10);
     ClientDetail detail = bundles.get(0).getClientDetail();
@@ -214,10 +229,13 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     //
     //
 
+    ClientRecord my = clientsTestDao.get().getRecordClientById(newBundle.getClient().id);
+
     assertThat(newClientRecord).isNotEqualTo(old);
     assertThat(newClientRecord).isEqualTo(newBundle.getClientRecord());
+    assertThat(newClientRecord).isEqualTo(my);
 
-    // TODO: пероверь ещё на сохранение в базу.
+    // TODO(DONE): пероверь ещё на сохранение в базу.
     // то что метод вернул рекорд, это ещё не гарантирует сохранение в базу.
   }
 
