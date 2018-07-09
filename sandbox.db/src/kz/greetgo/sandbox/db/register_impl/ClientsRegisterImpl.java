@@ -21,7 +21,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -54,8 +53,16 @@ public class ClientsRegisterImpl implements ClientsRegister {
   @Override
   public TableResponse getClientRecords(QueryFilter queryFilter) {
     try {
+
+      // TODO: есть уже реализация для jdbc
+      // public BeanGetter<JdbcSandbox> jdbc;
+      // jdbc.get().execute(connection -> ...)
+      // jdbc.get().execute(new ClassForMigrationForExample)
+
       return new DBHelper<TableResponse>().run(connection -> GetClientRecords.instance().run(connection, queryFilter));
     } catch (DatabaseException | SQLException e) {
+
+      // TODO: не проглатывай ошибку
       e.printStackTrace();
       return null;
     }
@@ -85,7 +92,7 @@ public class ClientsRegisterImpl implements ClientsRegister {
 
         ResultSet rs = statement.executeQuery();
         int result = -1;
-        while (rs.next()){
+        while (rs.next()) {
           result = (rs.getInt(1));
         }
         return result;
@@ -145,7 +152,7 @@ public class ClientsRegisterImpl implements ClientsRegister {
     filter.limit = 1000000000;
 
     TableResponse response = getClientRecords(filter);
-    ReportClientsRecord reportClientsRecord  = null;
+    ReportClientsRecord reportClientsRecord = null;
 
     String root = "/home/aqali/tmp/" + "Report_" + new Random().nextInt(100000);
 

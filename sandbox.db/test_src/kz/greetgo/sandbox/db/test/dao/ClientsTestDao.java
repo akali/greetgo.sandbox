@@ -6,6 +6,10 @@ import org.apache.ibatis.annotations.*;
 import java.util.ArrayList;
 
 public interface ClientsTestDao {
+
+  //TODO: Delete очень ресурсо-ёмкая операция, желательно использовать параметр actual,
+  // указывающий на действительность записи.
+  // в тестах уже не меняй. Просто знай. На real надо будет именно так делать, через actual
   @Delete("delete from Charm")
   void clearCharm();
 

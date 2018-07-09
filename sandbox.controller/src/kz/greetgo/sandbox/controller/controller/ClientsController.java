@@ -9,7 +9,6 @@ import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.controller.register.ClientsRegister;
 import kz.greetgo.sandbox.controller.security.NoSecurity;
 import kz.greetgo.sandbox.controller.util.Controller;
-import kz.greetgo.util.RND;
 
 import java.io.IOException;
 import java.util.List;
@@ -17,7 +16,7 @@ import java.util.List;
 @Bean
 @Mapping("/clients")
 public class ClientsController implements Controller {
-  
+
   //TODO: Название переменной соответственно нужно поменять
   public BeanGetter<ClientsRegister> tableRegister;
 

@@ -11,8 +11,9 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -36,9 +37,13 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
     List<ClientRecord> testClientRecords = new ArrayList<>(), actualClientRecords = new ArrayList<>();
 
+    // TODO: простовляй такие пометки непосредственно в месте вызова проверяемого методы
     //
     //
     for (RandomClientGenerator.ClientBundle clientBundle : clientBundles) {
+      // TODO: Не пиши всё в одну строку в одно выражение.
+      // Если после тебя на проект придёт другой программист, ему будет тяжелее понять такой код.
+      // Старайся писать легче, чтобы другие разрабы с твоей команды понимали код.
       testClientRecords.add(clientsRegister.get().addClientToSave(clientBundle.getClientToSave()));
       ClientRecord actualClientRecord = clientBundle.getClientRecord();
       actualClientRecord.total = actualClientRecord.max = actualClientRecord.min = 0;
@@ -48,6 +53,9 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     //
 
     assertThat(testClientRecords).containsAll(actualClientRecords);
+
+    // TODO: пероверь ещё на сохранение в базу.
+    // то что метод вернул рекорд, это ещё не гарантирует сохранение в базу.
   }
 
   @Test
@@ -74,6 +82,7 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
     QueryFilter filter = new QueryFilter(0, 5, "DESC", "name", "");
 
+    //TODO: TableResponse - поменяй название класса на более понятный
     TableResponse actual = RandomClientGenerator.getClientRecords(clientBundles, filter);
 
     //
@@ -105,7 +114,7 @@ public class ClientsRegisterImplTest extends ParentTestNg {
       assertThat(test.list).isSortedAccordingTo(
         (t1, t2) -> {
           int result = 0;
-          switch(filter.active.toLowerCase()) {
+          switch (filter.active.toLowerCase()) {
             case "name":
               result = t1.name.compareTo(t2.name);
               break;
@@ -131,7 +140,9 @@ public class ClientsRegisterImplTest extends ParentTestNg {
             result = -result;
           }
           return result;
-      });
+        });
+
+      // TODO: тебе надо проверить ещё правильные ли объекты метод выдаёт.
     });
   }
 
@@ -152,6 +163,8 @@ public class ClientsRegisterImplTest extends ParentTestNg {
   }
 
   @Test
+  // TODO: назови тест правильно, чтобы было понятно.
+  // даже если он просто для проверки "левого" метода
   public void test() {
     clearEntities();
     List<RandomClientGenerator.ClientBundle> bundles = RandomClientGenerator.generate(10);
@@ -203,6 +216,9 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
     assertThat(newClientRecord).isNotEqualTo(old);
     assertThat(newClientRecord).isEqualTo(newBundle.getClientRecord());
+
+    // TODO: пероверь ещё на сохранение в базу.
+    // то что метод вернул рекорд, это ещё не гарантирует сохранение в базу.
   }
 
   @Test
