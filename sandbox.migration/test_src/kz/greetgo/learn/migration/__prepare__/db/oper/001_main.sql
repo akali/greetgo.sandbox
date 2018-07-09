@@ -42,7 +42,7 @@ create table TransactionType (
 create table ClientAccount (
   id bigserial primary key,
   client bigint references Client on delete cascade,
-  money numeric,
+  money numeric default 0,
   number varchar(300),
   registered_at timestamp
 );;

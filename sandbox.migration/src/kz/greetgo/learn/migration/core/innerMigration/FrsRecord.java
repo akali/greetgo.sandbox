@@ -1,4 +1,4 @@
-package kz.greetgo.learn.migration.core;
+package kz.greetgo.learn.migration.core.innerMigration;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
@@ -14,6 +14,33 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public class FrsRecord {
+  public FrsRecord() {
+  }
+
+  public FrsRecord createAccount(
+    String client_id,
+    String account_number,
+    Date registered_at) {
+    this.type = Type.NEW_ACCOUNT;
+    this.client_id = client_id;
+    this.account_number = account_number;
+    this.registered_at = registered_at;
+    return this;
+  }
+
+  public FrsRecord createTransaction(
+    String transaction_type,
+    String account_number,
+    Float money,
+    Date finished_at
+  ) {
+    this.transaction_type = transaction_type;
+    this.account_number = account_number;
+    this.money = money;
+    this.finished_at = finished_at;
+    return this;
+  }
+
   public long number;
   public Type type;
   public Date finished_at;
@@ -46,11 +73,6 @@ public class FrsRecord {
         (data,
           FrsRecord.class
         );
-  }
-
-  public static void main(String[] args) {
-    Type type = Type.get("TRANSACTIOn");
-    System.out.println(type);
   }
 
   @Override

@@ -1,4 +1,4 @@
-package kz.greetgo.learn.migration.core;
+package kz.greetgo.learn.migration.core.innerMigration;
 
 public class ClientAddress {
   public String street, house, flat;

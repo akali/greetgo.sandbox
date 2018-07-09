@@ -1,4 +1,4 @@
-package kz.greetgo.learn.migration.core;
+package kz.greetgo.learn.migration.core.outerMigration;
 
 import kz.greetgo.learn.migration.interfaces.RowParser;
 

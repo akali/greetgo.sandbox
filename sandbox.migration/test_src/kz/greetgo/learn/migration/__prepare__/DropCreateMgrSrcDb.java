@@ -4,9 +4,7 @@ import kz.greetgo.learn.migration.__prepare__.core.DbWorker;
 import kz.greetgo.learn.migration.__prepare__.db.cia.CiaDDL;
 import kz.greetgo.learn.migration.util.ConfigFiles;
 
-import java.io.IOException;
-
-public class DropCreateCiaDb {
+public class DropCreateMgrSrcDb {
   public static void main(String[] args) throws Exception {
     execute();
   }

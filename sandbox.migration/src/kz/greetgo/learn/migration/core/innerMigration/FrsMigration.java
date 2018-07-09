@@ -1,4 +1,4 @@
-package kz.greetgo.learn.migration.core;
+package kz.greetgo.learn.migration.core.innerMigration;
 
 import kz.greetgo.learn.migration.interfaces.ConnectionConfig;
 import org.fest.util.Lists;
@@ -28,6 +28,7 @@ public class FrsMigration extends Migration {
       {
         put("TMP_TRANSACTION", "frs_migration_transaction_" + sdf.format(now));
         put("TMP_ACCOUNT", "frs_migration_account_" + sdf.format(now));
+        put("TMP_TYPE", "frs_migration_transaction_type_" + sdf.format(now));
       }
     };
     tmpSqlVars.forEach((key, value) -> info(key + " = " + value));
@@ -61,6 +62,13 @@ public class FrsMigration extends Migration {
       uploadAndDropErrors(entry.getKey(), "transition_frs", "row_number");
     }
 
+    exec("update TMP_TYPE d set id = f.id " +
+      "from TransactionType f " +
+      "where f.name = d.name");
+
+    exec("update TMP_TYPE d set id = nextval('s_transaction_type') " +
+      "where d.id is null");
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //    exec("update TMP_ACCOUNT set id = f.id, client = f.client from ClientAccount f where number = f.number");
 
@@ -71,20 +79,15 @@ public class FrsMigration extends Migration {
     exec("update TMP_ACCOUNT set id = nextval('s_client_account') where id is null");
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    exec("update TMP_TRANSACTION set transaction_type_id = f.id " +
-      "from TransactionType f " +
-      "where transaction_type = f.name");
+    exec("update TMP_TRANSACTION q set transaction_type_id = f.id from TMP_TYPE f where q.row_number = f.row_number");
 
-    exec("update TMP_TRANSACTION set transaction_type_id = nextval('s_transaction_type') " +
-      "where transaction_type_id is null");
-
-    exec("update TMP_TRANSACTION set account = f.id from TMP_ACCOUNT f where account_number = f.number");
+    exec("update TMP_TRANSACTION q set account = f.id from TMP_ACCOUNT f where q.account_number = f.number");
 
     exec("update TMP_TRANSACTION set id = nextval('s_client_account_transaction')");
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     exec("insert into TransactionType(id, name) " +
-      "select transaction_type_id, transaction_type from TMP_TRANSACTION on conflict do nothing;");
+      "select id, name from TMP_TYPE on conflict do nothing;");
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     exec("insert into client(id) select client from TMP_ACCOUNT on conflict do nothing;");
@@ -98,7 +101,7 @@ public class FrsMigration extends Migration {
       "where status = 0");
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    exec("update ClientAccount set money = money + (select sum(money) from TMP_TRANSACTION f where f.account = id)");
+    exec("update ClientAccount q set money = money + (select sum(money) from TMP_TRANSACTION f where f.account = q.id)");
 
     for (Map.Entry<String, String> entry : tmpSqlVars.entrySet()) {
       uploadAllOk(entry.getKey(), "transition_frs", "row_number");
@@ -131,10 +134,14 @@ public class FrsMigration extends Migration {
         insertAccount.field(3, "number", "?");
         insertAccount.field(4, "row_number", "?");
 
+        Insert insertType = new Insert("TMP_TYPE").onConflictDoNothing(true);
+        insertType.field(1, "row_number", "?");
+        insertType.field(2, "name", "?");
 
         try (
           PreparedStatement transactionPS = operConnection.prepareStatement(r(insertTransaction.toString()));
-          PreparedStatement accountPS = operConnection.prepareStatement(r(insertAccount.toString()))
+          PreparedStatement accountPS = operConnection.prepareStatement(r(insertAccount.toString()));
+          PreparedStatement typePS = operConnection.prepareStatement(r(insertType.toString()))
         ) {
           while (srcRs.next()) {
             String data = srcRs.getString("record_data");
@@ -154,6 +161,10 @@ public class FrsMigration extends Migration {
               transactionPS.setDate(4, record.finished_at);
               transactionPS.setLong(5, record.number);
 
+              typePS.setLong(1, record.number);
+              typePS.setString(2, record.transaction_type);
+
+              typePS.addBatch();
               transactionPS.addBatch();
             }
             ++batchSize;
@@ -161,6 +172,7 @@ public class FrsMigration extends Migration {
             if (batchSize >= downloadMaxBatchSize) {
               accountPS.executeBatch();
               transactionPS.executeBatch();
+              typePS.executeBatch();
               batchSize = 0;
               operConnection.commit();
             }
@@ -168,6 +180,7 @@ public class FrsMigration extends Migration {
           if (batchSize > 0) {
             accountPS.executeBatch();
             transactionPS.executeBatch();
+            typePS.executeBatch();
             operConnection.commit();
           }
         }
@@ -193,7 +206,7 @@ public class FrsMigration extends Migration {
       "  row_number bigint primary key,\n" +
       "  client_id varchar(300),\n" +
       "  client bigint,\n" +
-      "  money float,\n" +
+      "  money float default 0,\n" +
       "  number varchar(300),\n" +
       "  registered_at timestamp,\n" +
       "  status int not null default 0," +
@@ -212,5 +225,13 @@ public class FrsMigration extends Migration {
       "  status int not null default 0," +
       "  error varchar(300)" +
       ");");
+    exec("create table TMP_TYPE (\n" +
+      "  row_number bigint primary key,\n" +
+      "  id bigint,\n" +
+      "  code varchar(300),\n" +
+      "  name varchar(300) unique,\n" +
+      "  status int not null default 0,\n" +
+      "  error varchar(300)\n" +
+      ");\n");
   }
 }
