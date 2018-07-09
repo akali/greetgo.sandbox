@@ -45,7 +45,11 @@ public class FilteredTable {
     this.list = total.stream().skip(start).limit(offset).collect(Collectors.toList());
   }
 
-  public FilteredTable() {
+  public FilteredTable(List<ClientRecord> clientRecords) {
     list = new ArrayList<>();
+  }
+
+  public FilteredTable(List<ClientRecord> clientRecords, QueryFilter filter) {
+    this(clientRecords, filter.start, filter.limit, filter.direction, filter.active, filter.filter);
   }
 }

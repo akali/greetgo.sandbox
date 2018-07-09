@@ -111,6 +111,9 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     List<RandomClientGenerator.ClientBundle> clientBundles = RandomClientGenerator.generate(10);
     insertBundles(clientBundles);
 
+    List<ClientRecord> clientRecords = new ArrayList<>();
+    clientBundles.forEach(clientBundle -> clientRecords.add(clientBundle.getClientRecord()));
+
     List<QueryFilter> filters = RandomClientGenerator.generateFilters(10, Arrays.asList("name", "total", "age", "total", "max", "min"));
 
     filters.forEach(filter -> {
@@ -157,7 +160,9 @@ public class ClientsRegisterImplTest extends ParentTestNg {
           return result;
         });
 
-      // TODO: тебе надо проверить ещё правильные ли объекты метод выдаёт.
+      assertThat(test.list).isEqualTo(new FilteredTable(clientRecords, filter).list);
+
+      // TODO(DONE): тебе надо проверить ещё правильные ли объекты метод выдаёт.
     });
   }
 

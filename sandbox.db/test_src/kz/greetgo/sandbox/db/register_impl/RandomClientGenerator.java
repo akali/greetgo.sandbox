@@ -39,9 +39,10 @@ public class RandomClientGenerator {
 
   static {
     try {
-      sigma = "";
-      for (char c = 'a'; c <= 'z'; ++c) sigma = sigma.concat(String.valueOf(c));
-      for (char c = 'A'; c <= 'Z'; ++c) sigma = sigma.concat(String.valueOf(c));
+      StringBuilder sb = new StringBuilder();
+      for (char c = 'a'; c <= 'z'; ++c) sb.append(String.valueOf(c));
+      for (char c = 'A'; c <= 'Z'; ++c) sb.append(String.valueOf(c));
+      sigma = sb.toString();
       names = load("firstnames/all.txt");
       surnames = load("surnames/all.txt");
       phoneCodes = load("phonesCodes/all.txt");
