@@ -1,115 +1,31 @@
-package kz.greetgo.learn.migration.core;
+package kz.greetgo.learn.migration.core.innerMigration;
 
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
 import kz.greetgo.learn.migration.interfaces.ConnectionConfig;
-import kz.greetgo.learn.migration.util.ConnectionUtils;
 import kz.greetgo.learn.migration.util.TimeUtils;
 import org.xml.sax.SAXException;
 
-import javax.xml.transform.Result;
-import java.io.*;
-import java.sql.Connection;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static kz.greetgo.learn.migration.util.TimeUtils.recordsPerSecond;
 import static kz.greetgo.learn.migration.util.TimeUtils.showTime;
 
-public class Migration implements Closeable {
-
-  private final ConnectionConfig operConfig;
-
-
-  private final ConnectionConfig ciaConfig;
-  private Connection operConnection = null, ciaConnection = null;
-  private HashMap<String, String> tmpSqlVars;
-
-  public Migration(ConnectionConfig operConfig, ConnectionConfig ciaConfig) {
-    this.operConfig = operConfig;
-    this.ciaConfig = ciaConfig;
+public class CiaMigration extends Migration {
+  public CiaMigration(ConnectionConfig operConfig, ConnectionConfig migrationConnection) {
+    super(operConfig, migrationConnection);
   }
-
-  @Override
-  public void close() {
-    closeOperConnection();
-    closeCiaConnection();
-  }
-
-  private void closeCiaConnection() {
-    if (ciaConnection != null) {
-      try {
-        ciaConnection.close();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      ciaConnection = null;
-    }
-  }
-
-  private void closeOperConnection() {
-    if (this.operConnection != null) {
-      try {
-        this.operConnection.close();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      this.operConnection = null;
-    }
-  }
-
-  private void info(String message) {
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-    System.out.println(sdf.format(new Date()) + " [" + getClass().getSimpleName() + "] " + message);
-  }
-
-  private String r(String sql) {
-    for (Map.Entry<String, String> a: tmpSqlVars.entrySet()) {
-      sql = sql.replace(a.getKey(), a.getValue());
-    }
-    return sql;
-  }
-
-  private void exec(String sql) throws SQLException {
-    String executingSql = r(sql);
-
-    System.err.println("EXECUTING: " + sql);
-
-    long startedAt = System.nanoTime();
-    try (Statement statement = operConnection.createStatement()) {
-      int updates = statement.executeUpdate(executingSql);
-      info("Updated " + updates
-        + " records for " + showTime(System.nanoTime(), startedAt)
-        + ", EXECUTED SQL : " + executingSql);
-    } catch (SQLException e) {
-      info("ERROR EXECUTE SQL for " + showTime(System.nanoTime(), startedAt)
-        + ", message: " + e.getMessage() + ", SQL : " + executingSql);
-      throw e;
-    }
-  }
-
-  public int chunkSize = 1_000_000;
-  public int downloadMaxBatchSize = 50_000;
-  public int uploadMaxBatchSize = 50_000;
-  public int showStatusPingMillis = 5000;
-
-  private String tmpClientTable;
 
   public int migrate() throws Exception {
     long startedAt = System.nanoTime();
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmssSSS");
     Date nowDate = new Date();
-    tmpClientTable = "cia_migration_client_" + sdf.format(nowDate);
     tmpSqlVars = new HashMap<String, String>() {
       {
         put("TMP_CLIENT", "cia_migration_client_" + sdf.format(nowDate));
@@ -121,10 +37,8 @@ public class Migration implements Closeable {
     tmpSqlVars.forEach((key, value) -> info(key + " = " + value));
 
     createOperConnection();
-
     createTables();
-
-    createCiaConnection();
+    createMigrationConnection();
 
     int chunkSize = download();
 
@@ -132,7 +46,7 @@ public class Migration implements Closeable {
 
     if (chunkSize == 0) return 0;
 
-    closeCiaConnection();
+    closeMigrationConnection();
 
     migrateFromTmp();
 
@@ -194,14 +108,6 @@ public class Migration implements Closeable {
     * */
   }
 
-  private void createOperConnection() throws Exception {
-    operConnection = ConnectionUtils.create(operConfig);
-  }
-
-  private void createCiaConnection() throws Exception {
-    ciaConnection = ConnectionUtils.create(ciaConfig);
-  }
-
   private int download() throws SQLException, IOException, SAXException {
 
     final AtomicBoolean working = new AtomicBoolean(true);
@@ -224,25 +130,21 @@ public class Migration implements Closeable {
     });
     see.start();
 
-    try (PreparedStatement ciaPS = ciaConnection.prepareStatement(
-      "select * from transition_client where status='JUST_INSERTED' order by number limit ?")) {
+    try (PreparedStatement ciaPS = migrationConnection.prepareStatement(
+      "select * from transition_cia where status='JUST_INSERTED' order by number limit ?")) {
 
       info("Prepared statement for : select * from transition_client");
 
       ciaPS.setInt(1, chunkSize);
 
-//      Insert insertCharm = new Insert("TMP_CHARM");
-//      insertCharm.field(1, "number", "?");
-//      insertCharm.field(2, "name", "?");
-
-      Insert insert = new Insert("TMP_CLIENT");
-      insert.field(1, "number", "?");
-      insert.field(2, "cia_id", "?");
-      insert.field(3, "surname", "?");
-      insert.field(4, "name", "?");
-      insert.field(5, "patronymic", "?");
-      insert.field(6, "birth_date", "?");
-      insert.field(7, "charm_name", "?");
+      Insert insertClient = new Insert("TMP_CLIENT");
+      insertClient.field(1, "number", "?");
+      insertClient.field(2, "cia_id", "?");
+      insertClient.field(3, "surname", "?");
+      insertClient.field(4, "name", "?");
+      insertClient.field(5, "patronymic", "?");
+      insertClient.field(6, "birth_date", "?");
+      insertClient.field(7, "charm_name", "?");
 
       Insert insertAddress = new Insert("TMP_ADDRESS"); // TODO(DONE): write all inserts
       insertAddress.field(1, "number", "?");
@@ -251,14 +153,13 @@ public class Migration implements Closeable {
       insertAddress.field(4, "house", "?");
       insertAddress.field(5, "flat", "?");
 
-      Insert insertPhone = new Insert("TMP_PHONE"); // TODO: write all inserts
+      Insert insertPhone = new Insert("TMP_PHONE"); // TODO(DONE): write all inserts
       insertPhone.field(1, "number", "?");
       insertPhone.field(2, "type", "?");
       insertPhone.field(3, "phone_number", "?");
 
       operConnection.setAutoCommit(false);
-      try (PreparedStatement clientStatement = operConnection.prepareStatement(r(insert.toString()));
-//           PreparedStatement charmStatement = operConnection.prepareStatement(r(insertCharm.toString()));
+      try (PreparedStatement clientStatement = operConnection.prepareStatement(r(insertClient.toString()));
            PreparedStatement addressStatement = operConnection.prepareStatement(r(insertAddress.toString()));
            PreparedStatement phoneStatement = operConnection.prepareStatement(r(insertPhone.toString()))
       ) {
@@ -309,19 +210,19 @@ public class Migration implements Closeable {
             }
 
             {
-              for (String homePhone: r.homePhones) {
+              for (String homePhone : r.homePhones) {
                 phoneStatement.setLong(1, r.number);
                 phoneStatement.setString(2, "HOME");
                 phoneStatement.setString(3, homePhone);
                 phoneStatement.addBatch();
               }
-              for (String homePhone: r.workPhones) {
+              for (String homePhone : r.workPhones) {
                 phoneStatement.setLong(1, r.number);
                 phoneStatement.setString(2, "WORK");
                 phoneStatement.setString(3, homePhone);
                 phoneStatement.addBatch();
               }
-              for (String homePhone: r.mobilePhones) {
+              for (String homePhone : r.mobilePhones) {
                 phoneStatement.setLong(1, r.number);
                 phoneStatement.setString(2, "MOBILE");
                 phoneStatement.setString(3, homePhone);
@@ -333,7 +234,6 @@ public class Migration implements Closeable {
             recordsCount++;
 
             if (batchSize >= downloadMaxBatchSize) {
-//              charmStatement.executeBatch();
               clientStatement.executeBatch();
               addressStatement.executeBatch();
               phoneStatement.executeBatch();
@@ -349,7 +249,6 @@ public class Migration implements Closeable {
               info(" -- downloaded records " + recordsCount + " for " + showTime(now, startedAt)
                 + " : " + recordsPerSecond(recordsCount, now - startedAt));
             }
-
           }
 
           if (batchSize > 0) {
@@ -375,182 +274,7 @@ public class Migration implements Closeable {
     }
   }
 
-  private void uploadAndDropErrors() throws Exception {
-    info("uploadAndDropErrors goes : maxBatchSize = " + uploadMaxBatchSize);
-
-    final AtomicBoolean working = new AtomicBoolean(true);
-
-    createCiaConnection();
-    ciaConnection.setAutoCommit(false);
-    try {
-
-      try (PreparedStatement inPS = operConnection.prepareStatement(r(
-        "select number, error from TMP_CLIENT where error is not null"))) {
-
-        info("Prepared statement for : select number, error from TMP_CLIENT where error is not null");
-
-        try (ResultSet inRS = inPS.executeQuery()) {
-          info("Query executed for : select number, error from TMP_CLIENT where error is not null");
-
-          try (PreparedStatement outPS = ciaConnection.prepareStatement(
-            "update transition_client set status = 'ERROR', error = ? where number = ?")) {
-
-            int batchSize = 0, recordsCount = 0;
-
-            final AtomicBoolean showStatus = new AtomicBoolean(false);
-
-            new Thread(() -> {
-
-              while (working.get()) {
-
-                try {
-                  Thread.sleep(showStatusPingMillis);
-                } catch (InterruptedException e) {
-                  break;
-                }
-
-                showStatus.set(true);
-
-              }
-
-            }).start();
-
-            long startedAt = System.nanoTime();
-
-            while (inRS.next()) {
-
-              outPS.setString(1, inRS.getString("error"));
-              outPS.setLong(2, inRS.getLong("number"));
-              outPS.addBatch();
-              batchSize++;
-              recordsCount++;
-
-              if (batchSize >= uploadMaxBatchSize) {
-                outPS.executeBatch();
-                ciaConnection.commit();
-                batchSize = 0;
-              }
-
-              if (showStatus.get()) {
-                showStatus.set(false);
-
-                long now = System.nanoTime();
-                info(" -- uploaded errors " + recordsCount + " for " + TimeUtils.showTime(now, startedAt)
-                  + " : " + TimeUtils.recordsPerSecond(recordsCount, now - startedAt));
-              }
-            }
-
-            if (batchSize > 0) {
-              outPS.executeBatch();
-              ciaConnection.commit();
-            }
-
-            {
-              long now = System.nanoTime();
-              info("TOTAL Uploaded errors " + recordsCount + " for " + TimeUtils.showTime(now, startedAt)
-                + " : " + TimeUtils.recordsPerSecond(recordsCount, now - startedAt));
-            }
-          }
-        }
-      }
-
-    } finally {
-      closeCiaConnection();
-      working.set(false);
-    }
-
-    //language=PostgreSQL
-    exec("delete from TMP_CLIENT where error is not null");
-  }
-
-  private void uploadAllOk() throws Exception {
-
-    info("uploadAllOk goes: maxBatchSize = " + uploadMaxBatchSize);
-
-    final AtomicBoolean working = new AtomicBoolean(true);
-
-    createCiaConnection();
-    ciaConnection.setAutoCommit(false);
-    try {
-
-      try (PreparedStatement inPS = operConnection.prepareStatement(r("select number from TMP_CLIENT"))) {
-
-        info("Prepared statement for : select number from TMP_CLIENT");
-
-        try (ResultSet inRS = inPS.executeQuery()) {
-          info("Query executed for : select number from TMP_CLIENT");
-
-          try (PreparedStatement outPS = ciaConnection.prepareStatement(
-            "update transition_client set status = 'OK' where number = ?")) {
-
-            int batchSize = 0, recordsCount = 0;
-
-            final AtomicBoolean showStatus = new AtomicBoolean(false);
-
-            new Thread(() -> {
-
-              while (true) {
-
-                if (!working.get()) break;
-
-                try {
-                  Thread.sleep(showStatusPingMillis);
-                } catch (InterruptedException e) {
-                  break;
-                }
-
-                showStatus.set(true);
-              }
-
-            }).start();
-
-            long startedAt = System.nanoTime();
-
-            while (inRS.next()) {
-
-              outPS.setLong(1, inRS.getLong("number"));
-              outPS.addBatch();
-              batchSize++;
-              recordsCount++;
-
-              if (batchSize >= uploadMaxBatchSize) {
-                outPS.executeBatch();
-                ciaConnection.commit();
-                batchSize = 0;
-              }
-
-              if (showStatus.get()) {
-                showStatus.set(false);
-
-                long now = System.nanoTime();
-                info(" -- uploaded ok records " + recordsCount + " for " + TimeUtils.showTime(now, startedAt)
-                  + " : " + TimeUtils.recordsPerSecond(recordsCount, now - startedAt));
-              }
-            }
-
-            if (batchSize > 0) {
-              outPS.executeBatch();
-              ciaConnection.commit();
-            }
-
-            {
-              long now = System.nanoTime();
-              info("TOTAL Uploaded ok records " + recordsCount + " for " + TimeUtils.showTime(now, startedAt)
-                + " : " + TimeUtils.recordsPerSecond(recordsCount, now - startedAt));
-            }
-          }
-        }
-      }
-
-    } finally {
-      closeCiaConnection();
-      working.set(false);
-    }
-
-  }
-
   private void migrateFromTmp() throws Exception {
-
     //language=PostgreSQL
     exec("update TMP_CLIENT set error = 'surname is not defined'\n" +
       "where error is null and surname is null");
@@ -564,7 +288,9 @@ public class Migration implements Closeable {
     exec("update TMP_CLIENT set error = 'age must be in interval[4, 1000]'\n" +
       "where error is null and birth_date is not null and date_part('year', age(birth_date)) not between 4 and 1000");
 
-    uploadAndDropErrors();
+    for (Map.Entry<String, String> entry : tmpSqlVars.entrySet()) {
+      uploadAndDropErrors(entry.getKey(), "transition_client", "number");
+    }
 
     //language=PostgreSQL
     exec("with num_ord as (\n" +
@@ -575,7 +301,7 @@ public class Migration implements Closeable {
       "update TMP_CLIENT set status = 2\n" +
       "where status = 0 and number in (select number from num_ord where ord > 1)");
 
-    // createCiaConnection();
+    // createMigrationConnection();
 
     //language=PostgreSQL
     exec("update TMP_CLIENT t set client_id = c.id\n" +
@@ -635,7 +361,7 @@ public class Migration implements Closeable {
       "  select client_id from TMP_CLIENT where status = 0\n" +
       ")");
 
-    uploadAllOk();
+    uploadAllOk("TMP_CLIENT", "transition_client", "number");
   }
 
   private void printTmpTable() {
@@ -680,19 +406,4 @@ public class Migration implements Closeable {
     }
   }
 
-//  public static void main(String[] args) throws JSchException, IOException {
-//    JSch jsch = new JSch();
-//    String key = "";
-//    FileInputStream fis = new FileInputStream(new File("/home/aqali/Загрузки/greetgo_ssh.pem"));
-//    BufferedReader br = new BufferedReader(fis);
-//    jsch.addIdentity("");
-//    fis.close();
-//    Session session = jsch.getSession("ubuntu", "18.219.75.117\n", 22);
-////    session.setPassword("aklenaz123");
-//    session.connect();
-//    Channel channel = session.openChannel("shell");
-//    channel.setInputStream(System.in);
-//    channel.setOutputStream(System.out);
-//    channel.connect();
-//  }
 }

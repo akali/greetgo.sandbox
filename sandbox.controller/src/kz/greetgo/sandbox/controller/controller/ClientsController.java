@@ -11,49 +11,50 @@ import kz.greetgo.sandbox.controller.security.NoSecurity;
 import kz.greetgo.sandbox.controller.util.Controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 @Bean
 @Mapping("/clients")
 public class ClientsController implements Controller {
 
-  //TODO: Название переменной соответственно нужно поменять
-  public BeanGetter<ClientsRegister> tableRegister;
+  //TODO(DONE): Название переменной соответственно нужно поменять
+  public BeanGetter<ClientsRegister> clientsRegister;
 
   @ToJson
   @Mapping("/getCharms")
-  public List<Charm> getCharms() throws InterruptedException {
-    return tableRegister.get().getCharms();
+  public List<Charm> getCharms() {
+    return clientsRegister.get().getCharms();
   }
 
   @ToJson
   @Mapping("/getClientRecords")
-  public TableResponse getClientRecords(@Par("queryFilter") @Json QueryFilter queryFilter) {
-    return tableRegister.get().getClientRecords(queryFilter);
+  public FilteredTable getClientRecords(@Par("queryFilter") @Json QueryFilter queryFilter) throws SQLException {
+    return clientsRegister.get().getClientRecords(queryFilter);
   }
 
   @ToJson
   @Mapping("/getClientDetailsById")
   public ClientDetail getClientDetailsById(@Par("clientId") int clientId) {
-    return tableRegister.get().getClientDetailsById(clientId);
+    return clientsRegister.get().getClientDetailsById(clientId);
   }
 
   @ToJson
   @Mapping("/removeClientById")
   public void removeClientById(@Par("clientId") int clientId) {
-    tableRegister.get().removeClientById(clientId);
+    clientsRegister.get().removeClientById(clientId);
   }
 
   @ToJson
   @Mapping("/addClientToSave")
   public ClientRecord addClientToSave(@Par("clientToSave") @Json ClientToSave client) {
-    return tableRegister.get().addClientToSave(client);
+    return clientsRegister.get().addClientToSave(client);
   }
 
   @ToJson
   @Mapping("/editClientToSave")
   public ClientRecord editClientToSave(@Par("clientToSave") @Json ClientToSave clientToSave) {
-    return tableRegister.get().editClientToSave(clientToSave);
+    return clientsRegister.get().editClientToSave(clientToSave);
   }
 
   @AsIs
@@ -63,23 +64,12 @@ public class ClientsController implements Controller {
     @Par("reportType") @Json ReportType reportType,
     @Par("queryFilter") @Json QueryFilter filter) throws IOException, DocumentException {
     System.out.println("Token: " + token);
-    return tableRegister.get().generateReport(reportType, filter, token);
+    return clientsRegister.get().generateReport(reportType, filter, token);
   }
 
   @NoSecurity
   @Mapping("/downloadReport")
-  public void downloadReport(@Par("id") String id, BinResponse binResponse) throws IOException, DocumentException {
-    tableRegister.get().downloadReport(id, binResponse);
-//    tableRegister.get().generateReport(ReportType.XLSX, 1,
-//      new QueryFilter(0, 0, "ASC", "name", ""),
-//      binResponse);
-
-//    binResponse.setFilename(filename + ".txt");
-//    binResponse.setContentType("application/txt");
-//    PrintWriter pr = new PrintWriter(binResponse.out());
-//    pr.println("Hello, world!");
-//    pr.flush();
-//    binResponse.flushBuffers();
-//    binResponse.out().flush();
+  public void downloadReport(@Par("id") String id, BinResponse binResponse) throws IOException {
+    clientsRegister.get().downloadReport(id, binResponse);
   }
 }

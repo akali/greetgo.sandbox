@@ -1,11 +1,13 @@
-package kz.greetgo.learn.migration.core;
+package kz.greetgo.learn.migration.core.outerMigration;
 
 import kz.greetgo.learn.migration.interfaces.RowParser;
 import kz.greetgo.learn.migration.interfaces.StreamHandler;
 import kz.greetgo.learn.migration.util.ConfigFiles;
 import kz.greetgo.learn.migration.util.ConnectionUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class XmlHandler implements StreamHandler {
   private StreamHandler parentHandler;

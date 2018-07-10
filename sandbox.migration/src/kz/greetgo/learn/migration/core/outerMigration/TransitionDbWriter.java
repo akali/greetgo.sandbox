@@ -1,8 +1,7 @@
-package kz.greetgo.learn.migration.core;
+package kz.greetgo.learn.migration.core.outerMigration;
 
 import kz.greetgo.learn.migration.interfaces.ConnectionConfig;
 import kz.greetgo.learn.migration.util.ConnectionUtils;
-import kz.greetgo.learn.migration.util.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -74,7 +73,6 @@ public class TransitionDbWriter {
     if (!open)
       throw new Exception("Writer is not opened");
     try {
-//      Logger.log("TransitionDbWriter", "Writing xml " + xml);
       preparedStatement.setString(1, xml);
       preparedStatement.addBatch();
 

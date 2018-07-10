@@ -1,4 +1,4 @@
-package kz.greetgo.learn.migration.core;
+package kz.greetgo.learn.migration.core.innerMigration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,12 @@ import java.util.stream.Collectors;
 
 public class Insert {
   private final String tableName;
+  private boolean onConflictDoNothing;
+
+  public Insert onConflictDoNothing(boolean b) {
+    onConflictDoNothing = b;
+    return this;
+  }
 
   private static class InsertElement {
     final String name, value;
@@ -32,6 +38,6 @@ public class Insert {
       + elementList.stream().map(e -> e.name).collect(Collectors.joining(", "))
       + ") values ("
       + elementList.stream().map(e -> e.value).collect(Collectors.joining(", "))
-      + ")";
+      + ") " + (onConflictDoNothing ? "on conflict do nothing" : "");
   }
 }

@@ -1,4 +1,4 @@
-package kz.greetgo.learn.migration.core;
+package kz.greetgo.learn.migration.core.innerMigration;
 
 import kz.greetgo.learn.migration.util.SaxHandler;
 import org.fest.util.Lists;
@@ -10,7 +10,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class ClientRecord extends SaxHandler {
   }
 
   @Override
-  protected void startingTag(Attributes attributes) throws ParseException {
+  protected void startingTag(Attributes attributes) {
     String path = path();
     switch (path) {
       case "/client": cia_id = attributes.getValue("id"); break;
@@ -62,7 +61,7 @@ public class ClientRecord extends SaxHandler {
   }
 
   @Override
-  protected void endedTag(String tagName) throws Exception {
+  protected void endedTag(String tagName) {
     String path = path() + "/" + tagName;
 
     switch (path) {

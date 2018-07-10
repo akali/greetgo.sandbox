@@ -1,4 +1,4 @@
-package kz.greetgo.learn.migration.core;
+package kz.greetgo.learn.migration.core.outerMigration;
 
 import kz.greetgo.learn.migration.interfaces.RowParser;
 import kz.greetgo.learn.migration.interfaces.StreamHandler;
@@ -13,7 +13,8 @@ public class JsonHandler implements StreamHandler {
 
   private StreamHandler parentStreamHandler;
   private RowParser parser;
-  private TransitionDbWriter frsWriter = new FrsTransitionWriter(ConnectionUtils.fileToConnectionConfig(ConfigFiles.migrationDb()));
+  private TransitionDbWriter frsWriter =
+    new FrsTransitionWriter(ConnectionUtils.fileToConnectionConfig(ConfigFiles.migrationDb()));
 
   public JsonHandler() throws IOException { }
 

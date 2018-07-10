@@ -1,6 +1,8 @@
 # IDE files #
 #############
 .idea/
+.ideaDataSources/
+dataSources/
 .classpath
 .project
 *.ids

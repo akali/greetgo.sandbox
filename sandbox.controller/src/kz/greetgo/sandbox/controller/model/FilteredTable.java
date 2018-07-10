@@ -3,18 +3,17 @@ package kz.greetgo.sandbox.controller.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public class TableResponse {
+public class FilteredTable {
   public int size;
   public List<ClientRecord> list;
 
-  public TableResponse(List<ClientRecord> sample, int start, int offset, String direction, String action, String filter) {
+  public FilteredTable(List<ClientRecord> sample, int start, int offset, String direction, String action, String filter) {
     List<ClientRecord> total = sample.stream()
       .filter(clientRecord -> filter == null || clientRecord.getCombinedString().contains(filter))
       .sorted(
         (t1, t2) -> {
-          int result = 0;
+          int result;
           switch(action) {
             case "name":
               result = t1.name.compareTo(t2.name);
@@ -42,10 +41,11 @@ public class TableResponse {
           }
           return result;
         }).collect(Collectors.toList());
-    this.size = (int) total.size();
+    this.size = total.size();
     this.list = total.stream().skip(start).limit(offset).collect(Collectors.toList());
   }
-  public TableResponse() {
+
+  public FilteredTable() {
     list = new ArrayList<>();
   }
 }

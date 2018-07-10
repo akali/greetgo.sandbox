@@ -3,7 +3,6 @@ package kz.greetgo.sandbox.db.register_impl;
 import kz.greetgo.sandbox.controller.model.*;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Date;
@@ -12,7 +11,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class RandomClientGenerator {
   private int accountId = 1;
@@ -39,19 +37,19 @@ public class RandomClientGenerator {
     return filters;
   }
 
-  public static TableResponse getClientRecords(List<ClientBundle> clientBundles, QueryFilter queryFilter) {
-    int start = queryFilter.start;
-    int offset = queryFilter.limit;
-    String direction = queryFilter.direction;
-    String active = queryFilter.active;
-    String filter = queryFilter.filter;
-    List<ClientRecord> list = new ArrayList<>();
-
-    for (ClientBundle clientBundle: clientBundles) {
-      list.add(clientBundle.getClientRecord());
+  static {
+    try {
+      sigma = "";
+      for (char c = 'a'; c <= 'z'; ++c) sigma = sigma.concat(String.valueOf(c));
+      for (char c = 'A'; c <= 'Z'; ++c) sigma = sigma.concat(String.valueOf(c));
+      names = load("firstnames/all.txt");
+      surnames = load("surnames/all.txt");
+      phoneCodes = load("phonesCodes/all.txt");
+      generateCharms();
+      generateTransactionTypes();
+    } catch (IOException e) {
+      e.printStackTrace();
     }
-
-    return new TableResponse(list, start, offset, direction, active, filter);
   }
 
   public class ClientBundle {
@@ -268,19 +266,23 @@ public class RandomClientGenerator {
   private static final long RANDOM_SEED = 1337;
   private static Random random = new Random(RANDOM_SEED);
 
-  static {
-    try {
-      sigma = "";
-      for (char c = 'a'; c <= 'z'; ++c) sigma = sigma.concat(String.valueOf(c));
-      for (char c = 'A'; c <= 'Z'; ++c) sigma = sigma.concat(String.valueOf(c));
-      names = load("first_names/all.txt");
-      surnames = load("surnames/all.txt");
-      phoneCodes = load("phonesCodes/all.txt");
-      generateCharms();
-      generateTransactionTypes();
-    } catch (IOException e) {
-      e.printStackTrace();
+  public static FilteredTable getClientRecords(List<ClientBundle> clientBundles, QueryFilter queryFilter) {
+    int start = queryFilter.start;
+    int offset = queryFilter.limit;
+    String direction = queryFilter.direction;
+    String active = queryFilter.active;
+    String filter = queryFilter.filter;
+    List<ClientRecord> list = new ArrayList<>();
+
+    for (ClientBundle clientBundle : clientBundles) {
+      list.add(clientBundle.getClientRecord());
     }
+
+    return new FilteredTable(list, start, offset, direction, active, filter);
+  }
+
+  public static void main(String[] args) {
+
   }
 
   public static List<ClientBundle> generate(int count) {
@@ -477,15 +479,15 @@ public class RandomClientGenerator {
   private static List<String> load(String name) throws IOException {
     List<String> objs = new ArrayList<>();
 
-    // TODO: Укажи относительный путь.
+    // TODO(DONE): Укажи относительный путь.
     // В командной разработке не указывай абсолютные пути,
     // потому что у всех в команде на своих машинах свои пути.
     // Пути должны строится относительно проекта
 
-    // TODO: также закоммить эти файлы.
+    // TODO(DONE): также закоммить эти файлы.
     BufferedReader bf =
       new BufferedReader(new FileReader(
-        "/home/aqali/work/greetgo/greetgo.sandbox/sandbox.db/test_src/kz/greetgo/sandbox/db/register_impl/NameDatabases/NamesDatabases/" + name));
+        "sandbox.db/test_src/kz/greetgo/sandbox/db/register_impl/NameDatabases/NameDatabases/" + name));
     String s;
     while ((s = bf.readLine()) != null) {
       s = s.trim();

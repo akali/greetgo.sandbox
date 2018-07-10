@@ -1,10 +1,8 @@
 package kz.greetgo.sandbox.db.register_impl;
 
 import com.itextpdf.text.DocumentException;
-import kz.greetgo.sandbox.controller.model.ClientRecord;
 import kz.greetgo.sandbox.controller.model.ClientRecordRow;
 import kz.greetgo.sandbox.controller.model.QueryFilter;
-import kz.greetgo.sandbox.controller.model.TableResponse;
 import kz.greetgo.sandbox.controller.reports.ReportClientsRecord;
 import kz.greetgo.sandbox.db.util.DBHelper;
 import liquibase.exception.DatabaseException;

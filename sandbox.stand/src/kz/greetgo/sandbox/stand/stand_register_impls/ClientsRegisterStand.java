@@ -13,7 +13,10 @@ import kz.greetgo.sandbox.controller.reports.ReportClientsRecord;
 import kz.greetgo.sandbox.db.stand.beans.StandDb;
 import org.apache.poi.util.IOUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -47,7 +50,7 @@ public class ClientsRegisterStand implements ClientsRegister {
   }
 
   @Override
-  public TableResponse getClientRecords(QueryFilter queryFilter) {
+  public FilteredTable getClientRecords(QueryFilter queryFilter) {
     int start = queryFilter.start;
     int offset = queryFilter.limit;
     String direction = queryFilter.direction;
@@ -68,7 +71,7 @@ public class ClientsRegisterStand implements ClientsRegister {
     System.out.println(Arrays.toString(list.stream()
       .filter(clientRecord -> filter == null || clientRecord.getCombinedString().contains(filter)).toArray()));
 
-    return new TableResponse(list, start, offset, direction, active, filter);
+    return new FilteredTable(list, start, offset, direction, active, filter);
   }
 
   public static int calculateAge(long birthDateTs) {
@@ -195,7 +198,7 @@ public class ClientsRegisterStand implements ClientsRegister {
     filter.start = 0;
     filter.limit = 1000000000;
 
-    TableResponse response = getClientRecords(filter);
+    FilteredTable response = getClientRecords(filter);
     ReportClientsRecord reportClientsRecord  = null;
 
     String root = "/home/aqali/tmp/" + "Report_" + new Random().nextInt(100000);

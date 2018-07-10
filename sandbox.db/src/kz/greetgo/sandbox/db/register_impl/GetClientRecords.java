@@ -1,9 +1,8 @@
 package kz.greetgo.sandbox.db.register_impl;
 
 import kz.greetgo.sandbox.controller.model.ClientRecord;
+import kz.greetgo.sandbox.controller.model.FilteredTable;
 import kz.greetgo.sandbox.controller.model.QueryFilter;
-import kz.greetgo.sandbox.controller.model.TableResponse;
-import liquibase.structure.core.Table;
 import org.apache.ibatis.jdbc.SQL;
 
 import java.sql.Connection;
@@ -18,8 +17,8 @@ public class GetClientRecords {
     return new GetClientRecords();
   }
 
-  public TableResponse run(Connection connection, QueryFilter queryFilter) throws SQLException {
-    TableResponse tableResponse = new TableResponse();
+  public FilteredTable run(Connection connection, QueryFilter queryFilter) throws SQLException {
+    FilteredTable filteredTable = new FilteredTable();
     String active;
     switch(queryFilter.active) {
       case "age": active = "age"; break;
@@ -58,7 +57,7 @@ public class GetClientRecords {
 
     ResultSet result = statement.executeQuery();
     while (result.next()) {
-      tableResponse.list.add(new ClientRecord(result.getInt("id"),
+      filteredTable.list.add(new ClientRecord(result.getInt("id"),
         result.getString("name"),
         result.getString("surname"),
         result.getString("patronymic"),
@@ -69,7 +68,7 @@ public class GetClientRecords {
         result.getInt("age")
       ));
     }
-    tableResponse.size = tableResponse.list.size();
-    return tableResponse;
+    filteredTable.size = filteredTable.list.size();
+    return filteredTable;
   }
 }
