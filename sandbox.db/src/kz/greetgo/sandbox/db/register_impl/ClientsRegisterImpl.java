@@ -54,11 +54,6 @@ public class ClientsRegisterImpl implements ClientsRegister {
   @Override
   public FilteredTable getClientRecords(QueryFilter queryFilter) {
 
-    // TODO(DONE): есть уже реализация для jdbc
-    // public BeanGetter<JdbcSandbox> jdbc;
-    // jdbc.get().execute(connection -> ...)
-    // jdbc.get().execute(new ClassForMigrationForExample)
-
     return jdbcBeanGetter.get().execute(connection -> GetClientRecords.instance().run(connection, queryFilter));
   }
 

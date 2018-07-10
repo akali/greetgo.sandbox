@@ -37,6 +37,9 @@ public class RandomClientGenerator {
     return filters;
   }
 
+  private static String sigma;
+
+  // TODO: не должно быть выше инициализации самой переменной.
   static {
     try {
       sigma = "";
@@ -255,7 +258,6 @@ public class RandomClientGenerator {
       );
     }
   }
-  private static String sigma;
 
   private static List<String> phoneCodes = new ArrayList<>();
   private static List<String> names = new ArrayList<>();
@@ -479,12 +481,6 @@ public class RandomClientGenerator {
   private static List<String> load(String name) throws IOException {
     List<String> objs = new ArrayList<>();
 
-    // TODO(DONE): Укажи относительный путь.
-    // В командной разработке не указывай абсолютные пути,
-    // потому что у всех в команде на своих машинах свои пути.
-    // Пути должны строится относительно проекта
-
-    // TODO(DONE): также закоммить эти файлы.
     BufferedReader bf =
       new BufferedReader(new FileReader(
         "sandbox.db/test_src/kz/greetgo/sandbox/db/register_impl/NameDatabases/NameDatabases/" + name));
