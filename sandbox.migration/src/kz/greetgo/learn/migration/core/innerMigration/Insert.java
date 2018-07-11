@@ -13,16 +13,23 @@ public class Insert {
     return this;
   }
 
+  public final List<InsertElement> elementList = new ArrayList<>();
+
   private static class InsertElement {
     final String name, value;
+    String valueAfterInit;
 
     public InsertElement(String name, String value) {
       this.name = name;
       this.value = value;
     }
-  }
 
-  private final List<InsertElement> elementList = new ArrayList<>();
+    public InsertElement(String name, String value, String valueAfterInit) {
+      this.name = name;
+      this.value = value;
+      this.valueAfterInit = valueAfterInit;
+    }
+  }
 
   public Insert(String tableName) {
     this.tableName = tableName;

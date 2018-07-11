@@ -48,14 +48,14 @@ public class FrsMigration extends Migration {
   }
 
   private void migrateFromTmp() throws Exception {
-    for (String column : Lists.newArrayList("account_number", "money", "finished_at"))
+    for (String column : Lists.newArrayList("account_number"))
       exec(String.format(
-        "update TMP_TRANSACTION set error = '%s is null, status = 1' where error is null and %s is null", column, column
+        "update TMP_TRANSACTION set error = '%s is null, status = 1' where error is null and (%s is null or %s = '')", column, column, column
       ));
 
-    for (String column : Lists.newArrayList("client_id", "number", "registered_at"))
+    for (String column : Lists.newArrayList("client_id", "number"))
       exec(String.format(
-        "update TMP_ACCOUNT set error = '%s is null', status = 1 where error is null and %s is null", column, column
+        "update TMP_ACCOUNT set error = '%s is null', status = 1 where error is null and (%s is null or %s = '')", column, column, column
       ));
 
     for (Map.Entry<String, String> entry : tmpSqlVars.entrySet()) {
@@ -148,7 +148,7 @@ public class FrsMigration extends Migration {
             FrsRecord record = FrsRecord.parse(data);
             record.number = srcRs.getLong("number");
             if (record.type == FrsRecord.Type.NEW_ACCOUNT) {
-              accountPS.setDate(1, record.registered_at);
+              accountPS.setTimestamp(1, record.registered_at);
               accountPS.setString(2, record.client_id);
               accountPS.setString(3, record.account_number);
               accountPS.setLong(4, record.number);
@@ -158,7 +158,7 @@ public class FrsMigration extends Migration {
               transactionPS.setString(1, record.transaction_type);
               transactionPS.setString(2, record.account_number);
               transactionPS.setFloat(3, record.money);
-              transactionPS.setDate(4, record.finished_at);
+              transactionPS.setTimestamp(4, record.finished_at);
               transactionPS.setLong(5, record.number);
 
               typePS.setLong(1, record.number);

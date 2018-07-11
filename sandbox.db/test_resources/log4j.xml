@@ -35,7 +35,7 @@
         <priority value="INFO"/>
     </category>
 
-    <category name="kz.greetgo.sandbox.db.test.beans._develop_" additivity="true">
+    <category name="kz.greetgo.sandbox.db.kz.greetgo.learn.migration.test.beans._develop_" additivity="true">
         <priority value="INFO"/>
         <appender-ref ref="CONSOLE"/>
     </category>

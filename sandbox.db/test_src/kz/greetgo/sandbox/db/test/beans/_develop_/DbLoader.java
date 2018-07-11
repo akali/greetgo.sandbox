@@ -3,9 +3,9 @@ package kz.greetgo.sandbox.db.test.beans._develop_;
 import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.sandbox.db.register_impl.TokenRegister;
-import kz.greetgo.sandbox.db.test.dao.AuthTestDao;
 import kz.greetgo.sandbox.db.stand.beans.StandDb;
 import kz.greetgo.sandbox.db.stand.model.PersonDot;
+import kz.greetgo.sandbox.db.test.dao.AuthTestDao;
 import kz.greetgo.sandbox.db.test.dao.ClientsTestDao;
 import org.apache.log4j.Logger;
 
@@ -21,7 +21,7 @@ public class DbLoader {
   public BeanGetter<ClientsTestDao> tableTestDao;
 
   public void loadTestData() {
-    logger.info("Start loading test data...");
+    logger.info("Start loading kz.greetgo.learn.migration.test data...");
 
     logger.info("Loading persons...");
     Function<String, String> passwordEncryption = tokenManager.get()::encryptPassword;
@@ -51,6 +51,6 @@ public class DbLoader {
     standDb.get().transactionStorage.values()
       .forEach(tableTestDao.get()::insertClientAccountTransaction);
 
-    logger.info("Finish loading test data");
+    logger.info("Finish loading kz.greetgo.learn.migration.test data");
   }
 }

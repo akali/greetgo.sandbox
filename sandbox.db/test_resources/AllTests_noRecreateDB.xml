@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="All Db Test Suite (no recreate DB)" parallel="false" verbose="1">
-    <test name="All DB Tests">
+    <kz.greetgo.learn.migration.test name="All DB Tests">
         <groups>
             <run>
                 <exclude name="left"/>
@@ -9,5 +9,5 @@
         <packages>
             <package name="kz.greetgo.access.*"/>
         </packages>
-    </test>
+    </kz.greetgo.learn.migration.test>
 </suite>

@@ -52,4 +52,9 @@ public class FilteredTable {
   public FilteredTable(List<ClientRecord> clientRecords, QueryFilter filter) {
     this(clientRecords, filter.start, filter.limit, filter.direction, filter.active, filter.filter);
   }
+
+  public FilteredTable() {
+    list = new ArrayList<>();
+
+  }
 }

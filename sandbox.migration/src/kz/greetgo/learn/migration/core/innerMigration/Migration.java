@@ -29,7 +29,7 @@ public abstract class Migration implements Closeable {
     this.ciaConfig = ciaConfig;
   }
 
-  protected HashMap<String, String> tmpSqlVars;
+  public HashMap<String, String> tmpSqlVars;
 
   @Override
   public void close() {
@@ -199,7 +199,7 @@ public abstract class Migration implements Closeable {
           info("Query executed for : select number, error from TMP_CLIENT where error is not null");
 
           try (PreparedStatement outPS = migrationConnection.prepareStatement(
-            "update " + migrationTableName + "set status = 'ERROR', error = ? where number = ?")) {
+            "update " + migrationTableName + " set status = 'ERROR', error = ? where number = ?")) {
 
             int batchSize = 0, recordsCount = 0;
 
@@ -216,9 +216,7 @@ public abstract class Migration implements Closeable {
                 }
 
                 showStatus.set(true);
-
               }
-
             }).start();
 
             long startedAt = System.nanoTime();

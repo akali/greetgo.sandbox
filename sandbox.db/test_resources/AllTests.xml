@@ -1,10 +1,10 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="All Db Test Suite" parallel="false" verbose="1">
     <listeners>
-        <listener class-name="kz.greetgo.sandbox.db.test.util.TestNgRecreateDbListener"/>
+        <listener class-name="kz.greetgo.sandbox.db.kz.greetgo.learn.migration.test.util.TestNgRecreateDbListener"/>
     </listeners>
 
-    <test name="All DB Tests">
+    <kz.greetgo.learn.migration.test name="All DB Tests">
         <groups>
             <run>
                 <exclude name="left"/>
@@ -13,5 +13,5 @@
         <packages>
             <package name="kz.greetgo.sandbox.*"/>
         </packages>
-    </test>
+    </kz.greetgo.learn.migration.test>
 </suite>

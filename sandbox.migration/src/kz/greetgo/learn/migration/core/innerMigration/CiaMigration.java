@@ -29,7 +29,6 @@ public class CiaMigration extends Migration {
     tmpSqlVars = new HashMap<String, String>() {
       {
         put("TMP_CLIENT", "cia_migration_client_" + sdf.format(nowDate));
-        put("TMP_CHARM", "cia_migration_charm_" + sdf.format(nowDate));
         put("TMP_ADDRESS", "cia_migration_address_" + sdf.format(nowDate));
         put("TMP_PHONE", "cia_migration_phone_" + sdf.format(nowDate));
       }
@@ -61,7 +60,6 @@ public class CiaMigration extends Migration {
       "  client_id int,\n" +
       "  status int not null default 0,\n" +
       "  error varchar(300),\n" +
-      "  \n" +
       "  number bigint not null primary key,\n" +
       "  cia_id varchar(100) not null,\n" +
       "  surname varchar(300),\n" +
@@ -71,14 +69,6 @@ public class CiaMigration extends Migration {
       "  charm_name varchar(300)," +
       "  charm_id int" +
       ")");
-//    //language=PostgreSQL
-//    exec("create table TMP_CHARM (" +
-//      " charm_id serial primary key," +
-//      " name varchar(300) not null unique," +
-//      " desciption varchar(300)," +
-//      " energy numeric, " +
-//      " number bigint not null primary key" +
-//      ");");
     //language=PostgreSQL
     exec("create table TMP_ADDRESS (\n" +
       "  number bigint references TMP_CLIENT on delete cascade,\n" +
@@ -88,6 +78,7 @@ public class CiaMigration extends Migration {
       "  house varchar(300),\n" +
       "  flat varchar(300),\n" +
       "  status int not null default 0,\n" +
+      "  error varchar(300),\n" +
       "  primary key(number, type)\n" +
       ");");
 
@@ -98,6 +89,7 @@ public class CiaMigration extends Migration {
       "  type varchar(64) not null,\n" +
       "  number bigint references TMP_CLIENT on delete cascade,\n" +
       "  status int not null default 0,\n" +
+      "  error varchar(300),\n" +
       "  primary key(number, phone_number)\n" +
       ");\n");
     /*
@@ -276,11 +268,14 @@ public class CiaMigration extends Migration {
 
   private void migrateFromTmp() throws Exception {
     //language=PostgreSQL
+    exec("update TMP_CLIENT set error = 'patronymic is not defined'\n" +
+      "where error is null and (patronymic is null or patronymic = '')");
+    //language=PostgreSQL
     exec("update TMP_CLIENT set error = 'surname is not defined'\n" +
-      "where error is null and surname is null");
+      "where error is null and (surname is null or surname = '')");
     //language=PostgreSQL
     exec("update TMP_CLIENT set error = 'name is not defined'\n" +
-      "where error is null and name is null");
+      "where error is null and (name is null or name = '')");
     //language=PostgreSQL
     exec("update TMP_CLIENT set error = 'birth_date is not defined'\n" +
       "where error is null and birth_date is null");
@@ -289,7 +284,7 @@ public class CiaMigration extends Migration {
       "where error is null and birth_date is not null and date_part('year', age(birth_date)) not between 4 and 1000");
 
     for (Map.Entry<String, String> entry : tmpSqlVars.entrySet()) {
-      uploadAndDropErrors(entry.getKey(), "transition_client", "number");
+      uploadAndDropErrors(entry.getKey(), "transition_cia", "number");
     }
 
     //language=PostgreSQL
@@ -361,7 +356,7 @@ public class CiaMigration extends Migration {
       "  select client_id from TMP_CLIENT where status = 0\n" +
       ")");
 
-    uploadAllOk("TMP_CLIENT", "transition_client", "number");
+    uploadAllOk("TMP_CLIENT", "transition_cia", "number");
   }
 
   private void printTmpTable() {

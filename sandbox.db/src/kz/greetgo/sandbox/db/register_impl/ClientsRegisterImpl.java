@@ -1,6 +1,5 @@
 package kz.greetgo.sandbox.db.register_impl;
 
-import kz.greetgo.db.Jdbc;
 import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.depinject.core.BeanGetter;
 import kz.greetgo.mvc.interfaces.BinResponse;
@@ -13,6 +12,7 @@ import kz.greetgo.sandbox.controller.reports.ReportClientsRecord;
 import kz.greetgo.sandbox.db.dao.ClientsDao;
 import kz.greetgo.sandbox.db.dao.ReportsDao;
 import kz.greetgo.sandbox.db.util.DBHelper;
+import kz.greetgo.sandbox.db.util.JdbcSandbox;
 import liquibase.exception.DatabaseException;
 
 import java.io.FileOutputStream;
@@ -31,7 +31,7 @@ public class ClientsRegisterImpl implements ClientsRegister {
   public BeanGetter<ClientsDao> clientsDao;
   public BeanGetter<ReportsDao> reportsDao;
   public BeanGetter<AuthRegister> authRegister;
-  public BeanGetter<Jdbc> jdbcBeanGetter;
+  public BeanGetter<JdbcSandbox> jdbcBeanGetter;
 
   @Override
   public List<Charm> getCharms() {

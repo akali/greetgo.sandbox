@@ -23,12 +23,14 @@ dependencies {
   compile "com.google.code.findbugs:annotations:$findbugsVersion"
 
   compile group: 'org.postgresql', name: 'postgresql', version: '42.0.0'
-// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
   compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.0.1'
   compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.0"
-// https://mvnrepository.com/artifact/org.apache.commons/commons-compress
   compile group: 'org.apache.commons', name: 'commons-compress', version: '1.7'
   compile group: 'com.jcraft', name: 'jsch', version: '0.1.44-1'
+  compile project(':sandbox.db')
+
+//  testCompile project(':sandbox.migration').sourceSets.main.output
+  testCompile project(':sandbox.db').sourceSets.test.output
 }
 
 jar {
@@ -53,7 +55,7 @@ sourceSets {
   test {
     java.srcDirs = ["test_src"]
     resources.srcDirs = ["test_src", "test_resources"]
-    output.resourcesDir = "build/classes/test"
+    output.resourcesDir = "build/classes/kz.greetgo.learn.migration.test"
   }
 }
 

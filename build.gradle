@@ -73,14 +73,14 @@ subprojects {
     sourceSets.main.java.srcDirs = ["src"]
     sourceSets.main.resources.srcDirs = ["src", "src_resources"]
     //sourceSets.main.output.resourcesDir = "build/classes/main"
-    sourceSets.test.java.srcDirs = ["test_src"]
-    sourceSets.test.resources.srcDirs = ["test_src", "test_resources"]
-    //sourceSets.test.output.resourcesDir = "build/classes/test"
+    sourceSets.kz.greetgo.learn.migration.test.java.srcDirs = ["test_src"]
+    sourceSets.kz.greetgo.learn.migration.test.resources.srcDirs = ["test_src", "test_resources"]
+    //sourceSets.kz.greetgo.learn.migration.test.output.resourcesDir = "build/classes/kz.greetgo.learn.migration.test"
 */
 
     idea.module.inheritOutputDirs = false
     idea.module.outputDir = file("$buildDir/classes/main/")
-    idea.module.testOutputDir = file("$buildDir/classes/test/")
+    idea.module.testOutputDir = file("$buildDir/classes/kz.greetgo.learn.migration.test/")
 
 
     sourceSets.main.java.srcDirs = ["src"]
