@@ -66,5 +66,7 @@ public class ReportClientRecordXlsxGenerator implements ReportClientsRecord {
 
     workbook.write(out);
   }
+
+  // TODO: где main тест для рендера? В видео есть пример
 }
 
