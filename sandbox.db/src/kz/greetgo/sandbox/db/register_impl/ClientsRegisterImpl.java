@@ -170,6 +170,7 @@ public class ClientsRegisterImpl implements ClientsRegister {
     //TODO: у нас есть специальный класс RND. Посмотри там методы. Для строк тоже есть рандом
     String id = "" + new Random().nextInt(100000);
 
+    // TODO: запиши этот файл в бд после реального создания файла, а не до.
     reportsDao.get().putFile(root, id);
 
     GenerateReport report =
