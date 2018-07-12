@@ -137,12 +137,16 @@ public class ClientsRegisterImpl implements ClientsRegister {
 
   @Override
   public String generateReport(ReportType reportType, QueryFilter filter, String token) throws IOException {
+
+    // TODO: не устанавливай так лимиты. Просто не
     filter.start = 0;
     filter.limit = 1000000000;
 
+    // TODO: если не используешь - убирай. Лишний код портит читабильность
     FilteredTable response = getClientRecords(filter);
     ReportClientsRecord reportClientsRecord = null;
 
+    //TODO: не используй обсолютные пути
     String root = "/home/aqali/tmp/" + "Report_" + new Random().nextInt(100000);
 
     FileOutputStream fos = null; // = new FileOutputStream(root);
@@ -160,8 +164,10 @@ public class ClientsRegisterImpl implements ClientsRegister {
         break;
     }
 
+    // TODO: если не используешь - убирай. Лишний код портит читабильность
     int count = 1;
 
+    //TODO: у нас есть специальный класс RND. Посмотри там методы. Для строк тоже есть рандом
     String id = "" + new Random().nextInt(100000);
 
     reportsDao.get().putFile(root, id);

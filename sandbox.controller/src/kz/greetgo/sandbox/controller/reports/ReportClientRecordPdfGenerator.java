@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
 
+// TODO: для большого кол-ва клиентов отчёт будет тормозить. Переделай.
 public class ReportClientRecordPdfGenerator implements ReportClientsRecord {
 
   private OutputStream out;
