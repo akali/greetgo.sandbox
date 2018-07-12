@@ -138,7 +138,7 @@ public class ClientsRegisterImpl implements ClientsRegister {
   @Override
   public String generateReport(ReportType reportType, QueryFilter filter, String token) throws IOException {
 
-    // TODO: не устанавливай так лимиты. Просто не
+    // TODO: не устанавливай так лимиты
     filter.start = 0;
     filter.limit = 1000000000;
 
