@@ -49,19 +49,6 @@ public class RandomClientGenerator {
   };
   private static String sigma = generateSigma.get();
 
-  static {
-    try {
-      sigma = generateSigma.get();
-      names = load(ToLoad.NAMES);
-      surnames = load(ToLoad.SURNAMES);
-      phoneCodes = load(ToLoad.PHONECODE);
-      generateCharms();
-      generateTransactionTypes();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
   private static List<String> phoneCodes = new ArrayList<>();
   private static List<String> names = new ArrayList<>();
   private static List<String> surnames = new ArrayList<>();
@@ -651,4 +638,16 @@ public class RandomClientGenerator {
     }
   }
 
+  static {
+    try {
+      sigma = generateSigma.get();
+      names = load(ToLoad.NAMES);
+      surnames = load(ToLoad.SURNAMES);
+      phoneCodes = load(ToLoad.PHONECODE);
+      generateCharms();
+      generateTransactionTypes();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 }
