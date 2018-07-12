@@ -187,6 +187,6 @@ public class ClientsRegisterImpl implements ClientsRegister {
 
   @Override
   public void downloadReport(String id, BinResponse binResponse) {
-
+    //TODO: почему метод пустой?
   }
 }
