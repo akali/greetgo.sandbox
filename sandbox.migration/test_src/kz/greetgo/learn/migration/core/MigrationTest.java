@@ -554,7 +554,7 @@ public class MigrationTest {
   }
 
   @Test
-  void testCiaLargeMigration() throws Exception {
+  void testCiaStressMigration() throws Exception {
     long start = System.nanoTime();
     RandomClientGenerator gen = new RandomClientGenerator();
 
@@ -647,4 +647,123 @@ public class MigrationTest {
     }
   }
 
+  @Test
+  void testFrsStressMigration() throws Exception {
+    long startedAt = System.nanoTime();
+    RandomClientGenerator gen = new RandomClientGenerator();
+
+    int bundlesCount = 10000;
+
+    DropCreateMgrSrcDb.execute();
+    DropCreateOperDb.execute();
+
+    final long MAX_INSERT_BATCH_SIZE = 250_000;
+    final long MAX_INSERT_SIZE = 1_000_000;
+    final long[] batchCount = {0};
+    final long[] totalInsertedCount = {0};
+
+    AtomicInteger errorsCount = new AtomicInteger();
+
+    new DBHelper<>().useSrcDb(true).run(connection -> {
+      PreparedStatement ps = connection.prepareStatement("insert into transition_frs(record_data) values (?)");
+
+      HashMap<Integer, Function<RandomClientGenerator.ClientBundle, RandomClientGenerator.ClientBundle>> mutate = new HashMap<>();
+
+      mutate.put(0, clientBundle -> clientBundle.noCiaId(true));
+      mutate.put(1, clientBundle -> clientBundle.noNumber(true));
+      mutate.put(2, clientBundle -> clientBundle);
+
+      Random random = new Random(1337);
+
+      for (int i = 1; i <= 2 * bundlesCount; ++i) {
+        int x = random.nextInt(2);
+        if (i > bundlesCount)
+          x = 2;
+        RandomClientGenerator.ClientBundle bundle = gen.generateClientBundle(i);
+        bundle = mutate.get(x).apply(bundle);
+        int finalX = x;
+        bundle.getJsonAccounts().forEach(data -> {
+          try {
+            if (finalX != 2)
+              errorsCount.incrementAndGet();
+            ps.setString(1, data);
+            ps.addBatch();
+            batchCount[0]++;
+          } catch (SQLException e) {
+            e.printStackTrace();
+          }
+        });
+
+        bundle.getJsonTransactions().forEach(data -> {
+          try {
+            if (finalX != 2)
+              errorsCount.incrementAndGet();
+            ps.setString(1, data);
+            ps.addBatch();
+            batchCount[0]++;
+          } catch (SQLException e) {
+            e.printStackTrace();
+          }
+        });
+        if (batchCount[0] >= MAX_INSERT_BATCH_SIZE) {
+          ps.executeBatch();
+          System.out.println("Inserted " + batchCount[0] + " batches");
+          totalInsertedCount[0] += batchCount[0];
+          batchCount[0] = 0;
+          if (totalInsertedCount[0] > MAX_INSERT_SIZE)
+            break;
+        }
+      }
+      if (batchCount[0] >= 0) {
+        ps.executeBatch();
+        System.out.println("Inserted " + batchCount[0] + " batches");
+        totalInsertedCount[0] += batchCount[0];
+        batchCount[0] = 0;
+      }
+      return null;
+    });
+
+    //
+    //
+
+    ConnectionConfig operCC = ConnectionUtils.fileToConnectionConfig(ConfigFiles.homeDb());
+    ConnectionConfig ciaCC = ConnectionUtils.fileToConnectionConfig(ConfigFiles.migrationDb());
+    try (Migration migration = new FrsMigration(operCC, ciaCC)) {
+      migration.chunkSize = 250_000;
+      migration.uploadMaxBatchSize = 50_000;
+      migration.downloadMaxBatchSize = 50_000;
+
+      long count = 0;
+      long lastTime = System.nanoTime();
+      long allCount = 0;
+      while ((count = migration.migrate()) > 0) {
+        allCount += count;
+        System.out.println("Migrated bunch: " + count + ", in time " + TimeUtils.showTime(System.nanoTime(), lastTime));
+        System.out.println("Migrated total: " + allCount);
+        lastTime = System.nanoTime();
+      }
+      System.out.println("Migrated bunch: " + count + ", in time " + TimeUtils.showTime(System.nanoTime(), lastTime));
+      System.out.println("Migrated total: " + allCount);
+    }
+    //
+    //
+
+    long now = System.nanoTime();
+
+    System.out.println("Finished in: " + TimeUtils.showTime(now, startedAt));
+  }
+
+  @Test
+  public void testFrsIntegration() throws Exception {
+    DropCreateMgrSrcDb.execute();
+    DropCreateOperDb.execute();
+    LaunchMigration.runFrsMigration();
+  }
+
+  @Test
+  public void testCiaIntegration() throws Exception {
+    DropCreateMgrSrcDb.execute();
+    DropCreateOperDb.execute();
+    LaunchMigration.runCiaMigration();
+  }
 }

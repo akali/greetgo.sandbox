@@ -96,11 +96,15 @@ public class FrsMigration extends Migration {
       "select id, client, number, registered_at from TMP_ACCOUNT where status = 0 on conflict do nothing;");
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//    exec("update TMP_ACCOUNT q set money = money + (select sum(money) from TMP_TRANSACTION f where f.account = q.id)");
+//
+//    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     exec("insert into ClientAccountTransaction(id, account, money, finished_at, type) " +
       "select id, account, money, finished_at, transaction_type_id from TMP_TRANSACTION " +
       "where status = 0");
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//    exec("update ClientAccount q set q.money = money + w.money from TMP_ACCOUNT w where q.id = w.id");
     exec("update ClientAccount q set money = money + (select sum(money) from TMP_TRANSACTION f where f.account = q.id)");
 
     for (Map.Entry<String, String> entry : tmpSqlVars.entrySet()) {
@@ -218,7 +222,7 @@ public class FrsMigration extends Migration {
       "  id bigint,\n" +
       "  account bigint,\n" +
       "  account_number varchar(300),\n" +
-      "  money float not null,\n" +
+      "  money float not null default 0,\n" +
       "  finished_at timestamp,\n" +
       "  transaction_type_id bigint,\n" +
       "  transaction_type varchar(300),\n" +
@@ -233,5 +237,8 @@ public class FrsMigration extends Migration {
       "  status int not null default 0,\n" +
       "  error varchar(300)\n" +
       ");\n");
+
+    exec("create index if not exists" +
+      " tmpAccountNumberIndex on TMP_ACCOUNT(id)");
   }
 }

@@ -66,4 +66,5 @@ public class JsonHandler implements StreamHandler {
   public void setParentHandler(StreamHandler handler) {
     parentStreamHandler = handler;
   }
+
 }

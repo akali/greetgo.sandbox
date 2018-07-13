@@ -26,13 +26,33 @@ export class HttpService {
 
   public pageSize: number = 10;
 
-  private urlPrefix = "http://localhost:1414/access/api";
+  // private urlPrefix = "http://localhost:1414/access/api";
 
   constructor(private http: Http) {
   }
 
-  private prefix(): string {
-    return this.urlPrefix;
+  public getLink(urlSuffix: string, keyValue?: { [key: string]: string | number | null }): string {
+    let post: string = '';
+
+    let append = function (keyValue) {
+      let data = new URLSearchParams();
+      let appended = false;
+      for (let key in keyValue) {
+        let value = keyValue[key];
+        if (value) {
+          data.append(key, value as string);
+          appended = true;
+        }
+      }
+
+      if (appended) post += '?' + data.toString();
+    };
+
+    if (keyValue) append(keyValue);
+
+    console.log(post);
+
+    return this.url(urlSuffix) + post;
   }
 
   public get token(): string | null {
@@ -69,28 +89,9 @@ export class HttpService {
     return this.http.get(this.url(urlSuffix) + post, this.newOptionsBuilder().get());
   }
 
-  public getLink(urlSuffix: string, keyValue?: { [key: string]: string | number | null }): String {
-    let post: string = '';
-
-    let append = function(keyValue) {
-      let data = new URLSearchParams();
-      let appended = false;
-      for (let key in keyValue) {
-        let value = keyValue[key];
-        if (value) {
-          data.append(key, value as string);
-          appended = true;
-        }
-      }
-
-      if (appended) post += '?' + data.toString();
-    };
-
-    if (keyValue) append(keyValue);
-
-    console.log(post);
-
-    return this.url(urlSuffix) + post;
+  private prefix(): string {
+    return ((String)((<any>window).urlPrefix)).replace("undefined", "") + "/access/api/";
+    // return this.urlPrefix;
   }
 
   private newOptionsBuilder(): OptionsBuilder {

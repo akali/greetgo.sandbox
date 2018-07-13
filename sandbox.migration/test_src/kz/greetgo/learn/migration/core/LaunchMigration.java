@@ -1,5 +1,6 @@
 package kz.greetgo.learn.migration.core;
 
+import com.jcraft.jsch.*;
 import kz.greetgo.learn.migration.__prepare__.DropCreateMgrSrcDb;
 import kz.greetgo.learn.migration.__prepare__.DropCreateOperDb;
 import kz.greetgo.learn.migration.core.innerMigration.FrsMigration;
@@ -8,11 +9,14 @@ import kz.greetgo.learn.migration.core.outerMigration.*;
 import kz.greetgo.learn.migration.interfaces.ConnectionConfig;
 import kz.greetgo.learn.migration.interfaces.StreamHandler;
 import kz.greetgo.learn.migration.util.ConfigFiles;
+import kz.greetgo.learn.migration.util.Configs;
 import kz.greetgo.learn.migration.util.ConnectionUtils;
 import kz.greetgo.learn.migration.util.Logger;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 public class LaunchMigration {
 
@@ -76,7 +80,7 @@ public class LaunchMigration {
     handler.setParentHandler(xmlHandler);
     ((XmlHandler) xmlHandler).setRowParser(new XmlParser());
 
-    ArchiveParser parser = new ArchiveParser(file);
+    ArchiveParser parser = new ArchiveParser(new FileInputStream(file));
     parser.run(new ArchiveParser.MyObservable().withObserver((observable1, o) -> {
       if (o == null) return;
       ArchiveParser.StreamBundle sb = (ArchiveParser.StreamBundle) o;
@@ -84,4 +88,53 @@ public class LaunchMigration {
     }));
   }
 
+  public static void runFrsMigration() throws JSchException, SftpException, IOException {
+    JSch jSch = new JSch();
+    Session session = jSch.getSession(Configs.username, Configs.host);
+    session.setPassword(Configs.password);
+    session.setConfig(new Properties() {
+      {
+        put("StrictHostKeyChecking", "no");
+      }
+    });
+    session.connect();
+    ChannelSftp sftp = (ChannelSftp) session.openChannel("sftp");
+    sftp.connect();
+    sftp.cd(Configs.downloadDirectory);
+
+    for (Object o : sftp.ls("*.tar.bz2")) {
+      System.err.println("/----------------------------/");
+      System.err.println(o);
+      System.err.println("/----------------------------/");
+      ChannelSftp.LsEntry entry = (ChannelSftp.LsEntry) o;
+      String filename = Configs.downloadDirectory + "/" + entry.getFilename();
+      FrsMigrationWorker worker = new FrsMigrationWorker(sftp.get(filename));
+      worker.migrate();
+    }
+  }
+
+  public static void runCiaMigration() throws JSchException, SftpException, IOException {
+    JSch jSch = new JSch();
+    Session session = jSch.getSession(Configs.username, Configs.host);
+    session.setPassword(Configs.password);
+    session.setConfig(new Properties() {
+      {
+        put("StrictHostKeyChecking", "no");
+      }
+    });
+    session.connect();
+    ChannelSftp sftp = (ChannelSftp) session.openChannel("sftp");
+    sftp.connect();
+    sftp.cd(Configs.downloadDirectory);
+
+    for (Object o : sftp.ls("*.tar.bz2")) {
+      System.err.println("/----------------------------/");
+      System.err.println(o);
+      System.err.println("/----------------------------/");
+      ChannelSftp.LsEntry entry = (ChannelSftp.LsEntry) o;
+      String filename = Configs.downloadDirectory + "/" + entry.getFilename();
+      CiaMigrationWorker worker = new CiaMigrationWorker(sftp.get(filename));
+      worker.migrate();
+    }
+  }
 }

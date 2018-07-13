@@ -44,7 +44,7 @@ war {
 
     classpath beanContainerJar
 
-    from project(':sandbox.client:front').projectDir.toPath().resolve('dist').toFile()
+    from project(':sandbox.client:front').projectDir.toPath().resolve('dist/ng-front').toFile()
 }
 
 static def addExcludes(rootSpec) {
