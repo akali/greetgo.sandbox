@@ -201,6 +201,7 @@ public class ClientsRegisterStand implements ClientsRegister {
     FilteredTable response = getClientRecords(filter);
     ReportClientsRecord reportClientsRecord  = null;
 
+    // TODO: пути к ресурсам неверно заданы. Не используй абсолютные пути.
     String root = "/home/aqali/tmp/" + "Report_" + new Random().nextInt(100000);
 
     FileOutputStream fos = null; // = new FileOutputStream(root);

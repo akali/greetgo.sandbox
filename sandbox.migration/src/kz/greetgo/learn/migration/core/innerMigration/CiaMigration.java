@@ -146,14 +146,14 @@ public class CiaMigration extends Migration {
       insertClient.field(6, "birth_date", "?");
       insertClient.field(7, "charm_name", "?");
 
-      Insert insertAddress = new Insert("TMP_ADDRESS"); // TODO(DONE): write all inserts
+      Insert insertAddress = new Insert("TMP_ADDRESS");
       insertAddress.field(1, "number", "?");
       insertAddress.field(2, "type", "?");
       insertAddress.field(3, "street", "?");
       insertAddress.field(4, "house", "?");
       insertAddress.field(5, "flat", "?");
 
-      Insert insertPhone = new Insert("TMP_PHONE"); // TODO(DONE): write all inserts
+      Insert insertPhone = new Insert("TMP_PHONE");
       insertPhone.field(1, "number", "?");
       insertPhone.field(2, "type", "?");
       insertPhone.field(3, "phone_number", "?");
