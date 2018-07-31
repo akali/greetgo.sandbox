@@ -297,13 +297,16 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     charms.forEach(clientsTestDao.get()::insertCharm);
   }
 
-
+  // TODO: Неверный тест на источник данных
+  // Посмотри видео Жени. Внём всё рассказано.
+  // TODO: Для тестирования нужно использовать тестовый рендерер, тоже есть видео.
   @Test()
   private void generateReportTest() {
     clearEntities();
     List<RandomClientGenerator.ClientBundle> bundles = RandomClientGenerator.generate(20);
     insertBundles(bundles);
     String id = null;
+
     try {
       id = clientsRegister.get().generateReport(
         ReportType.XLSX,
