@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FilteredTable {
+public class ClientRecordsListPage {
   public int size;
   public List<ClientRecord> list;
 
-  public FilteredTable(List<ClientRecord> sample, int start, int offset, String direction, String action, String filter) {
+  public ClientRecordsListPage(List<ClientRecord> sample, int start, int offset, String direction, String action, String filter) {
     List<ClientRecord> total = sample.stream()
       .filter(clientRecord -> filter == null || clientRecord.getCombinedString().contains(filter))
       .sorted(
@@ -45,15 +45,15 @@ public class FilteredTable {
     this.list = total.stream().skip(start).limit(offset).collect(Collectors.toList());
   }
 
-  public FilteredTable(List<ClientRecord> clientRecords) {
+  public ClientRecordsListPage(List<ClientRecord> clientRecords) {
     list = new ArrayList<>();
   }
 
-  public FilteredTable(List<ClientRecord> clientRecords, QueryFilter filter) {
+  public ClientRecordsListPage(List<ClientRecord> clientRecords, QueryFilter filter) {
     this(clientRecords, filter.start, filter.limit, filter.direction, filter.active, filter.filter);
   }
 
-  public FilteredTable() {
+  public ClientRecordsListPage() {
     list = new ArrayList<>();
 
   }

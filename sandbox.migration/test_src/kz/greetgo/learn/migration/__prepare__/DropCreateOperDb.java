@@ -1,10 +1,7 @@
 package kz.greetgo.learn.migration.__prepare__;
 
-import kz.greetgo.learn.migration.__prepare__.core.DbWorker;
-import kz.greetgo.learn.migration.__prepare__.db.oper.OperDDL;
-import kz.greetgo.learn.migration.util.ConfigFiles;
-
-import java.io.IOException;
+import kz.greetgo.sandbox.db.test.util.TestsBeanContainer;
+import kz.greetgo.sandbox.db.test.util.TestsBeanContainerCreator;
 
 public class DropCreateOperDb {
   public static void main(String[] args) throws Exception {
@@ -12,13 +9,19 @@ public class DropCreateOperDb {
   }
 
   public static void execute() throws Exception {
-    DbWorker dbWorker = new DbWorker();
+    // Using liquibase instead of own workers
 
-    dbWorker.prepareConfigFiles();
+    TestsBeanContainer bc = TestsBeanContainerCreator.create();
 
-    dbWorker.dropOperDb();
-    dbWorker.createOperDb();
+    bc.dbWorker().recreateAll();
 
-    dbWorker.applyDDL(ConfigFiles.homeDb(), OperDDL.get());
+//    DbWorker dbWorker = new DbWorker();
+//
+//    dbWorker.prepareConfigFiles();
+//
+//    dbWorker.dropOperDb();
+//    dbWorker.createOperDb();
+//
+//    dbWorker.applyDDL(ConfigFiles.homeDb(), OperDDL.get());
   }
 }

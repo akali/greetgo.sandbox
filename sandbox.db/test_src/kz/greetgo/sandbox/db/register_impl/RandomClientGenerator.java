@@ -58,7 +58,7 @@ public class RandomClientGenerator {
   private static final long RANDOM_SEED = 1337;
   private static Random random = new Random(RANDOM_SEED);
 
-  public static FilteredTable getClientRecords(List<ClientBundle> clientBundles, QueryFilter queryFilter) {
+  public static ClientRecordsListPage getClientRecords(List<ClientBundle> clientBundles, QueryFilter queryFilter) {
     int start = queryFilter.start;
     int offset = queryFilter.limit;
     String direction = queryFilter.direction;
@@ -70,7 +70,7 @@ public class RandomClientGenerator {
       list.add(clientBundle.getClientRecord());
     }
 
-    return new FilteredTable(list, start, offset, direction, active, filter);
+    return new ClientRecordsListPage(list, start, offset, direction, active, filter);
   }
 
   public static void main(String[] args) {

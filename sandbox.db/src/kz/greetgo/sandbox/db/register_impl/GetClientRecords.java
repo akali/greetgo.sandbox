@@ -1,7 +1,7 @@
 package kz.greetgo.sandbox.db.register_impl;
 
 import kz.greetgo.sandbox.controller.model.ClientRecord;
-import kz.greetgo.sandbox.controller.model.FilteredTable;
+import kz.greetgo.sandbox.controller.model.ClientRecordsListPage;
 import kz.greetgo.sandbox.controller.model.QueryFilter;
 import org.apache.ibatis.jdbc.SQL;
 
@@ -17,8 +17,8 @@ public class GetClientRecords {
     return new GetClientRecords();
   }
 
-  public FilteredTable run(Connection connection, QueryFilter queryFilter) throws SQLException {
-    FilteredTable filteredTable = new FilteredTable();
+  public ClientRecordsListPage run(Connection connection, QueryFilter queryFilter) throws SQLException {
+    ClientRecordsListPage filteredTable = new ClientRecordsListPage();
     String active;
     switch(queryFilter.active) {
       case "age": active = "age"; break;
@@ -28,6 +28,10 @@ public class GetClientRecords {
       case "total": active = "total"; break;
       default: active="name"; break;
     }
+
+    String direction = queryFilter.direction.toLowerCase().equals("asc") ? " asc " : " desc ";
+    active = String.format("%s %s, %s %s", active, direction, "id", direction);
+
     PreparedStatement statement = connection.prepareStatement(
       new SQL()
         .SELECT(
@@ -47,7 +51,7 @@ public class GetClientRecords {
         .GROUP_BY("client.id", "c3.name")
         .WHERE("client.name || client.surname || client.patronymic like '%'||?||'%'")
         .ORDER_BY(active)
-        .toString().concat(queryFilter.direction.toLowerCase().equals("asc") ? " asc " : " desc ")
+        .toString()
         .concat(" LIMIT ? OFFSET ?")
     );
 

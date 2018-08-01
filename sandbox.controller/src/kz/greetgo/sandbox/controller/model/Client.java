@@ -1,9 +1,9 @@
 package kz.greetgo.sandbox.controller.model;
 
-import java.sql.Timestamp;
 import java.sql.Date;
+import java.sql.Timestamp;
 
-public class Client {
+public class Client implements Cloneable {
   public int id;
   public String surname;
   public String name;
@@ -78,5 +78,14 @@ public class Client {
       ", birth_date=" + birth_date +
       ", charm=" + charm +
       '}';
+  }
+
+  public Client clone() {
+    try {
+      return (Client) super.clone();
+    } catch (CloneNotSupportedException e) {
+      e.printStackTrace();
+      return this;
+    }
   }
 }

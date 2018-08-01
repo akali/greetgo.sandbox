@@ -11,6 +11,7 @@ import kz.greetgo.sandbox.controller.reports.ReportClientRecordPdfGenerator;
 import kz.greetgo.sandbox.controller.reports.ReportClientRecordXlsxGenerator;
 import kz.greetgo.sandbox.controller.reports.ReportClientsRecord;
 import kz.greetgo.sandbox.db.stand.beans.StandDb;
+import kz.greetgo.util.RND;
 import org.apache.poi.util.IOUtils;
 
 import java.io.File;
@@ -18,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -50,7 +52,7 @@ public class ClientsRegisterStand implements ClientsRegister {
   }
 
   @Override
-  public FilteredTable getClientRecords(QueryFilter queryFilter) {
+  public ClientRecordsListPage getClientRecords(QueryFilter queryFilter) {
     int start = queryFilter.start;
     int offset = queryFilter.limit;
     String direction = queryFilter.direction;
@@ -71,7 +73,7 @@ public class ClientsRegisterStand implements ClientsRegister {
     System.out.println(Arrays.toString(list.stream()
       .filter(clientRecord -> filter == null || clientRecord.getCombinedString().contains(filter)).toArray()));
 
-    return new FilteredTable(list, start, offset, direction, active, filter);
+    return new ClientRecordsListPage(list, start, offset, direction, active, filter);
   }
 
   public static int calculateAge(long birthDateTs) {
@@ -196,28 +198,43 @@ public class ClientsRegisterStand implements ClientsRegister {
   @Override
   public String generateReport(ReportType reportType, QueryFilter filter, String token) throws IOException, DocumentException {
     filter.start = 0;
-    filter.limit = 1000000000;
+    filter.limit = 10000000;
 
-    FilteredTable response = getClientRecords(filter);
-    ReportClientsRecord reportClientsRecord  = null;
+    Instant start = Instant.now();
+
+    System.out.println("Generation start");
+
+    ClientRecordsListPage response = getClientRecords(filter);
+
+    {
+      long seconds = Duration.between(start, Instant.now()).getSeconds();
+      System.out.println("Got full list in: " + seconds);
+      start = Instant.now();
+    }
+
+    ReportClientsRecord reportClientsRecord = null;
 
     // TODO: пути к ресурсам неверно заданы. Не используй абсолютные пути.
-    String root = "/home/aqali/tmp/" + "Report_" + new Random().nextInt(100000);
-
-    FileOutputStream fos = null; // = new FileOutputStream(root);
+    String root = "/home/aqali/tmp/" + "Report_" + RND.str(10);
 
     switch (reportType) {
       case XLSX:
         root += ".xlsx";
-        fos = new FileOutputStream(root);
-        reportClientsRecord = new ReportClientRecordXlsxGenerator(fos);
+        reportClientsRecord = new ReportClientRecordXlsxGenerator(new FileOutputStream(root));
         break;
       case PDF:
         root += ".pdf";
-        fos = new FileOutputStream(root);
-        reportClientsRecord = new ReportClientRecordPdfGenerator(fos);
+        reportClientsRecord = new ReportClientRecordPdfGenerator(new FileOutputStream(root));
         break;
     }
+
+    {
+      long seconds = Duration.between(start, Instant.now()).getSeconds();
+      System.out.println("Starting using generator in: " + seconds);
+      start = Instant.now();
+    }
+
+    Instant start2 = Instant.now();
 
     reportClientsRecord.start(authRegister.get().getUserInfo(token).accountName, new Date());
 
@@ -225,15 +242,25 @@ public class ClientsRegisterStand implements ClientsRegister {
 
     for (ClientRecord record: response.list) {
       reportClientsRecord.append(new ClientRecordRow(count++, record));
+      {
+        long seconds = Duration.between(start, Instant.now()).getSeconds();
+        System.out.println("Appended one element in: " + seconds);
+        start = Instant.now();
+      }
     }
 
     reportClientsRecord.finish();
+    {
+      long seconds = Duration.between(start2, Instant.now()).getSeconds();
+      System.out.println("Finished generating report in: " + seconds);
+      start = Instant.now();
+    }
     return standDb.get().putUrl(root);
   }
 
   @Override
   public void downloadReport(String id, BinResponse binResponse) throws IOException {
-    System.out.println(id);
+    System.err.println(id);
     standDb.get().downloadUrl.forEach((s, s2) -> System.out.println(s + ": " + s2));
 
     String filename = standDb.get().getUrl(id);
@@ -241,7 +268,7 @@ public class ClientsRegisterStand implements ClientsRegister {
     binResponse.setFilename(filename);
     binResponse.setContentType("application/octet-stream");
 
-    System.out.println(filename);
+    System.err.println(filename);
 
     try (FileInputStream fin = new FileInputStream(new File(filename))) {
       IOUtils.copy(fin, binResponse.out());

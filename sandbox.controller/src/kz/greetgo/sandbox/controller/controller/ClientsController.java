@@ -11,7 +11,6 @@ import kz.greetgo.sandbox.controller.security.NoSecurity;
 import kz.greetgo.sandbox.controller.util.Controller;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 //TODO: не собирается war. Исправить
@@ -30,7 +29,7 @@ public class ClientsController implements Controller {
 
   @ToJson
   @Mapping("/getClientRecords")
-  public FilteredTable getClientRecords(@Par("queryFilter") @Json QueryFilter queryFilter) throws SQLException {
+  public ClientRecordsListPage getClientRecords(@Par("queryFilter") @Json QueryFilter queryFilter) {
     return clientsRegister.get().getClientRecords(queryFilter);
   }
 

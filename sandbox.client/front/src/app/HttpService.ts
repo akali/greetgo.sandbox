@@ -24,9 +24,11 @@ class OptionsBuilder {
 @Injectable()
 export class HttpService {
 
+  public debug: boolean = true;
+
   public pageSize: number = 10;
 
-  // private urlPrefix = "http://localhost:1414/access/api";
+  private urlPrefix = "http://localhost:1414/access/api";
 
   constructor(private http: Http) {
   }
@@ -65,6 +67,8 @@ export class HttpService {
   }
 
   public url(urlSuffix: string): string {
+    if (this.debug)
+      return this.urlPrefix + urlSuffix;
     return this.prefix() + urlSuffix;
   }
 
@@ -90,7 +94,7 @@ export class HttpService {
   }
 
   private prefix(): string {
-    return ((String)((<any>window).urlPrefix)).replace("undefined", "") + "/access/api/";
+    return ((String)((<any>window).urlPrefix)).replace("undefined", "") + "/access/api";
     // return this.urlPrefix;
   }
 

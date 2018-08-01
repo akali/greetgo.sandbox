@@ -16,15 +16,15 @@ import kz.greetgo.sandbox.db.util.JdbcSandbox;
 import kz.greetgo.util.RND;
 import liquibase.exception.DatabaseException;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 @Bean
 public class ClientsRegisterImpl implements ClientsRegister {
@@ -53,7 +53,7 @@ public class ClientsRegisterImpl implements ClientsRegister {
   }
 
   @Override
-  public FilteredTable getClientRecords(QueryFilter queryFilter) {
+  public ClientRecordsListPage getClientRecords(QueryFilter queryFilter) {
 
     return jdbcBeanGetter.get().execute(connection -> GetClientRecords.instance().run(connection, queryFilter));
   }
@@ -139,17 +139,20 @@ public class ClientsRegisterImpl implements ClientsRegister {
   @Override
   public String generateReport(ReportType reportType, QueryFilter filter, String token) throws IOException {
 
-    // TODO: не устанавливай так лимиты
+    // TODO(DONE): не устанавливай так лимиты
     filter.start = 0;
-    filter.limit = 1000000000;
+    filter.noLimit = true;
 
     // TODO(DONE): если не используешь - убирай. Лишний код портит читабильность
     ReportClientsRecord reportClientsRecord = null;
 
-    //TODO: не используй обсолютные пути
-    String root = "/home/aqali/tmp/" + "Report_" + new Random().nextInt(100000);
+    // TODO(DONE): не используй обсолютные пути
+    String root = "reports/" + "Report_" + RND.str(10);
 
-    FileOutputStream fos = null; // = new FileOutputStream(root);
+    if (!Files.exists(Paths.get(root)))
+      Files.createDirectories(Paths.get(root));
+
+    FileOutputStream fos;
 
     switch (reportType) {
       case XLSX:
@@ -185,7 +188,13 @@ public class ClientsRegisterImpl implements ClientsRegister {
   }
 
   @Override
-  public void downloadReport(String id, BinResponse binResponse) {
-    //TODO: почему метод пустой?
+  public void downloadReport(String id, BinResponse binResponse) throws IOException {
+    // TODO(DONE): почему метод пустой?
+    FileInputStream fileInputStream = new FileInputStream(reportsDao.get().getFile(id));
+    BufferedReader br = new BufferedReader(new InputStreamReader(fileInputStream));
+    OutputStreamWriter outputStreamWriter = new OutputStreamWriter(binResponse.out());
+    String line;
+    while ((line = br.readLine()) != null)
+      outputStreamWriter.write(line);
   }
 }

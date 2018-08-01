@@ -35,7 +35,6 @@ export class AppComponent implements OnInit {
       console.log(error);
       this.mode = "login";
     });
-
   }
 
   exit() {

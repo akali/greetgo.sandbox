@@ -14,7 +14,7 @@ create table client (
 
   actual smallint not null default 0,
   cia_id varchar(100),
-  charm bigint references charm
+  charm bigint references charm on delete cascade
 );;
 create table ClientAddress (
     client bigint references Client on delete cascade,

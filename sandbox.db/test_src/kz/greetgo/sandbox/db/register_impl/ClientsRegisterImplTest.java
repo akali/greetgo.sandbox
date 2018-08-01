@@ -2,14 +2,7 @@ package kz.greetgo.sandbox.db.register_impl;
 
 import com.itextpdf.text.DocumentException;
 import kz.greetgo.depinject.core.BeanGetter;
-import kz.greetgo.sandbox.controller.model.Charm;
-import kz.greetgo.sandbox.controller.model.ClientDetail;
-import kz.greetgo.sandbox.controller.model.ClientRecord;
-import kz.greetgo.sandbox.controller.model.ClientToSave;
-import kz.greetgo.sandbox.controller.model.FilteredTable;
-import kz.greetgo.sandbox.controller.model.QueryFilter;
-import kz.greetgo.sandbox.controller.model.ReportType;
-import kz.greetgo.sandbox.controller.model.TransactionType;
+import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.controller.register.ClientsRegister;
 import kz.greetgo.sandbox.db.dao.ReportsDao;
 import kz.greetgo.sandbox.db.test.dao.ClientsTestDao;
@@ -18,9 +11,7 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -45,12 +36,16 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
     List<ClientRecord> testClientRecords = new ArrayList<>(), actualClientRecords = new ArrayList<>();
 
-    // TODO(!DONE): простовляй такие пометки непосредственно в месте вызова проверяемого методы !!!
+    // TODO(DONE): простовляй такие пометки непосредственно в месте вызова проверяемого методы !!!
     //
     //
     for (RandomClientGenerator.ClientBundle clientBundle : clientBundles) {
       ClientToSave clientToSave = clientBundle.getClientToSave();
+      //
+      //
       ClientRecord e = clientsRegister.get().addClientToSave(clientToSave);
+      //
+      //
       testClientRecords.add(e);
       ClientRecord actualClientRecord = clientBundle.getClientRecord();
       actualClientRecord.total = actualClientRecord.max = actualClientRecord.min = 0;
@@ -84,26 +79,29 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     assertThat(testCharms).containsAll(charms);
   }
 
-  @Test//FIXME При ошибке не понятно что заполняется не правильно
-  public void testGetClientRecords() throws SQLException {
+  @Test//FIXME DONE При ошибке не понятно что заполняется не правильно
+  public void testGetClientRecords() {
     clearEntities();
     List<RandomClientGenerator.ClientBundle> clientBundles = RandomClientGenerator.generate(10);
     insertBundles(clientBundles);
 
     QueryFilter filter = new QueryFilter(0, 5, "DESC", "name", "");
 
-    //TODO(!DONE): TableResponse - поменяй название класса на более понятный !!!
-    //TODO: всё ещё непонятное название.
-    FilteredTable actual = RandomClientGenerator.getClientRecords(clientBundles, filter);
+    //TODO(DONE): TableResponse - поменяй название класса на более понятный !!!
+    //TODO(DONE): всё ещё непонятное название.
+    ClientRecordsListPage actual = RandomClientGenerator.getClientRecords(clientBundles, filter);
 
     //
     //
-    FilteredTable test = clientsRegister.get()
+    ClientRecordsListPage test = clientsRegister.get()
       .getClientRecords(filter);
     //
     //
 
-    assertThat(test.list).isEqualTo(actual.list);
+    int j = 0;
+    test.list.forEach(record -> {
+      assertThat(record).as(j + "th element").isEqualTo(actual.list.get(j));
+    });
   }
 
 
@@ -117,11 +115,11 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
     QueryFilter filter = new QueryFilter(0, 5, "DESC", "name", "");//если элемент 1 то сортировка не нужна
 
-    FilteredTable actual = RandomClientGenerator.getClientRecords(clientBundles, filter);
+    ClientRecordsListPage actual = RandomClientGenerator.getClientRecords(clientBundles, filter);
 
     //
     //
-    FilteredTable test = clientsRegister.get()
+    ClientRecordsListPage test = clientsRegister.get()
       .getClientRecords(filter);
     //
     //
@@ -130,61 +128,6 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     assertThat(test.list.get(0).name).isEqualTo(actual.list.get(0).name);
     //...
     // а поля нужно проверять отдельно
-  }
-
-
-  //FIXME pompei Если тест упал, то непонятно какая сортировка не работает
-  @Test
-  public void getClientRecordsCheckSorting() {
-    clearEntities();
-    List<RandomClientGenerator.ClientBundle> clientBundles = RandomClientGenerator.generate(10);
-    insertBundles(clientBundles);
-
-    //FIXME pompei use DataProvider
-    List<QueryFilter> filters = RandomClientGenerator.generateFilters(10, Arrays.asList("name", "total", "age", "total", "max", "min"));
-
-    filters.forEach(filter -> {
-
-      //
-      //
-      FilteredTable test = clientsRegister.get().getClientRecords(filter);
-      //
-      //
-
-      assertThat(test.list).isSortedAccordingTo(
-        (t1, t2) -> {
-          int result = 0;
-          switch (filter.active.toLowerCase()) {
-            case "name":
-              result = t1.name.compareTo(t2.name);
-              break;
-            case "total":
-              result = Float.compare(t1.total, t2.total);
-              break;
-            case "max":
-              result = Float.compare(t1.max, t2.max);
-              break;
-            case "min":
-              result = Float.compare(t1.min, t2.min);
-              break;
-            case "charm":
-              result = t1.charm.compareTo(t2.charm);
-              break;
-            case "age":
-              result = Integer.compare(t1.age, t2.age);
-              break;
-            default:
-              result = Integer.compare(t1.id, t2.id);
-          }
-          if (filter.direction != null && filter.direction.toLowerCase().equals("desc")) {
-            result = -result;
-          }
-          return result;
-        });
-
-      // TODO: тебе надо проверить ещё правильные ли объекты метод выдаёт.
-      // TODO: что с этим замечанием?
-    });
   }
 
   private void insertBundles(List<RandomClientGenerator.ClientBundle> clientBundles) {
@@ -237,6 +180,7 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
   @Test
   public void testEditClientToSave() {
+
     clearEntities();
     List<RandomClientGenerator.ClientBundle> bundles = RandomClientGenerator.generate(5);
     insertBundles(bundles);
@@ -253,12 +197,12 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     //
     //
 
-    // TODO: Называй переменные со смыслом, понятным для всех.
-    ClientRecord my = clientsTestDao.get().getRecordClientById(newBundle.getClient().id);
+    // TODO(DONE): Называй переменные со смыслом, понятным для всех.
+    ClientRecord actualClientRecord = clientsTestDao.get().getRecordClientById(newBundle.getClient().id);
 
     assertThat(newClientRecord).isNotEqualTo(old);
     assertThat(newClientRecord).isEqualTo(newBundle.getClientRecord());
-    assertThat(newClientRecord).isEqualTo(my);
+    assertThat(newClientRecord).isEqualTo(actualClientRecord);
   }
 
   @Test

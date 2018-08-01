@@ -26,9 +26,6 @@ public class GenerateReport {
   private String client;
 
   public GenerateReport(ReportClientsRecord generator, QueryFilter queryFilter, String client) {
-    System.out.println(generator);
-    System.out.println(queryFilter);
-    System.out.println(client);
     this.generator = generator;
     this.queryFilter = queryFilter;
     this.client = client;
@@ -58,11 +55,16 @@ public class GenerateReport {
       .WHERE("client.name || client.surname || client.patronymic like '%'||?||'%'")
       .ORDER_BY(queryFilter.active)
       .toString().concat(queryFilter.direction.toLowerCase().equals("asc") ? " asc " : " desc ")
-      .concat(" LIMIT ? OFFSET ?");
+      .concat(queryFilter.noLimit ? "" : " LIMIT ?")
+      .concat(" OFFSET ?");
     statement = connection.prepareStatement(sql);
     statement.setString(1, queryFilter.filter);
-    statement.setInt(2, queryFilter.limit);
-    statement.setInt(3, queryFilter.start);
+    if (queryFilter.noLimit) {
+      statement.setInt(2, queryFilter.start);
+    } else {
+      statement.setInt(2, queryFilter.limit);
+      statement.setInt(3, queryFilter.start);
+    }
   }
 
   public void execute() {

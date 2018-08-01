@@ -4,14 +4,16 @@ import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.depinject.core.HasAfterInject;
 import kz.greetgo.sandbox.controller.model.*;
 import kz.greetgo.sandbox.db.stand.model.PersonDot;
-
+import kz.greetgo.util.RND;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Bean
 public class StandDb implements HasAfterInject {
@@ -41,10 +43,43 @@ public class StandDb implements HasAfterInject {
     return downloadUrl.get(id);
   }
 
+  private int myId = 100000000;
+
   public String putUrl(String url) {
-    String id = "Report_" + new Date() + random.nextInt(100000);
+    String id = "Report_" + new Date() + RND.intStr(10);
     downloadUrl.put(id, url);
     return id;
+  }
+
+  private void parseCharms(String[] line) {
+    Charm charm = Charm.parse(line);
+    charmStorage.put(String.valueOf(charm.id), charm);
+  }
+
+  private void parseTransactionTypes(String[] splitLine) {
+    TransactionType type = TransactionType.parse(splitLine);
+    transactionTypeStorage.put(String.valueOf(type.id), type);
+  }
+
+  private void parseTransactions(String[] line) {
+    ClientAccountTransaction transaction = ClientAccountTransaction.parse(line);
+    transactionStorage.put(String.valueOf(transaction.id), transaction);
+  }
+
+  private void parseAccount(String[] line) {
+    ClientAccount account = ClientAccount.parse(line);
+    accountStorage.put(String.valueOf(account.id), account);
+  }
+
+  private void parsePhone(String[] splitLine) {
+    ClientPhone phone = ClientPhone.parse(splitLine);
+    phoneStorage.put(phone.getId(), phone);
+  }
+
+  private void parseAddress(String[] splitLine) {
+    ClientAddress address = ClientAddress.parse(splitLine);
+    addressStorage.put(String.valueOf(address.getId()), address);
+    ++addressId;
   }
 
   @Override
@@ -62,7 +97,7 @@ public class StandDb implements HasAfterInject {
 
     for (String filename : files) {
       try (BufferedReader br = new BufferedReader(
-              new InputStreamReader(getClass().getResourceAsStream(filename), "UTF-8"))) {
+        new InputStreamReader(getClass().getResourceAsStream(filename), StandardCharsets.UTF_8))) {
 
         int lineNo = 0;
 
@@ -121,7 +156,7 @@ public class StandDb implements HasAfterInject {
       System.out.println(key + " " + personStorage.get(key));
     }
     System.out.println("clientStorage: ");
-    for (String key : clientStorage.keySet()) {
+    for (String key : clientStorage.keySet().stream().limit(500).collect(Collectors.toList())) {
       System.out.println(key + " " + clientStorage.get(key));
     }
     System.out.println("addressStorage: ");
@@ -150,41 +185,16 @@ public class StandDb implements HasAfterInject {
     }
   }
 
-  private void parseCharms(String[] line) {
-    Charm charm = Charm.parse(line);
-    charmStorage.put(String.valueOf(charm.id), charm);
-  }
-
-  private void parseTransactionTypes(String[] splitLine) {
-    TransactionType type = TransactionType.parse(splitLine);
-    transactionTypeStorage.put(String.valueOf(type.id), type);
-  }
-
-  private void parseTransactions(String[] line) {
-    ClientAccountTransaction transaction = ClientAccountTransaction.parse(line);
-    transactionStorage.put(String.valueOf(transaction.id), transaction);
-  }
-
-  private void parseAccount(String[] line) {
-    ClientAccount account = ClientAccount.parse(line);
-    accountStorage.put(String.valueOf(account.id), account);
-  }
-
-  private void parsePhone(String[] splitLine) {
-    ClientPhone phone = ClientPhone.parse(splitLine);
-    phoneStorage.put(phone.getId(), phone);
-  }
-
-  private void parseAddress(String[] splitLine) {
-    ClientAddress address = ClientAddress.parse(splitLine);
-    addressStorage.put(String.valueOf(address.getId()), address);
-    ++addressId;
-  }
-
   private void parseClient(String[] splitLine) {
     Client client = Client.parse(splitLine);
     clientStorage.put(String.valueOf(client.id), client);
     ++clientId;
+    for (int i = 0; i < 1000; ++i) {
+      Client fakeClient = client.clone();
+      fakeClient.id = ++myId;
+      clientStorage.put(String.valueOf(fakeClient.id), fakeClient);
+      ++clientId;
+    }
   }
 
   @SuppressWarnings("unused")

@@ -31,6 +31,7 @@ dependencies {
 
 //  testCompile project(':sandbox.migration').sourceSets.main.output
   testCompile project(':sandbox.db').sourceSets.test.output
+  testCompile project(':sandbox.controller')
   testCompile project(':sandbox.migration')
 }
 
