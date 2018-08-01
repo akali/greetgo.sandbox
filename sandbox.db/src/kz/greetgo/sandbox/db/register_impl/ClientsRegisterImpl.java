@@ -54,11 +54,6 @@ public class ClientsRegisterImpl implements ClientsRegister {
   @Override
   public FilteredTable getClientRecords(QueryFilter queryFilter) {
 
-    // TODO(DONE): есть уже реализация для jdbc
-    // public BeanGetter<JdbcSandbox> jdbc;
-    // jdbc.get().execute(connection -> ...)
-    // jdbc.get().execute(new ClassForMigrationForExample)
-
     return jdbcBeanGetter.get().execute(connection -> GetClientRecords.instance().run(connection, queryFilter));
   }
 
@@ -142,12 +137,16 @@ public class ClientsRegisterImpl implements ClientsRegister {
 
   @Override
   public String generateReport(ReportType reportType, QueryFilter filter, String token) throws IOException {
+
+    // TODO: не устанавливай так лимиты
     filter.start = 0;
     filter.limit = 1000000000;
 
+    // TODO: если не используешь - убирай. Лишний код портит читабильность
     FilteredTable response = getClientRecords(filter);
     ReportClientsRecord reportClientsRecord = null;
 
+    //TODO: не используй обсолютные пути
     String root = "/home/aqali/tmp/" + "Report_" + new Random().nextInt(100000);
 
     FileOutputStream fos = null; // = new FileOutputStream(root);
@@ -165,10 +164,13 @@ public class ClientsRegisterImpl implements ClientsRegister {
         break;
     }
 
+    // TODO: если не используешь - убирай. Лишний код портит читабильность
     int count = 1;
 
+    //TODO: у нас есть специальный класс RND. Посмотри там методы. Для строк тоже есть рандом
     String id = "" + new Random().nextInt(100000);
 
+    // TODO: запиши этот файл в бд после реального создания файла, а не до.
     reportsDao.get().putFile(root, id);
 
     GenerateReport report =
@@ -185,6 +187,6 @@ public class ClientsRegisterImpl implements ClientsRegister {
 
   @Override
   public void downloadReport(String id, BinResponse binResponse) {
-
+    //TODO: почему метод пустой?
   }
 }

@@ -38,13 +38,10 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
     List<ClientRecord> testClientRecords = new ArrayList<>(), actualClientRecords = new ArrayList<>();
 
-    // TODO(DONE): простовляй такие пометки непосредственно в месте вызова проверяемого методы
+    // TODO(!DONE): простовляй такие пометки непосредственно в месте вызова проверяемого методы !!!
     //
     //
     for (RandomClientGenerator.ClientBundle clientBundle : clientBundles) {
-      // TODO(DONE): Не пиши всё в одну строку в одно выражение.
-      // Если после тебя на проект придёт другой программист, ему будет тяжелее понять такой код.
-      // Старайся писать легче, чтобы другие разрабы с твоей команды понимали код.
       ClientToSave clientToSave = clientBundle.getClientToSave();
       ClientRecord e = clientsRegister.get().addClientToSave(clientToSave);
       testClientRecords.add(e);
@@ -62,10 +59,6 @@ public class ClientsRegisterImplTest extends ParentTestNg {
         clientBundle.getClientRecord()
       );
     }
-
-
-    // TODO(DONE): пероверь ещё на сохранение в базу.
-    // то что метод вернул рекорд, это ещё не гарантирует сохранение в базу.
   }
 
   @Test
@@ -92,7 +85,8 @@ public class ClientsRegisterImplTest extends ParentTestNg {
 
     QueryFilter filter = new QueryFilter(0, 5, "DESC", "name", "");
 
-    //TODO(DONE): TableResponse - поменяй название класса на более понятный
+    //TODO(!DONE): TableResponse - поменяй название класса на более понятный !!!
+    //TODO: всё ещё непонятное название.
     FilteredTable actual = RandomClientGenerator.getClientRecords(clientBundles, filter);
 
     //
@@ -160,9 +154,7 @@ public class ClientsRegisterImplTest extends ParentTestNg {
           return result;
         });
 
-      assertThat(test.list).isEqualTo(new FilteredTable(clientRecords, filter).list);
-
-      // TODO(DONE): тебе надо проверить ещё правильные ли объекты метод выдаёт.
+      // TODO: тебе надо проверить ещё правильные ли объекты метод выдаёт.
     });
   }
 
@@ -183,8 +175,6 @@ public class ClientsRegisterImplTest extends ParentTestNg {
   }
 
   @Test
-  // TODO(DONE): назови тест правильно, чтобы было понятно.
-  // даже если он просто для проверки "левого" метода
   public void testClientDetailIsEqualByAge() {
     clearEntities();
     List<RandomClientGenerator.ClientBundle> bundles = RandomClientGenerator.generate(10);
@@ -234,14 +224,12 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     //
     //
 
+    // TODO: Называй переменные со смыслом, понятным для всех.
     ClientRecord my = clientsTestDao.get().getRecordClientById(newBundle.getClient().id);
 
     assertThat(newClientRecord).isNotEqualTo(old);
     assertThat(newClientRecord).isEqualTo(newBundle.getClientRecord());
     assertThat(newClientRecord).isEqualTo(my);
-
-    // TODO(DONE): пероверь ещё на сохранение в базу.
-    // то что метод вернул рекорд, это ещё не гарантирует сохранение в базу.
   }
 
   @Test

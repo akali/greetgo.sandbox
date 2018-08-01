@@ -14,11 +14,12 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+//TODO: не собирается war. Исправить
+
 @Bean
 @Mapping("/clients")
 public class ClientsController implements Controller {
 
-  //TODO(DONE): Название переменной соответственно нужно поменять
   public BeanGetter<ClientsRegister> clientsRegister;
 
   @ToJson
