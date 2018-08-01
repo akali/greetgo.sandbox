@@ -1,9 +1,7 @@
 package kz.greetgo.sandbox.controller.register;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import kz.greetgo.mvc.interfaces.BinResponse;
 
 public interface MigrationRegister {
-  default void runFrsMigration() {
-    throw new NotImplementedException();
-  }
+  void run(String migrationType, BinResponse binResponse);
 }

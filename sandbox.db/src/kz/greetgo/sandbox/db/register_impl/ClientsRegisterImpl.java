@@ -13,6 +13,7 @@ import kz.greetgo.sandbox.db.dao.ClientsDao;
 import kz.greetgo.sandbox.db.dao.ReportsDao;
 import kz.greetgo.sandbox.db.util.DBHelper;
 import kz.greetgo.sandbox.db.util.JdbcSandbox;
+import kz.greetgo.util.RND;
 import liquibase.exception.DatabaseException;
 
 import java.io.FileOutputStream;
@@ -142,8 +143,7 @@ public class ClientsRegisterImpl implements ClientsRegister {
     filter.start = 0;
     filter.limit = 1000000000;
 
-    // TODO: если не используешь - убирай. Лишний код портит читабильность
-    FilteredTable response = getClientRecords(filter);
+    // TODO(DONE): если не используешь - убирай. Лишний код портит читабильность
     ReportClientsRecord reportClientsRecord = null;
 
     //TODO: не используй обсолютные пути
@@ -164,14 +164,10 @@ public class ClientsRegisterImpl implements ClientsRegister {
         break;
     }
 
-    // TODO: если не используешь - убирай. Лишний код портит читабильность
-    int count = 1;
+    // TODO(DONE: если не используешь - убирай. Лишний код портит читабильность
 
-    //TODO: у нас есть специальный класс RND. Посмотри там методы. Для строк тоже есть рандом
-    String id = "" + new Random().nextInt(100000);
-
-    // TODO: запиши этот файл в бд после реального создания файла, а не до.
-    reportsDao.get().putFile(root, id);
+    //TODO(DONE: у нас есть специальный класс RND. Посмотри там методы. Для строк тоже есть рандом
+    String id = RND.str(5);
 
     GenerateReport report =
       new GenerateReport(
@@ -181,6 +177,9 @@ public class ClientsRegisterImpl implements ClientsRegister {
       );
 
     report.execute();
+
+    // TODO(DONE): запиши этот файл в бд после реального создания файла, а не до.
+    reportsDao.get().putFile(root, id);
 
     return id;
   }

@@ -123,9 +123,10 @@ public class ClientsRegisterImplTest extends ParentTestNg {
       //
       //
 
+      assertThat(test).isNotNull();
       assertThat(test.list).isSortedAccordingTo(
         (t1, t2) -> {
-          int result = 0;
+          int result;
           switch (filter.active.toLowerCase()) {
             case "name":
               result = t1.name.compareTo(t2.name);
@@ -224,12 +225,12 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     //
     //
 
-    // TODO: Называй переменные со смыслом, понятным для всех.
-    ClientRecord my = clientsTestDao.get().getRecordClientById(newBundle.getClient().id);
+    // TODO(DONE): Называй переменные со смыслом, понятным для всех.
+    ClientRecord actualClientRecord = clientsTestDao.get().getRecordClientById(newBundle.getClient().id);
 
     assertThat(newClientRecord).isNotEqualTo(old);
     assertThat(newClientRecord).isEqualTo(newBundle.getClientRecord());
-    assertThat(newClientRecord).isEqualTo(my);
+    assertThat(newClientRecord).isEqualTo(actualClientRecord);
   }
 
   @Test
