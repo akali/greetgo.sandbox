@@ -2,7 +2,14 @@ package kz.greetgo.sandbox.db.register_impl;
 
 import com.itextpdf.text.DocumentException;
 import kz.greetgo.depinject.core.BeanGetter;
-import kz.greetgo.sandbox.controller.model.*;
+import kz.greetgo.sandbox.controller.model.Charm;
+import kz.greetgo.sandbox.controller.model.ClientDetail;
+import kz.greetgo.sandbox.controller.model.ClientRecord;
+import kz.greetgo.sandbox.controller.model.ClientToSave;
+import kz.greetgo.sandbox.controller.model.FilteredTable;
+import kz.greetgo.sandbox.controller.model.QueryFilter;
+import kz.greetgo.sandbox.controller.model.ReportType;
+import kz.greetgo.sandbox.controller.model.TransactionType;
 import kz.greetgo.sandbox.controller.register.ClientsRegister;
 import kz.greetgo.sandbox.db.dao.ReportsDao;
 import kz.greetgo.sandbox.db.test.dao.ClientsTestDao;
@@ -77,7 +84,7 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     assertThat(testCharms).containsAll(charms);
   }
 
-  @Test
+  @Test//FIXME При ошибке не понятно что заполняется не правильно
   public void testGetClientRecords() throws SQLException {
     clearEntities();
     List<RandomClientGenerator.ClientBundle> clientBundles = RandomClientGenerator.generate(10);
@@ -99,34 +106,54 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     assertThat(test.list).isEqualTo(actual.list);
   }
 
+
+  //вот как правильно надо написать тест
+  //должен проверять правильность заполнения полей
+  @Test
+  public void testGetClientRecords______RIGHT___checkFillingRecordFields() {//нужно правильно выбирать название теста
+    clearEntities();
+    List<RandomClientGenerator.ClientBundle> clientBundles = RandomClientGenerator.generate(1);//1 - будет достаточно
+    insertBundles(clientBundles);
+
+    QueryFilter filter = new QueryFilter(0, 5, "DESC", "name", "");//если элемент 1 то сортировка не нужна
+
+    FilteredTable actual = RandomClientGenerator.getClientRecords(clientBundles, filter);
+
+    //
+    //
+    FilteredTable test = clientsRegister.get()
+      .getClientRecords(filter);
+    //
+    //
+
+    assertThat(test.list.get(0).surname).isEqualTo(actual.list.get(0).surname);
+    assertThat(test.list.get(0).name).isEqualTo(actual.list.get(0).name);
+    //...
+    // а поля нужно проверять отдельно
+  }
+
+
+  //FIXME pompei Если тест упал, то непонятно какая сортировка не работает
   @Test
   public void getClientRecordsCheckSorting() {
     clearEntities();
     List<RandomClientGenerator.ClientBundle> clientBundles = RandomClientGenerator.generate(10);
     insertBundles(clientBundles);
 
-    List<ClientRecord> clientRecords = new ArrayList<>();
-    clientBundles.forEach(clientBundle -> clientRecords.add(clientBundle.getClientRecord()));
-
+    //FIXME pompei use DataProvider
     List<QueryFilter> filters = RandomClientGenerator.generateFilters(10, Arrays.asList("name", "total", "age", "total", "max", "min"));
 
     filters.forEach(filter -> {
+
       //
       //
-      FilteredTable test = null;
-      try {
-        test = clientsRegister.get()
-          .getClientRecords(filter);
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
+      FilteredTable test = clientsRegister.get().getClientRecords(filter);
       //
       //
 
-      assertThat(test).isNotNull();
       assertThat(test.list).isSortedAccordingTo(
         (t1, t2) -> {
-          int result;
+          int result = 0;
           switch (filter.active.toLowerCase()) {
             case "name":
               result = t1.name.compareTo(t2.name);
@@ -156,6 +183,7 @@ public class ClientsRegisterImplTest extends ParentTestNg {
         });
 
       // TODO: тебе надо проверить ещё правильные ли объекты метод выдаёт.
+      // TODO: что с этим замечанием?
     });
   }
 
@@ -225,12 +253,12 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     //
     //
 
-    // TODO(DONE): Называй переменные со смыслом, понятным для всех.
-    ClientRecord actualClientRecord = clientsTestDao.get().getRecordClientById(newBundle.getClient().id);
+    // TODO: Называй переменные со смыслом, понятным для всех.
+    ClientRecord my = clientsTestDao.get().getRecordClientById(newBundle.getClient().id);
 
     assertThat(newClientRecord).isNotEqualTo(old);
     assertThat(newClientRecord).isEqualTo(newBundle.getClientRecord());
-    assertThat(newClientRecord).isEqualTo(actualClientRecord);
+    assertThat(newClientRecord).isEqualTo(my);
   }
 
   @Test
@@ -300,13 +328,16 @@ public class ClientsRegisterImplTest extends ParentTestNg {
     charms.forEach(clientsTestDao.get()::insertCharm);
   }
 
-
+  // TODO: Неверный тест на источник данных
+  // Посмотри видео Жени. Внём всё рассказано.
+  // TODO: Для тестирования нужно использовать тестовый рендерер, тоже есть видео.
   @Test()
   private void generateReportTest() {
     clearEntities();
     List<RandomClientGenerator.ClientBundle> bundles = RandomClientGenerator.generate(20);
     insertBundles(bundles);
     String id = null;
+
     try {
       id = clientsRegister.get().generateReport(
         ReportType.XLSX,

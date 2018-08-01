@@ -263,6 +263,7 @@ public abstract class Migration implements Closeable {
       working.set(false);
     }
 
+    // TODO: Желательно не удалять с базы. Дорогостоящая операция. Если будет провисать миграция в этом месте, придумаю другой способ.
     //language=PostgreSQL
     exec("delete from " + operTableName + " where error is not null");
   }

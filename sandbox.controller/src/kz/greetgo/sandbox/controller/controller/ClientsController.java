@@ -58,6 +58,7 @@ public class ClientsController implements Controller {
     return clientsRegister.get().editClientToSave(clientToSave);
   }
 
+  // TODO: 2.03.1. Входные параметры должны быть в одном классе-аргументе;
   @AsIs
   @Mapping("/generateReport")
   public String generateReport(
