@@ -13,7 +13,7 @@ import {ActionType} from "./client-dialog/actionType";
 import {Charm} from "../../model/Charm";
 import {ReportType} from "../../model/ReportType";
 import {QueryFilter} from "../../model/QueryFilter";
-import { saveAs } from 'file-saver/FileSaver';
+import {saveAs} from 'file-saver/FileSaver';
 
 @Component({
   selector: 'table-component',
@@ -28,6 +28,8 @@ export class TableComponent implements OnInit, AfterViewInit {
   @ViewChild('input') input: ElementRef;
 
   dataSource: TableDatasource;
+
+  reportType = ReportType;
 
   displayedColumns = ['name', 'charm', 'age', 'total', 'max', 'min'];
   INIT_PAGE_SIZE = 5;

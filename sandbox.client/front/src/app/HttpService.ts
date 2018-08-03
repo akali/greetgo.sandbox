@@ -1,6 +1,7 @@
 import {Injectable} from "@angular/core";
 import {Observable} from "rxjs";
 import {Headers, Http, RequestOptionsArgs, Response} from "@angular/http";
+import {environment} from "../environments/environment";
 
 class OptionsBuilder {
   private appendingHeaders: { [key: string]: string }[] = [];
@@ -24,13 +25,14 @@ class OptionsBuilder {
 @Injectable()
 export class HttpService {
 
-  public debug: boolean = true;
+  public debug: boolean = !environment.production;
 
   public pageSize: number = 10;
 
   private urlPrefix = "http://localhost:1414/access/api";
 
   constructor(private http: Http) {
+    console.log(this.debug);
   }
 
   public getLink(urlSuffix: string, keyValue?: { [key: string]: string | number | null }): string {
@@ -94,7 +96,7 @@ export class HttpService {
   }
 
   private prefix(): string {
-    return ((String)((<any>window).urlPrefix)).replace("undefined", "") + "/access/api";
+    return ((String)((<any>window).urlPrefix)).replace("undefined", "") + "/api";
     // return this.urlPrefix;
   }
 

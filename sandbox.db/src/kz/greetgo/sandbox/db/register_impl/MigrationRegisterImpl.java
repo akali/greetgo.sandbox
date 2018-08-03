@@ -1,11 +1,13 @@
-package kz.greetgo.learn.migration.register_impl;
+package kz.greetgo.sandbox.db.register_impl;
 
+import kz.greetgo.depinject.core.Bean;
 import kz.greetgo.mvc.interfaces.BinResponse;
 import kz.greetgo.sandbox.controller.controller.NotFound;
 import kz.greetgo.sandbox.controller.register.MigrationRegister;
 
 import java.io.PrintWriter;
 
+@Bean
 public class MigrationRegisterImpl implements MigrationRegister {
   @Override
   public void run(String migrationType, BinResponse binResponse) {

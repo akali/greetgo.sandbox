@@ -65,6 +65,6 @@
       [pageSizeOptions]="PAGE_SIZE_OPTIONS">
     </mat-paginator>
   </div>
-  <button (click)="exportReport('XLSX')" mat-button> Export xlsx report </button>
-  <button (click)="exportReport('PDF')" mat-button> Export pdf report </button>
+  <button (click)="exportReport(reportType.XLSX)" mat-button> Export xlsx report</button>
+  <button (click)="exportReport(reportType.PDF)" mat-button> Export pdf report</button>
 </div>

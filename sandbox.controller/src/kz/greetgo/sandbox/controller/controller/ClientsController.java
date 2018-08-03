@@ -13,7 +13,7 @@ import kz.greetgo.sandbox.controller.util.Controller;
 import java.io.IOException;
 import java.util.List;
 
-//TODO: не собирается war. Исправить
+//TODO(DONE): не собирается war. Исправить
 
 @Bean
 @Mapping("/clients")
@@ -64,7 +64,6 @@ public class ClientsController implements Controller {
     @ParSession("personId") String token,
     @Par("reportType") @Json ReportType reportType,
     @Par("queryFilter") @Json QueryFilter filter) throws IOException, DocumentException {
-    System.out.println("Token: " + token);
     return clientsRegister.get().generateReport(reportType, filter, token);
   }
 

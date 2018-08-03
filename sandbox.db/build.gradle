@@ -13,5 +13,5 @@ dependencies {
 
 
     testCompile "kz.greetgo.depinject:greetgo.depinject.testng:$depinjectVersion"
-    testCompile project(':sandbox.stand:db').sourceSets.main.output
+//    testCompile project(':sandbox.stand:db').sourceSets.main.output
 }
