@@ -1,0 +1,244 @@
+package kz.greetgo.sandbox.db.migration.innerMigration;
+
+import kz.greetgo.sandbox.db.interfaces.ConnectionConfig;
+import org.fest.util.Lists;
+
+import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import static kz.greetgo.sandbox.db.util.TimeUtils.recordsPerSecond;
+import static kz.greetgo.sandbox.db.util.TimeUtils.showTime;
+
+public class FrsMigration extends Migration {
+  public FrsMigration(ConnectionConfig operConfig, ConnectionConfig ciaConfig) {
+    super(operConfig, ciaConfig);
+  }
+
+  @Override
+  public int migrate() throws Exception {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmssSSS");
+    Date now = new Date();
+    tmpSqlVars = new HashMap<String, String>() {
+      {
+        put("TMP_TRANSACTION", "frs_migration_transaction_" + sdf.format(now));
+        put("TMP_ACCOUNT", "frs_migration_account_" + sdf.format(now));
+        put("TMP_TYPE", "frs_migration_transaction_type_" + sdf.format(now));
+      }
+    };
+    tmpSqlVars.forEach((key, value) -> info(key + " = " + value));
+
+    createOperConnection();
+    createTables();
+    createMigrationConnection();
+
+    int chunkSize = download();
+
+    if (chunkSize == 0) return 0;
+    closeMigrationConnection();
+
+    migrateFromTmp();
+
+    return chunkSize;
+  }
+
+  private void migrateFromTmp() throws Exception {
+    for (String column : Lists.newArrayList("account_number"))
+      exec(String.format(
+        "update TMP_TRANSACTION set error = '%s is null, status = 1' where error is null and (%s is null or %s = '')", column, column, column
+      ));
+
+    for (String column : Lists.newArrayList("client_id", "number"))
+      exec(String.format(
+        "update TMP_ACCOUNT set error = '%s is null', status = 1 where error is null and (%s is null or %s = '')", column, column, column
+      ));
+
+    for (Map.Entry<String, String> entry : tmpSqlVars.entrySet()) {
+      uploadAndDropErrors(entry.getKey(), "transition_frs", "row_number");
+    }
+
+    exec("update TMP_TYPE d set id = f.id " +
+      "from TransactionType f " +
+      "where f.name = d.name");
+
+    exec("update TMP_TYPE d set id = nextval('s_transaction_type') " +
+      "where d.id is null");
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    exec("update TMP_ACCOUNT set id = f.id, client = f.client from ClientAccount f where number = f.number");
+
+    exec("update TMP_ACCOUNT set client = f.id from Client f where f.cia_id = client_id and f.cia_id is not null");
+
+    exec("update TMP_ACCOUNT set client = nextval('s_client') where client is null");
+
+    exec("update TMP_ACCOUNT set id = nextval('s_client_account') where id is null");
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    exec("update TMP_TRANSACTION q set transaction_type_id = f.id from TMP_TYPE f where q.row_number = f.row_number");
+
+    exec("update TMP_TRANSACTION q set account = f.id from TMP_ACCOUNT f where q.account_number = f.number");
+
+    exec("update TMP_TRANSACTION set id = nextval('s_client_account_transaction')");
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    exec("insert into TransactionType(id, name) " +
+      "select id, name from TMP_TYPE on conflict do nothing;");
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    exec("insert into client(id) select client from TMP_ACCOUNT on conflict do nothing;");
+
+    exec("insert into ClientAccount(id, client, number, registered_at) " +
+      "select id, client, number, registered_at from TMP_ACCOUNT where status = 0 on conflict do nothing;");
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    exec("update TMP_ACCOUNT q set money = money + (select sum(money) from TMP_TRANSACTION f where f.account = q.id)");
+//
+//    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    exec("insert into ClientAccountTransaction(id, account, money, finished_at, type) " +
+      "select id, account, money, finished_at, transaction_type_id from TMP_TRANSACTION " +
+      "where status = 0");
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//    exec("update ClientAccount q set q.money = money + w.money from TMP_ACCOUNT w where q.id = w.id");
+    exec("update ClientAccount q set money = money + (select sum(money) from TMP_TRANSACTION f where f.account = q.id)");
+
+    for (Map.Entry<String, String> entry : tmpSqlVars.entrySet()) {
+      uploadAllOk(entry.getKey(), "transition_frs", "row_number");
+    }
+  }
+
+  private int download() throws SQLException {
+    long startedAt = System.nanoTime();
+    int batchSize = 0;
+    int recordsCount = 0;
+    try (PreparedStatement srcPS = migrationConnection.prepareStatement(
+      "select * from transition_frs where status='JUST_INSERTED' order by number limit ?"
+    )) {
+      srcPS.setInt(1, chunkSize);
+
+      operConnection.setAutoCommit(false);
+
+      try (ResultSet srcRs = srcPS.executeQuery()) {
+
+        Insert insertTransaction = new Insert("TMP_TRANSACTION");
+        insertTransaction.field(1, "transaction_type", "?");
+        insertTransaction.field(2, "account_number", "?");
+        insertTransaction.field(3, "money", "?");
+        insertTransaction.field(4, "finished_at", "?");
+        insertTransaction.field(5, "row_number", "?");
+
+        Insert insertAccount = new Insert("TMP_ACCOUNT");
+        insertAccount.field(1, "registered_at", "?");
+        insertAccount.field(2, "client_id", "?");
+        insertAccount.field(3, "number", "?");
+        insertAccount.field(4, "row_number", "?");
+
+        Insert insertType = new Insert("TMP_TYPE").onConflictDoNothing(true);
+        insertType.field(1, "row_number", "?");
+        insertType.field(2, "name", "?");
+
+        try (
+          PreparedStatement transactionPS = operConnection.prepareStatement(r(insertTransaction.toString()));
+          PreparedStatement accountPS = operConnection.prepareStatement(r(insertAccount.toString()));
+          PreparedStatement typePS = operConnection.prepareStatement(r(insertType.toString()))
+        ) {
+          while (srcRs.next()) {
+            String data = srcRs.getString("record_data");
+            FrsRecord record = FrsRecord.parse(data);
+            record.number = srcRs.getLong("number");
+            if (record.type == FrsRecord.Type.NEW_ACCOUNT) {
+              accountPS.setTimestamp(1, record.registered_at);
+              accountPS.setString(2, record.client_id);
+              accountPS.setString(3, record.account_number);
+              accountPS.setLong(4, record.number);
+
+              accountPS.addBatch();
+            } else {
+              transactionPS.setString(1, record.transaction_type);
+              transactionPS.setString(2, record.account_number);
+              transactionPS.setFloat(3, record.money);
+              transactionPS.setTimestamp(4, record.finished_at);
+              transactionPS.setLong(5, record.number);
+
+              typePS.setLong(1, record.number);
+              typePS.setString(2, record.transaction_type);
+
+              typePS.addBatch();
+              transactionPS.addBatch();
+            }
+            ++batchSize;
+            ++recordsCount;
+            if (batchSize >= downloadMaxBatchSize) {
+              accountPS.executeBatch();
+              transactionPS.executeBatch();
+              typePS.executeBatch();
+              batchSize = 0;
+              operConnection.commit();
+            }
+          }
+          if (batchSize > 0) {
+            accountPS.executeBatch();
+            transactionPS.executeBatch();
+            typePS.executeBatch();
+            operConnection.commit();
+          }
+        }
+        {
+          long now = System.nanoTime();
+          info("TOTAL Downloaded records " + recordsCount + " for " + showTime(now, startedAt)
+            + " : " + recordsPerSecond(recordsCount, now - startedAt));
+        }
+        return recordsCount;
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    } finally {
+      operConnection.setAutoCommit(true);
+    }
+    return 0;
+  }
+
+  private void createTables() throws SQLException {
+    //language=PostgreSQL
+    exec("create table TMP_ACCOUNT (\n" +
+      "  id bigint,\n" +
+      "  row_number bigint primary key,\n" +
+      "  client_id varchar(300),\n" +
+      "  client bigint,\n" +
+      "  money float default 0,\n" +
+      "  number varchar(300),\n" +
+      "  registered_at timestamp,\n" +
+      "  status int not null default 0," +
+      "  error varchar(300)" +
+      ");");
+    //language=PostgreSQL
+    exec("create table TMP_TRANSACTION (\n" +
+      "  row_number bigint primary key,\n" +
+      "  id bigint,\n" +
+      "  account bigint,\n" +
+      "  account_number varchar(300),\n" +
+      "  money float not null default 0,\n" +
+      "  finished_at timestamp,\n" +
+      "  transaction_type_id bigint,\n" +
+      "  transaction_type varchar(300),\n" +
+      "  status int not null default 0," +
+      "  error varchar(300)" +
+      ");");
+    exec("create table TMP_TYPE (\n" +
+      "  row_number bigint primary key,\n" +
+      "  id bigint,\n" +
+      "  code varchar(300),\n" +
+      "  name varchar(300) unique,\n" +
+      "  status int not null default 0,\n" +
+      "  error varchar(300)\n" +
+      ");\n");
+
+    exec("create index if not exists" +
+      " tmpAccountNumberIndex on TMP_ACCOUNT(id)");
+  }
+}

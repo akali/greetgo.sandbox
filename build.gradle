@@ -8,6 +8,7 @@ allprojects {
     apply plugin: 'eclipse'
     apply plugin: 'maven'
     apply plugin: 'idea'
+    apply plugin: 'project-report'
 
     version = '0.0.1'
 
@@ -55,6 +56,9 @@ subprojects {
 
         compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.9'
         compile group: 'com.itextpdf', name: 'itextpdf', version: '5.0.6'
+        compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.1.1'
+        compile group: 'org.apache.commons', name: 'commons-compress', version: '1.17'
+        compile group: 'com.jcraft', name: 'jsch', version: '0.1.44-1'
 
         //compile 'com.google.code.findbugs:annotations:2.0.1'
     }

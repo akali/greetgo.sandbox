@@ -1,7 +1,7 @@
 package kz.greetgo.sandbox.db.register_impl;
 
 import kz.greetgo.sandbox.controller.model.*;
-import kz.greetgo.sandbox.db.register_impl.NameDatabases.NamesDatabases.NamesLoader;
+import kz.greetgo.sandbox.db.register_impl.NameDatabases.NamesLoader;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,7 +1,10 @@
 package kz.greetgo.sandbox.controller.register;
 
-import kz.greetgo.mvc.interfaces.BinResponse;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.SftpException;
+
+import java.io.IOException;
 
 public interface MigrationRegister {
-  void run(String migrationType, BinResponse binResponse);
+  String run() throws JSchException, SftpException, IOException;
 }

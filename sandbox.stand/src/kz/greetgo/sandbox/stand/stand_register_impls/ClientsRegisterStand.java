@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
@@ -214,8 +216,11 @@ public class ClientsRegisterStand implements ClientsRegister {
 
     ReportClientsRecord reportClientsRecord = null;
 
-    // TODO: пути к ресурсам неверно заданы. Не используй абсолютные пути.
-    String root = "/home/aqali/tmp/" + "Report_" + RND.str(10);
+    // TODO(DONE): пути к ресурсам неверно заданы. Не используй абсолютные пути.
+    String root = "reports/" + "Report_" + RND.str(10);
+
+    if (!Files.exists(Paths.get(root)))
+      Files.createDirectories(Paths.get(root));
 
     switch (reportType) {
       case XLSX:
